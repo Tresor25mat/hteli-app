@@ -1,0 +1,5 @@
+RewriteEngine On
+
+RewriteRule ^accueil$ index.php
+RewriteRule ^connexion$ login.php
+RewriteRule ^inscription$ inscription.php
