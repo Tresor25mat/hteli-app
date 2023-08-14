@@ -6,7 +6,7 @@
     $ID = Securite::bdd($_GET['ID']);
     $IMG= Securite::bdd($_GET['IMG']);
     $IMG='images/Profil/'.$IMG;
-    if($token==$_SESSION['user_slj_wings']['token']){
+    if($token==$_SESSION['user_eteelo_app']['token']){
         $rs=$pdo->prepare("DELETE FROM utilisateur WHERE `ID_Utilisateur`=?");
         $params=array($ID);
         $rs->execute($params);

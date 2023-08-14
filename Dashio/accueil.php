@@ -1,5 +1,15 @@
+<?php
+    session_start();
+    $_SESSION['last_activity'] = time();
+    if(empty($_SESSION['logged_eteelo_app']) || $_SESSION['logged_eteelo_app']==false){
+        header("location: ../connexion");
+    }
+    require_once('../connexion.php');
+    $app_info=$pdo->query("SELECT * FROM app_infos");
+    $app_infos=$app_info->fetch();
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr-FR">
 
 <head>
   <meta charset="utf-8">
@@ -7,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="Dashboard">
   <meta name="keyword" content="Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
-  <title>Dashio - Bootstrap Admin Template</title>
+  <title>Accueil | <?php echo $app_infos['Design_App']; ?></title>
 
   <!-- Favicons -->
   <link href="img/favicon.png" rel="icon">
@@ -44,9 +54,9 @@
         <div class="row">
           <div class="col-lg-12 main-chart">
             <!--CUSTOM CHART START -->
-            <h3 style="margin-top: -40px"><strong>BISCAN AVT</strong></h3>
+            <h3 style="margin-top: -40px"><strong><?php echo $app_infos['Design_App']; ?></strong></h3>
             <div class="border-head">
-              <h3>Logiciel de gestion de stocks</h3>
+              <h3>Logiciel de gestion scolaire</h3>
             </div>
             <div class="custom-bar-chart">
               <ul class="y-axis">
