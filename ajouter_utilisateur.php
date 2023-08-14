@@ -250,7 +250,7 @@
                                                         <?php } ?>
                                                       </select>
                                                             <div class="input-group-btn">
-                                                              <button type="button" class="btn btn-primary" id="ajouter_module" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-plus"></i></button>
+                                                              <button type="button" class="btn btn-primary" id="ajouter_module" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-arrow-right"></i></button>
                                                             </div>
                                                         </div> 
                                           </div>
@@ -437,46 +437,28 @@
         }
     });
 
-    function delete_module(a, b){
+    function delete_module(mod){
+            let newModules = []
+            modules.forEach(m => {
+                if(m != mod){
+                    newModules.push(m)
+                    return
+                }
+            })
+            modules = newModules
+            alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Modules :' + modules.length);
             $.ajax({
-                    url:'suppr_langue.php',
-                    type:'post',
-                    dataType:'text',
-                    data:{Langue:a, ID_Utilisateur:b},
-                    success:function(ret){
-                        // alertify.alert('<?php echo $app_infos['Design_App']; ?>', ret);
-                        if(ret==2){
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>','This Language already exists!', function(){$('#langue').focus();});
-                        }else{
-                            $('#mydiv').html(ret);
-                            $('#langue').val('').focus();
-                        }
-                    }
-            });
+                      url:'ajout_module.php',
+                      type:'post',
+                      dataType:'text',
+                      data:{Modules:modules},
+                      success:function(ret){
+                          $('#mydiv').html(ret);
+                          $('#module').val('');
+                      }
+              });
     }
 
-
-    $('#btn_next').click(function(){
-        if($('#prenom').val()=='' || $('#password').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()==''){
-          alertify.alert('<?php echo $app_infos['Design_App']; ?>','Please fill in all required fields!', function(){$('#prenom').focus();});
-        }else{
-            $.ajax({
-                    url:'verification_login.php',
-                    type:'post',
-                    dataType:'text',
-                    data:{Email:$('#mail').val()},
-                    success:function(ret){
-                        if(ret==2){
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>','This email address already exists!', function(){$('#login').focus();});
-                        }else{
-                            $('#a1').attr('href','#tabs-profile-12');
-                            $('.l1').removeClass('disabled').addClass('Active');
-                            $('#a1').tab('show');
-                        }
-                    }
-            });
-        }
-    })
           $('#profil').change(function(){
             $('#tel').focus();
             if($('#mimg').val()==''){
@@ -540,6 +522,19 @@
         $('#UtilisateurForm').submit(function(e){
             e.preventDefault();
             var formData = new FormData(this);
+
+            if($('#prenom').val()=='' || $('#password').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()=='' || $('#statut').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#prenom').focus();});
+            }else if(modules.length==0 || $('#ecole').val()==''){
+              alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir l\'école et les modules svp!', function(){$('#ecole').focus();});
+            }else{
+              
+            }
+
+
+
+
+
             $.ajax({
                     url:'enreg_utilisateur.php',
                     type:'post',
@@ -600,21 +595,30 @@
         window.location.replace('table_utilisateur.php');
     })
     $('#btn_annuler_tout').click(function(){
-        // $('#a1').attr('href','#');
-        // $('.l1').addClass('disabled');
-        $('#a0').tab('show');
         $('#prenom').val('');
         $('#nom').val('');
         $('#profil').val('');
-        $('#pays').val('');
         $('#mimg').val('');
         $('#tel').val('');
         $('#login').val('');
         $('#mail').val('');
         $('#password').val('');
         $('#statut').val('');
+        $('#ecole').val('');
         $('#miamge').attr('src','images/photo.jpg');
+        modules = [];
+        $.ajax({
+                      url:'ajout_module.php',
+                      type:'post',
+                      dataType:'text',
+                      data:{Modules:modules},
+                      success:function(ret){
+                          $('#mydiv').html(ret);
+                          $('#module').val('');
+                      }
+              });
         $('#prenom').focus();
+        $('#privileges').slideUp('slow');
     })
     </script>
 </body>
