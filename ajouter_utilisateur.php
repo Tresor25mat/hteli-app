@@ -7,11 +7,16 @@
     require_once('connexion.php');
     $profil=$pdo->query("SELECT * FROM profil ORDER BY ID_Profil");
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
-    $statut=$pdo->query("SELECT * FROM statut_user ORDER BY ID_Statut");
+    if($_SESSION['user_eteelo_app']['ID_Statut']==1){
+      $statut=$pdo->query("SELECT * FROM statut_user ORDER BY ID_Statut");
+    }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
+      $statut=$pdo->query("SELECT * FROM statut_user WHERE ID_Statut!=1 AND ID_Statut!=2 ORDER BY ID_Statut");
+    }else{
+      $statut=$pdo->query("SELECT * FROM statut_user WHERE ID_Statut!=1 ORDER BY ID_Statut");
+    }
     $module=$pdo->query("SELECT * FROM module ORDER BY Design_Module");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
-    $Nbr=0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -222,19 +227,20 @@
                                     </div>
                                     </div>
 
-                                    <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE; display: none" id="privileges">
+                                    <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE; <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1){ echo 'display: none';} ?>" id="privileges">
                                     <div class="col-md-10" style="margin-bottom: 10px">
                                     <div class="row">
                                       <div class="col-md-4" style="margin-bottom: 10px">
                                         <div class="form-group ">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">
-                                            <select name="ecole" id="ecole" class="form-control ">
+                                            <select name="ecole" id="ecole" class="form-control " <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                                               <option value="">--</option>
                                               <?php while($ecoles=$ecole->fetch()){ ?>
-                                              <option value="<?php echo($ecoles['ID_Etablissement'])?>"><?php echo strtoupper($ecoles['Design_Etablissement']); ?></option>
+                                              <option value="<?php echo($ecoles['ID_Etablissement'])?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo strtoupper($ecoles['Design_Etablissement']); ?></option>
                                               <?php } ?>
                                             </select>
+                                            <input id="ID_Etablissement" type="hidden" name="ID_Etablissement" value="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo $_SESSION['user_eteelo_app']['ID_Etablissement'];} ?>">
                                           </div>
                                         </div>
                                       </div>
@@ -248,11 +254,12 @@
                                                         <?php while($modules=$module->fetch()){ ?>
                                                         <option value="<?php echo($modules['Id_Module'])?>"><?php echo strtoupper($modules['Design_Module']); ?></option>
                                                         <?php } ?>
-                                                      </select>
+                                                        </select>
                                                             <div class="input-group-btn">
                                                               <button type="button" class="btn btn-primary" id="ajouter_module" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-arrow-right"></i></button>
                                                             </div>
-                                                        </div> 
+                                                        </div>
+                                                        <input type="hidden" name="modules" id="modules">
                                           </div>
                                         </div>
                                       </div>
@@ -412,6 +419,7 @@
           alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner une école svp!', function(){$('#ecole').focus();});
         }else{
           $('#module').val('').focus();
+          $('#ID_Etablissement').val($('#ecole').val());
         }
     })
 
@@ -428,6 +436,7 @@
                       data:{Modules:modules},
                       success:function(ret){
                           $('#mydiv').html(ret);
+                          $('#modules').val(modules);
                           $('#module').val('').focus();
                       }
               });
@@ -446,7 +455,7 @@
                 }
             })
             modules = newModules
-            alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Modules :' + modules.length);
+            // alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Modules :' + modules.length);
             $.ajax({
                       url:'ajout_module.php',
                       type:'post',
@@ -454,11 +463,16 @@
                       data:{Modules:modules},
                       success:function(ret){
                           $('#mydiv').html(ret);
+                          $('#modules').val(modules);
                           $('#module').val('');
                       }
               });
     }
-
+    $('#module').change(function(){
+        if($('#module').val()!=''){
+            $('#ajouter_module').focus();
+        }
+    })
           $('#profil').change(function(){
             $('#tel').focus();
             if($('#mimg').val()==''){
@@ -507,7 +521,7 @@
                         var str = $('#prenom').val()+'.'+$('#nom').val()+ret;
                         var res = str.toLowerCase().replace(/ /g, "");
                         $('#login').val(res);
-                        // $('#password').val('1234');
+                        $('#password').val('1234');
                     }
                 });
           })
@@ -525,17 +539,10 @@
 
             if($('#prenom').val()=='' || $('#password').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()=='' || $('#statut').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#prenom').focus();});
-            }else if(modules.length==0 || $('#ecole').val()==''){
-              alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir l\'école et les modules svp!', function(){$('#ecole').focus();});
+            }else if($('#statut').val()!=1 && (modules.length==0 || $('#ecole').val()=='')){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir l\'école et les modules svp!', function(){$('#ecole').focus();});
             }else{
-              
-            }
-
-
-
-
-
-            $.ajax({
+                $.ajax({
                     url:'enreg_utilisateur.php',
                     type:'post',
                     beforeSend:function(){
@@ -555,7 +562,7 @@
                          }else if(ret==1){
                              Toast.fire({
                                 icon: 'success',
-                                title: 'Saved'
+                                title: 'Enregistré'
                              })
                              window.location.replace('table_utilisateur.php');
                          }else{
@@ -564,6 +571,7 @@
 
                     }
                 });
+            }
           })
   })
 

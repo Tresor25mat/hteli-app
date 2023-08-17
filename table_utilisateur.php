@@ -5,7 +5,13 @@
         header("location: connection");
     }
     require_once('connexion.php');
-    $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1");
+    if($_SESSION['user_eteelo_app']['ID_Statut']==1){
+      $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1");
+    }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
+      $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Statut!=1 AND ID_Statut!=2 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+    }else{
+      $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+    }
     $userTotal=$req_user->rowCount();
     $userparpage=10;
     $pagesTotales=ceil($userTotal/$userparpage);
@@ -16,7 +22,13 @@
         $pageCourante=1;
     }
     $depart=($pageCourante-1)*$userparpage;
-    $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 LIMIT ".$depart.",".$userparpage);
+    if($_SESSION['user_eteelo_app']['ID_Statut']==1){
+      $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 LIMIT ".$depart.",".$userparpage);
+    }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
+      $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Statut!=1 AND ID_Statut!=2 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." LIMIT ".$depart.",".$userparpage);
+    }else{
+      $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." LIMIT ".$depart.",".$userparpage);
+    }
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -64,7 +76,7 @@
             border: 1px #D64939;
       }
         .alertify .ajs-dialog {
-            top: 40%;
+            top: 20%;
             transform: translateY(-50%);
             margin: auto;
         }
@@ -91,9 +103,9 @@
                                         ?>
                                             Affiche de <?php echo $depart+1; ?> à <?php echo $depart+$userparpage; ?> sur <?php echo $userTotal; ?> enregistrements
                                             <?php }else{ ?>
-                                                Affiche de <?php echo $depart+1; ?> à <?php echo $userTotal; ?> of <?php echo $userTotal; ?> enregistrements
+                                                Affiche de <?php echo $depart+1; ?> à <?php echo $userTotal; ?> sur <?php echo $userTotal; ?> enregistrements
                                     <?php }}else{ ?>
-                                        Affiche de <?php echo $depart+1; ?> à <?php echo $userTotal; ?> of <?php echo $userTotal; ?> enregistrements
+                                        Affiche de <?php echo $depart+1; ?> à <?php echo $userTotal; ?> sur <?php echo $userTotal; ?> enregistrements
                                     <?php }}else{ ?>
                                         Affiche de 0 à 0 sur 0 enregistrements
                                     <?php } ?>
@@ -131,15 +143,18 @@
                     <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(<?php if($utilisateurs['Photo']==''){if($utilisateurs['ID_Profil']==1){echo('images/photo_femme.jpg');}else{echo('images/photo.jpg');}}else{ echo('images/profil/'.$utilisateurs['Photo']);} ?>); border: 1px solid #DEE2E6;"><?php if($utilisateurs['Etat']==1){echo("<img src='images/connecte.gif' style='width: 12px; height: 12px; margin-top: 85px; margin-left: 78px'>");} ?></span>
                     </a>
                     <h3 class="m-0 mb-1"><?php echo $utilisateurs['Prenom'].' '.$utilisateurs['Nom']; ?><!-- <a href="#">Paweł Kuna</a> --></h3>
-                    <h5 class="m-0 mb-1"><?php echo $utilisateurs['Email']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
-                    <h5 class="m-0 mb-1"><?php echo $utilisateurs['Tel']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
+                    <!-- <h5 class="m-0 mb-1"><?php echo $utilisateurs['Email']; ?><a href="#">Paweł Kuna</a></h5> -->
+                    <h5 class="m-0 mb-1"><?php echo $utilisateurs['Login']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
+                    <?php if($utilisateurs['Tel']!=''){ ?>
+                    <h5 class="m-0 mb-1"><?php echo '243'.$utilisateurs['Tel']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
+                    <?php } ?>
                     <div class="text-muted"><?php echo $utilisateurs['Statut']; ?></div>
                     <div class="mt-3">
                       <span class="badge bg-purple-lt"><?php echo stripslashes($ecoles['Design_Etablissement']); ?></span>
                     </div>
                   </div>
                   <div class="d-flex">
-<?php if($utilisateurs['ID_Utilisateur']!=1 && $utilisateurs['ID_Utilisateur']!=$_SESSION['user_eteelo_app']['ID_Utilisateur']){ ?><a href="modifier_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>" title="Modifier" style="width: 30px; border-radius: 0;" class="btn btn-primary card-btn"><i class="fa fa-edit fa-fw" style="color: white"></i></a><?php if ($utilisateurs['Active']==1){ echo '<a class="btn btn-secondary card-btn" href="desactiver_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Désactiver" style="width:30px; border-radius: 0;"><i class="fa fa-ban fa-fw" style="margin-left: -7px; color: white"></i></a>';}else{ echo '<a class="btn btn-info card-btn" style="width:30px; border-radius: 0;" href="activer_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Activer"><i class="fa fa-check fa-fw" style="color: white"></i></a>';} ?><?php if($utilisateurs['Etat']!=1){ ?><a style="width: 30px; border-radius: 0;" class="btn btn-danger card-btn" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet utilisateur?\n Toutes les informations concernant cet utilisateur seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&IMG=<?php echo($utilisateurs['Photo']) ?>');alertify.success('Spprimé');}).set('oncancel',function(closeEvent){alertify.error('Annulé');}).set({title:'<?php echo $app_infos['Design_App']; ?>'},{labels:{ok:'Oui', cancel:'Non'}});" title="Supprimer"><i class="fa fa-trash" style="color: white"></i></a><?php }} ?>
+<?php if($utilisateurs['ID_Utilisateur']!=1 && $utilisateurs['ID_Utilisateur']!=$_SESSION['user_eteelo_app']['ID_Utilisateur']){ ?><a href="modifier_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>" title="Modifier" style="width: 30px; border-radius: 0;" class="btn btn-primary card-btn"><i class="fa fa-edit fa-fw" style="color: white"></i></a><?php if ($utilisateurs['Active']==1){ echo '<a class="btn btn-secondary card-btn" href="desactiver_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Désactiver" style="width:30px; border-radius: 0;"><i class="fa fa-ban fa-fw" style="margin-left: -7px; color: white"></i></a>';}else{ echo '<a class="btn btn-info card-btn" style="width:30px; border-radius: 0;" href="activer_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Activer"><i class="fa fa-check fa-fw" style="color: white"></i></a>';} ?><?php if($utilisateurs['Etat']!=1 && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a style="width: 30px; border-radius: 0;" class="btn btn-danger card-btn" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet utilisateur?\n Toutes les informations concernant cet utilisateur seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&IMG=<?php echo($utilisateurs['Photo']) ?>');alertify.success('Spprimé');}).set('oncancel',function(closeEvent){alertify.error('Annulé');}).set({title:'<?php echo $app_infos['Design_App']; ?>'},{labels:{ok:'Oui', cancel:'Non'}});" title="Supprimer"><i class="fa fa-trash" style="color: white"></i></a><?php }} ?>
 
 
 

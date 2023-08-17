@@ -3,6 +3,7 @@
     require_once('connexion.php');
     if(isset($_POST['Modules'])){
         $Modules = $_POST['Modules'];
+        // echo var_dump($Modules);
         $list="";
         foreach($Modules as $module) {
             $tab_module=$pdo->query("select * from module where Id_Module=".$module);

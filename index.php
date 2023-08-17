@@ -247,7 +247,7 @@
                     </div>
                   </div>
                 </li>
-                <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='User_IT'){ ?>
+                <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT'){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/layout-2 -->
@@ -263,6 +263,17 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
+                      <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
+                        <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
+                          Ecoles
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="table_option.php">
+                          Options
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_section.php">
+                          Sections
+                        </a>
+                        <?php } ?>
                        <a class="dropdown-item gonow" href="#" ver="table_utilisateur.php">
                           Utilisateurs
                         </a>

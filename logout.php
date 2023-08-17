@@ -1,15 +1,15 @@
 <?php
-/*// On démarre la session
+/*// On dï¿½marre la session
 session_start ();
-// On détruit les variables de notre session
+// On dï¿½truit les variables de notre session
 session_unset ();
-// On détruit notre session
+// On dï¿½truit notre session
 session_destroy ();
 // On redirige le visiteur vers la page d'accueil
 */
 session_start();
 require_once('connexion.php');
-$rec=$pdo->query("UPDATE utilisateur SET Etat=0 WHERE ID_Utilisateur=".$_SESSION['user_slj_wings']['ID_Utilisateur']);
+$rec=$pdo->query("UPDATE utilisateur SET Etat=0 WHERE ID_Utilisateur=".$_SESSION['user_eteelo_app']['ID_Utilisateur']);
 unset($_SESSION);
 unset($_COOKIE);
 session_destroy();

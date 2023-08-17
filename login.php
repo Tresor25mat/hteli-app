@@ -239,19 +239,16 @@
                 dataType:'text', 
                 data:{login:$('#login').val(), password:$('#password').val()},
                 success:function(ret){
+                    waitingDialog.hide();
                     if (ret==1){
                         window.location.replace("accueil?theme=light");
                     }else if (ret==2){
-                        waitingDialog.hide();
                         alertify.alert("<?php echo $app_infos['Design_App']; ?>","Authentification incorrecte, assurez-vous que vos identifiants sont corrects ou veuillez contacter l'Administrateur.", function(){$('#login').focus(); $('#login').select();});                 
                     }else if (ret==3){
-                        waitingDialog.hide();
                         alertify.alert("<?php echo $app_infos['Design_App']; ?>","Ce compte utilisateur est désactivé, veuillez contacter l'Administrateur.", function(){$('#login').select(); $('#login').focus();});                   
                     }else if (ret==4){
-                        waitingDialog.hide();
-                        alertify.alert("<?php echo $app_infos['Design_App']; ?>","Cet utilisateur n'est pas autorisé", function(){$('#login').focus(); $('#login').select();});                                
+                        alertify.alert("<?php echo $app_infos['Design_App']; ?>","L'école de cet utilisateur est désactivé, veuillez contacter l'Administrateur.", function(){$('#login').focus(); $('#login').select();});                                
                     }else{
-                        waitingDialog.hide();
                         alertify.alert("<?php echo $app_infos['Design_App']; ?>",ret);                  
                     }
                 }
