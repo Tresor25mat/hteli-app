@@ -7,6 +7,7 @@
     require_once('connexion.php');
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    $liste_devise=$pdo->query("SELECT * FROM taux_change ORDER BY ID_Taux");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
@@ -17,7 +18,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Sections | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Devises | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -62,7 +63,7 @@
                   
                 </div>
                 <h2 class="page-title">
-                  Sections
+                  Devises
                 </h2>
               </div>
               <!-- Page title actions -->
@@ -90,16 +91,14 @@
                     </div>
                     <div class="col-12 col-md-auto ms-auto d-print-none" style="margin-top: 18px">
                         <div class="btn-list">
-                        <a href="#" id="ajouter_section" class="btn btn-primary d-sm-inline-block" title="Ajouter une section">
+                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter une devise">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            Ajouter une section
+                            Ajouter une devise
                         </a>
                         </div>
                     </div>
                   </div>
-
-
               </div>
             </div>
           </div>
@@ -109,11 +108,11 @@
         </div>
       </div>
     </div>
-    <div id="ModalAjoutSection" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+    <div id="ModalAjout" class="modal fade" data-backdrop="static" style="margin-top: 100px">
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nouvelle section</h4>
+                    <h4 class="modal-title">Nouvelle devise</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
@@ -126,13 +125,24 @@
                         <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
-                    <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Devise *</div>
+                    <select name="liste_devise" class="form-control" id="liste_devise">
+                        <option value="">--</option>
+                        <?php while($liste_devises=$liste_devise->fetch()){ ?>
+                        <option value="<?php echo($liste_devises['ID_Taux']) ?>"><?php echo(stripslashes($liste_devises['Devise'])) ?></option>
+                        <?php } ?>
+                    </select>
+                    <div class="col-lg-12">Taux *</div>
+                    <div class="input-group col-lg-12">
+                        <span class="input-group-text" style="margin-top: 3px; font-weight: bold;" id="afficher_taux">
+                        </span>
+                        <input type="number" class="form-control" min="0" autocomplete="off" step="any" name="taux_devise" id="taux_devise" style="margin-top: 1%">
+                    </div>
                     </form>
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="enregsection">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogueSection()">Annuler</button>
+                <button type="button" class="btn btn-primary" id="enregistrer">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogue()">Annuler</button>
             </div>
             </div>
         </div>
@@ -154,7 +164,18 @@
 
     <script>
     $(document).ready(function() {
-        $('#iframe').attr('src', "table_section.php?Ecole="+$('#ecole').val());
+        if($('#liste_ecole').val()!=''){
+            $.ajax({
+                url:'recherche_devise.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#afficher_taux').html(ret);
+                }
+            });
+        }
+        $('#iframe').attr('src', "table_devise.php?Ecole="+$('#ecole').val());
     });
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
@@ -163,14 +184,28 @@
     })
     $('#liste_ecole').change(function(){
         if($('#liste_ecole').val()!=''){
-            $('#Design_Etablissement').focus();
+            $.ajax({
+                url:'recherche_devise.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#afficher_taux').html(ret);
+                }
+            });
+            $('#liste_devise').focus();
+        }
+    })
+    $('#liste_devise').change(function(){
+        if($('#liste_devise').val()!=''){
+            $('#taux_devise').focus();
         }
     })
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_section.php?Ecole="+$('#ecole').val());
+        $('#iframe').attr('src', "table_devise.php?Ecole="+$('#ecole').val());
     })
-    function fermerDialogueSection(){
-        $("#ModalAjoutSection").modal('hide');
+    function fermerDialogue(){
+        $("#ModalAjout").modal('hide');
     }
   $(function() {
     const Toast = Swal.mixin({
@@ -180,24 +215,25 @@
       timer: 5000
     });
 
-    $('#ajouter_section').click(function(e){
+    $('#btn_ajouter').click(function(e){
       e.preventDefault();
-      $("#ModalAjoutSection").modal('show');
-      $('#Design_Etablissement').val('');
-      $('#Design_Etablissement').focus();
+      $("#ModalAjout").modal('show');
+      $('#liste_devise').val('');
+      $('#taux_devise').val('');
+      $('#liste_devise').focus();
     })
-    $('#enregsection').click(function(){
-        if($('#Design_Etablissement').val()=='' || $('#liste_ecole').val()==''){
+    $('#enregistrer').click(function(){
+        if($('#liste_devise').val()=='' || $('#liste_ecole').val()=='' || $('#taux_devise').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement').focus();
+                $('#liste_devise').focus();
         }else{
                 $.ajax({
-                        url:'enreg_section.php',
+                        url:'enreg_devise.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), Ecole:$('#liste_ecole').val(), token:$('#tok').val()},
+                        data: {Devise:$('#liste_devise').val(), Ecole:$('#liste_ecole').val(), Montant:$('#taux_devise').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -205,10 +241,10 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                $('#iframe').attr('src', "table_section.php?Ecole="+$('#ecole').val());
-                                fermerDialogueSection();
+                                $('#iframe').attr('src', "table_devise.php?Ecole="+$('#ecole').val());
+                                fermerDialogue();
                             }else if(ret==2){
-                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette devise existe déjà'); 
                             }else{
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>',ret); 
                             }

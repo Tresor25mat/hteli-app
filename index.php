@@ -241,7 +241,16 @@
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
                         <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
-                          Billets
+                          Comptabilité
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
+                          Cotes
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
+                          Elèves
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
+                          Paiements
                         </a>
                       </div>
                     </div>
@@ -263,17 +272,43 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-                      <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
+                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
+                        <a class="dropdown-item gonow" href="#" ver="table_annee.php">
+                          Année scolaire
+                        </a>
+                        <?php } ?>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_classe.php">
+                          Catégories frais
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_cat_eleve.php">
+                          Catégories élèves
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_classe.php">
+                          Classes
+                        </a>
+                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
                         <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
                           Ecoles
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="table_option.php">
+                        <?php } ?>
+                        <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
+                          Frais
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_devise.php">
+                          Devises
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_discipline.php">
+                          Disciplines
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_option.php">
                           Options
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_option.php">
+                          Plan comptable
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_section.php">
                           Sections
                         </a>
-                        <?php } ?>
                        <a class="dropdown-item gonow" href="#" ver="table_utilisateur.php">
                           Utilisateurs
                         </a>

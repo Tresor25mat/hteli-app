@@ -5,7 +5,7 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT * FROM etablissement ORDER BY Design_Etablissement";
+    $query="SELECT * FROM annee ORDER BY ID_Annee";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
     $totalparpage=10;
@@ -18,7 +18,7 @@
     }
     $depart=($pageCourante-1)*$totalparpage;
     $query.=" LIMIT ".$depart.",".$totalparpage;
-    $ecole=$pdo->query($query);
+    $annee=$pdo->query($query);
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
@@ -29,7 +29,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>ecoles | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Année scolaire | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -73,22 +73,22 @@
                   
                 </div>
                 <h2 class="page-title">
-                  Ecoles
+                    Année scolaire
                 </h2>
               </div>
               <!-- Page title actions -->
               <div class="col-12 col-md-auto ms-auto d-print-none">
-                <input type="hidden" name="ID_Etablissement" id="ID_Etablissement">
+                <input type="hidden" name="ID_Annee" id="ID_Annee">
                 <div class="btn-list">
 <!--                   <span class="d-none d-sm-inline">
                     <a href="#" class="btn btn-white">
                       New view
                     </a>
                   </span> -->
-                  <a href="#" id="ajouter_ecole" class="btn btn-primary d-sm-inline-block" title="Ajouter une école">
+                  <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter une année">
                     <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                    Ajouter une école
+                    Ajouter une année
                   </a>
 <!--                   <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
                     Download SVG icon from http://tabler-icons.io/i/plus
@@ -126,20 +126,20 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Désignation</th>
+                                        <th>Année</th>
                                         <th>Active</th>
                                         <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($ecoles=$ecole->fetch()){$Nbr++; ?>
+    <?php while($annees=$annee->fetch()){$Nbr++; ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
-            <td><!-- <center> --><?php echo strtoupper(stripslashes($ecoles['Design_Etablissement'])); ?></td>
-            <td><center><?php if ($ecoles['Active']==1){echo '<a class="btn btn-danger" style="width:25px; margin-right: 5px; border-radius: 0;" href="desactiver_ecole.php?ID='.$ecoles['ID_Etablissement'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Désactiver" style="margin-right: 5px"><i class="fa fa-ban fa-fw"></i></a>';}else{ echo '<a class="btn btn-success" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_ecole.php?ID='.$ecoles['ID_Etablissement'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Activer" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($annees['Libelle_Annee'])); ?></td>
+            <td><center><?php if ($annees['Encours']==1){echo 'Année en cours';}else{ echo '<a class="btn btn-success" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_annee.php?ID='.$annees['ID_Annee'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Définir comme année en cours" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
             <td><center>
-                <a href="#" onclick="Function_Modifier(<?php echo($ecoles['ID_Etablissement']); ?>, '<?php echo (stripslashes($ecoles['Design_Etablissement'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette école?\n Toutes les informations concernant cette école seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_ecole.php?ID=<?php echo($ecoles['ID_Etablissement']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
+                <a href="#" onclick="Function_Modifier(<?php echo($annees['ID_Annee']); ?>, '<?php echo (stripslashes($annees['Libelle_Annee'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette année?\n Toutes les informations concernant cette année seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_annee.php?ID=<?php echo($annees['ID_Annee']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
             </td>
         </tr>
     <?php } ?>
@@ -150,7 +150,7 @@
                                 <?php 
                                 if($pageCourante>1){
                                     $page=$pageCourante-1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_ecole.php?page='.$page.'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_annee.php?page='.$page.'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }
@@ -161,28 +161,28 @@
                                     $pageAvantPrecedente=$pageCourante-2;
                                     $pagesAvantTotales=$pagesTotales-1;
                                     if($pageCourante==1){
-                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pageNexte.'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pageTrois.'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pageNexte.'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pageTrois.'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==2){
-                                        echo '<li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pageNexte.'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="table_annee.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pageNexte.'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==$pagesAvantTotales){
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pageNexte.'">'.$pageNexte.'</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pageNexte.'">'.$pageNexte.'</a></li>';
                                     }else if($pageCourante==$pagesTotales){
-                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pageAvantPrecedente.'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pageAvantPrecedente.'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
                                     }else{
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_ecole.php?page='.$pageNexte.'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pagePrecedente.'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_annee.php?page='.$pageNexte.'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
                                     }
                                 }else{
                                     for ($i=1; $i <= $pagesTotales ; $i++) { 
                                         if ($i==$pageCourante) {
                                             echo '<li class="page-item active"><a class="page-link" href="#">'.$i.'</a></li>';
                                         }else{
-                                            echo '<li class="page-item"><a class="page-link" href="table_ecole.php?page='.$i.'">'.$i.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="table_annee.php?page='.$i.'">'.$i.'</a></li>';
                                         }
                                     } 
                                 }
                                 if($pagesTotales>$pageCourante){
                                     $page=$pageCourante+1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_ecole.php?page='.$page.'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_annee.php?page='.$page.'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }
@@ -196,44 +196,44 @@
         </div>
       </div>
     </div>
-    <div id="ModalAjoutEcole" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+    <div id="ModalAjout" class="modal fade" data-backdrop="static" style="margin-top: 100px">
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nouvelle école</h4>
+                    <h4 class="modal-title">Nouvelle année</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Année *</div>
+                    <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
                     </form>
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="enregecole">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogueEcole()">Annuler</button>
+                <button type="button" class="btn btn-primary" id="enregistrer">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogue()">Annuler</button>
             </div>
             </div>
         </div>
     </div>
-    <div id="ModalModifEcole" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+    <div id="ModalModif" class="modal fade" data-backdrop="static" style="margin-top: 100px">
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Modification école</h4>
+                    <h4 class="modal-title">Modification année</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueModEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement_mod" id="Design_Etablissement_mod" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Année *</div>
+                    <div class="col-lg-12"><input type="text" name="Design_mod" id="Design_mod" class="form-control" style="margin-top: 1%;" value="" required></div>
                     </form>
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="enregecole_mod">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogueModEcole()">Annuler</button>
+                <button type="button" class="btn btn-primary" id="enregistrermod">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogueMod()">Annuler</button>
             </div>
             </div>
         </div>
@@ -260,17 +260,17 @@
             //     responsive: true
             // });
         });
-  function fermerDialogueEcole(){
-        $("#ModalAjoutEcole").modal('hide');
+  function fermerDialogue(){
+        $("#ModalAjout").modal('hide');
   }
-  function fermerDialogueModEcole(){
-        $("#ModalModifEcole").modal('hide');
+  function fermerDialogueMod(){
+        $("#ModalModif").modal('hide');
   }
   function Function_Modifier(a, b){
-      $("#ModalModifEcole").modal('show');
-      $('#ID_Etablissement').val(a);
-      $('#Design_Etablissement_mod').val(b);
-      $('#Design_Etablissement_mod').focus();
+      $("#ModalModif").modal('show');
+      $('#ID_Annee').val(a);
+      $('#Design_mod').val(b);
+      $('#Design_mod').focus();
   }
   $(function() {
     const Toast = Swal.mixin({
@@ -280,26 +280,26 @@
       timer: 5000
     });
 
-    $('#ajouter_ecole').click(function(e){
+    $('#btn_ajouter').click(function(e){
       e.preventDefault();
-      $("#ModalAjoutEcole").modal('show');
-      $('#Design_Etablissement').val('');
-      $('#Design_Etablissement').focus();
+      $("#ModalAjout").modal('show');
+      $('#Design').val('');
+      $('#Design').focus();
     })
 
 
-    $('#enregecole').click(function(){
-        if($('#Design_Etablissement').val()==''){
+    $('#enregistrer').click(function(){
+        if($('#Design').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement').focus();
+                $('#Design').focus();
         }else{
                 $.ajax({
-                        url:'Enreg_Ecole.php',
+                        url:'enreg_annee.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), token:$('#tok').val()},
+                        data: {Design:$('#Design').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -307,9 +307,9 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                window.location.replace('table_ecole.php');
+                                window.location.replace('table_annee.php');
                             }else if(ret==2){
-                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette année existe déjà'); 
                             }else{
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>',ret); 
                             }
@@ -317,18 +317,18 @@
                     });
         }
     });
-    $('#enregecole_mod').click(function(){
-        if($('#Design_Etablissement_mod').val()==''){
+    $('#enregistrermod').click(function(){
+        if($('#Design_mod').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement_mod').focus();
+                $('#Design_mod').focus();
         }else{
                 $.ajax({
-                        url:'Edit_Ecole.php',
+                        url:'edit_annee.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement_mod').val(), token:$('#tok').val(), ID:$('#ID_Etablissement').val()},
+                        data: {Design:$('#Design_mod').val(), token:$('#tok').val(), ID:$('#ID_Annee').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -336,7 +336,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_ecole.php');
+                                window.location.replace('table_annee.php');
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{

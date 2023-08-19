@@ -7,6 +7,9 @@
     require_once('connexion.php');
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    if($_SESSION['user_eteelo_app']['ID_Statut']!=1){
+        $liste_section=$pdo->query("SELECT * FROM section WHERE ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." ORDER BY Design_Section");
+    }
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
@@ -17,7 +20,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Sections | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Options | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -62,7 +65,7 @@
                   
                 </div>
                 <h2 class="page-title">
-                  Sections
+                  Options
                 </h2>
               </div>
               <!-- Page title actions -->
@@ -85,15 +88,29 @@
                         </div>
                       </div>
                     </div>
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Section </label>
+                        <div class="col-lg-12">
+                          <div class="row">
+                            <div class="col-sm-12">
+                                <select name="section" class="form-control" id="section">
+                                    <option value="" id="add_section">--</option>
+                                </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="col-md-3" style='margin-top: 20px; margin-bottom: 20px;'>
                       <button class="btn btn-default" type="button" id="btn_afficher" style="height: 32px; border-radius: 0; margin-top: 2px"><i class="fa fa-search"></i></button>
                     </div>
                     <div class="col-12 col-md-auto ms-auto d-print-none" style="margin-top: 18px">
                         <div class="btn-list">
-                        <a href="#" id="ajouter_section" class="btn btn-primary d-sm-inline-block" title="Ajouter une section">
+                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter une option">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            Ajouter une section
+                            Ajouter une option
                         </a>
                         </div>
                     </div>
@@ -109,11 +126,11 @@
         </div>
       </div>
     </div>
-    <div id="ModalAjoutSection" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+    <div id="ModalAjout" class="modal fade" data-backdrop="static" style="margin-top: 100px">
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nouvelle section</h4>
+                    <h4 class="modal-title">Nouvelle option</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
@@ -126,13 +143,20 @@
                         <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
+                    <div class="col-lg-12">Section *</div>
+                    <select name="liste_section" class="form-control" id="liste_section">
+                        <option value="" id="ajouter_section">--</option>
+                        <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($liste_sections=$liste_section->fetch()){ ?>
+                        <option value="<?php echo($liste_sections['ID_Section']) ?>"><?php echo(stripslashes($liste_sections['Design_Section'])) ?></option>
+                        <?php }} ?>
+                    </select>
                     <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
                     </form>
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="enregsection">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogueSection()">Annuler</button>
+                <button type="button" class="btn btn-primary" id="enregistrer">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogue()">Annuler</button>
             </div>
             </div>
         </div>
@@ -154,23 +178,64 @@
 
     <script>
     $(document).ready(function() {
-        $('#iframe').attr('src', "table_section.php?Ecole="+$('#ecole').val());
+        $.ajax({
+                url:'recherche_section.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_section').nextAll().remove();
+                    $('#add_section').after(ret);
+                    $('#section').focus();
+                }
+            });
+        $('#iframe').attr('src', "table_option.php?Ecole="+$('#ecole').val()+"&Section="+$('#section').val());
     });
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
+            $.ajax({
+                url:'recherche_section.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_section').nextAll().remove();
+                    $('#add_section').after(ret);
+                    $('#section').focus();
+                }
+            });
+        }
+    })
+    $('#section').change(function(){
+        if($('#section').val()!=''){
             $('#btn_afficher').focus();
         }
     })
     $('#liste_ecole').change(function(){
         if($('#liste_ecole').val()!=''){
-            $('#Design_Etablissement').focus();
+            $.ajax({
+                url:'recherche_section.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#ajouter_section').nextAll().remove();
+                    $('#ajouter_section').after(ret);
+                    $('#liste_section').focus();
+                }
+            });
+        }
+    })
+    $('#liste_section').change(function(){
+        if($('#liste_section').val()!=''){
+            $('#Design').focus();
         }
     })
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_section.php?Ecole="+$('#ecole').val());
+        $('#iframe').attr('src', "table_option.php?Ecole="+$('#ecole').val()+"&Section="+$('#section').val());
     })
-    function fermerDialogueSection(){
-        $("#ModalAjoutSection").modal('hide');
+    function fermerDialogue(){
+        $("#ModalAjout").modal('hide');
     }
   $(function() {
     const Toast = Swal.mixin({
@@ -180,24 +245,25 @@
       timer: 5000
     });
 
-    $('#ajouter_section').click(function(e){
+    $('#btn_ajouter').click(function(e){
       e.preventDefault();
-      $("#ModalAjoutSection").modal('show');
-      $('#Design_Etablissement').val('');
-      $('#Design_Etablissement').focus();
+      $("#ModalAjout").modal('show');
+      $('#liste_section').val('');
+      $('#Design').val('');
+      $('#Design').focus();
     })
-    $('#enregsection').click(function(){
-        if($('#Design_Etablissement').val()=='' || $('#liste_ecole').val()==''){
+    $('#enregistrer').click(function(){
+        if($('#Design').val()=='' || $('#liste_ecole').val()=='' || $('#liste_section').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement').focus();
+                $('#Design').focus();
         }else{
                 $.ajax({
-                        url:'enreg_section.php',
+                        url:'enreg_option.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), Ecole:$('#liste_ecole').val(), token:$('#tok').val()},
+                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Section:$('#liste_section').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -205,8 +271,8 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                $('#iframe').attr('src', "table_section.php?Ecole="+$('#ecole').val());
-                                fermerDialogueSection();
+                                $('#iframe').attr('src', "table_option.php?Ecole="+$('#ecole').val()+"&Section="+$('#section').val());
+                                fermerDialogue();
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{

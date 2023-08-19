@@ -5,13 +5,13 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT * FROM section WHERE ID_Section!=0";
+    $query="SELECT * FROM taux_change INNER JOIN table_taux ON taux_change.ID_Taux=table_taux.ID_Taux WHERE table_taux.ID_Taux_Change!=0";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
-        $query.=" AND ID_Etablissement=".$_GET['Ecole'];
+        $query.=" AND table_taux.ID_Etablissement=".$_GET['Ecole'];
     }
-    $query.=" ORDER BY Design_Section";
-    $req_section=$pdo->query($query);
-    $Total=$req_section->rowCount();
+    $query.=" ORDER BY table_taux.ID_Taux";
+    $req=$pdo->query($query);
+    $Total=$req->rowCount();
     $totalparpage=10;
     $pagesTotales=ceil($Total/$totalparpage);
     if (isset($_GET['page']) AND !empty($_GET['page']) AND $_GET['page'] > 0 AND $_GET['page']<=$pagesTotales) {
@@ -22,8 +22,9 @@
     }
     $depart=($pageCourante-1)*$totalparpage;
     $query.=" LIMIT ".$depart.",".$totalparpage;
-    $section=$pdo->query($query);
+    $selection=$pdo->query($query);
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    $liste_devise=$pdo->query("SELECT * FROM taux_change ORDER BY ID_Taux");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
@@ -34,7 +35,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Sections | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Devises | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -88,7 +89,7 @@
         <div class="page-body">
           <div class="container-xl" style="border: 1px solid #E6E7E9">
             <div class="row row-deck row-cards">
-            <input type="hidden" name="ID_Section" id="ID_Section">
+            <input type="hidden" name="ID_Taux" id="ID_Taux">
             <input type="hidden" name="ID_Etab" id="ID_Etab" value="<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>">
                 <!-- <div class="col-md-12 col-lg-12"> -->
                     <!-- <div class="panel panel-default"> -->
@@ -97,19 +98,26 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Désignation</th>
+                                        <th>Devise</th>
+                                        <th>Taux</th>
+                                        <th>Active</th>
                                         <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($sections=$section->fetch()){$Nbr++; ?>
+    <?php while($selections=$selection->fetch()){
+                $default=$pdo->query("SELECT * FROM taux_change INNER JOIN table_taux ON taux_change.ID_Taux=table_taux.ID_Taux WHERE table_taux.ID_Etablissement=".$selections['ID_Etablissement']." AND table_taux.Active=1");
+                $defaults=$default->fetch();
+                $Nbr++; ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
-            <td><!-- <center> --><?php echo strtoupper(stripslashes($sections['Design_Section'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Devise'])); ?></td>
+            <td style="text-align: right;"><?php echo "1".$defaults['Symbole']." = ".number_format($selections['Montant'], 2, ',', ' ').$selections['Symbole']; ?></td>
+            <td><center><?php if ($selections['Active']==1){ echo 'Default';}else{ echo '<a class="btn btn-info" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_devise.php?ID='.$selections['ID_Taux_Change'].'&token='.$_SESSION['user_eteelo_app']['token'].'&Etab='.$selections['ID_Etablissement'].'&Ecole='.$_GET['Ecole'].'" title="Définir par defaut" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
             <td><center>
-                <a href="#" onclick="Function_Modifier(<?php echo($sections['ID_Section']); ?>, <?php echo($sections['ID_Etablissement']); ?>, '<?php echo (stripslashes($sections['Design_Section'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Taux_Change']); ?>, <?php echo($selections['ID_Etablissement']); ?>, <?php echo($selections['ID_Taux']); ?>, '<?php echo number_format($selections['Montant'], 2, '.', ''); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_section.php?ID=<?php echo($sections['ID_Section']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_devise.php?ID=<?php echo($selections['ID_Taux_Change']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
             </td>
         </tr>
@@ -121,7 +129,7 @@
                                 <?php 
                                 if($pageCourante>1){
                                     $page=$pageCourante-1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_section.php?page='.$page.'&Ecole='.$_GET['Ecole'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_devise.php?page='.$page.'&Ecole='.$_GET['Ecole'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }
@@ -132,28 +140,28 @@
                                     $pageAvantPrecedente=$pageCourante-2;
                                     $pagesAvantTotales=$pagesTotales-1;
                                     if($pageCourante==1){
-                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==2){
-                                        echo '<li class="page-item"><a class="page-link" href="table_section.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="table_devise.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==$pagesAvantTotales){
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li>';
                                     }else if($pageCourante==$pagesTotales){
-                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
                                     }else{
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_section.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_devise.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
                                     }
                                 }else{
                                     for ($i=1; $i <= $pagesTotales ; $i++) { 
                                         if ($i==$pageCourante) {
                                             echo '<li class="page-item active"><a class="page-link" href="#">'.$i.'</a></li>';
                                         }else{
-                                            echo '<li class="page-item"><a class="page-link" href="table_section.php?page='.$i.'&Ecole='.$_GET['Ecole'].'">'.$i.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="table_devise.php?page='.$i.'&Ecole='.$_GET['Ecole'].'">'.$i.'</a></li>';
                                         }
                                     } 
                                 }
                                 if($pagesTotales>$pageCourante){
                                     $page=$pageCourante+1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_section.php?page='.$page.'&Ecole='.$_GET['Ecole'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_devise.php?page='.$page.'&Ecole='.$_GET['Ecole'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }
@@ -171,11 +179,11 @@
         </div>
       </div>
     </div>
-    <div id="ModalModSection" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+    <div id="ModalMod" class="modal fade" data-backdrop="static" style="margin-top: 100px">
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Modification section</h4>
+                    <h4 class="modal-title">Modification devise</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
@@ -188,13 +196,24 @@
                         <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>"><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
-                    <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Devise *</div>
+                    <select name="liste_devise" class="form-control" id="liste_devise">
+                        <option value="">--</option>
+                        <?php while($liste_devises=$liste_devise->fetch()){ ?>
+                        <option value="<?php echo($liste_devises['ID_Taux']) ?>"><?php echo(stripslashes($liste_devises['Devise'])) ?></option>
+                        <?php } ?>
+                    </select>
+                    <div class="col-lg-12">Taux *</div>
+                    <div class="input-group col-lg-12">
+                        <span class="input-group-text" style="margin-top: 3px; font-weight: bold;" id="afficher_taux">
+                        </span>
+                        <input type="number" class="form-control" min="0" autocomplete="off" step="any" name="taux_devise" id="taux_devise" style="margin-top: 1%">
+                    </div>
                     </form>
                 </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="enregsection">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogueSection()">Annuler</button>
+                <button type="button" class="btn btn-primary" id="enregistrer">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogue()">Annuler</button>
             </div>
             </div>
         </div>
@@ -221,15 +240,27 @@
             //     responsive: true
             // });
         });
-  function fermerDialogueSection(){
-        $("#ModalModSection").modal('hide');
+  function fermerDialogue(){
+        $("#ModalMod").modal('hide');
   }
-  function Function_Modifier(a, b, c){
-      $("#ModalModSection").modal('show');
-      $('#ID_Section').val(a);
+  function Function_Modifier(a, b, c, d){
+      $("#ModalMod").modal('show');
+      $('#ID_Taux').val(a);
       $('#liste_ecole').val(b);
-      $('#Design_Etablissement').val(c);
-      $('#Design_Etablissement').focus();
+      $('#liste_devise').val(c);
+      if($('#liste_ecole').val()!=''){
+            $.ajax({
+                url:'recherche_devise.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#afficher_taux').html(ret);
+                }
+            });
+        }
+      $('#taux_devise').val(d);
+      $('#taux_devise').focus();
   }
   $(function() {
     const Toast = Swal.mixin({
@@ -239,18 +270,18 @@
       timer: 5000
     });
 
-    $('#enregsection').click(function(){
-        if($('#Design_Etablissement').val()=='' || $('#liste_ecole').val()==''){
+    $('#enregistrer').click(function(){
+        if($('#taux_devise').val()=='' || $('#liste_ecole').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement').focus();
+                $('#taux_devise').focus();
         }else{
                 $.ajax({
-                        url:'Edit_Section.php',
+                        url:'edit_devise.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), token:$('#tok').val(), ID_Section:$('#ID_Section').val()},
+                        data: {Montant:$('#taux_devise').val(), token:$('#tok').val(), ID_Taux:$('#ID_Taux').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -258,7 +289,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_section.php?Ecole='+$('#ID_Etab').val());
+                                window.location.replace('table_devise.php?Ecole='+$('#ID_Etab').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{
