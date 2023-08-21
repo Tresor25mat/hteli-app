@@ -291,6 +291,9 @@
                           Ecoles
                         </a>
                         <?php } ?>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_enseignant.php">
+                          Enseignants
+                        </a>
                         <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
                           Frais
                         </a>
