@@ -34,6 +34,7 @@
     <link href="./dist/css/tabler-payments.min.css" rel="stylesheet"/>
     <link href="./dist/css/tabler-vendors.min.css" rel="stylesheet"/>
     <link href="notifica/css/alertify.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="vendor/jquery/jquery-ui.min.css" />
     <link rel="stylesheet" href="plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
     <link href="./dist/css/demo.min.css" rel="stylesheet"/>
@@ -50,6 +51,11 @@
       }
       #btn_afficher:focus{
          border: 2px solid #D9DBDE;
+      }
+      .ui-autocomplete{
+        background-color:#CCC ! important;
+        z-index: 10000;
+        width: 200px
       }
   </style>
 </head>
@@ -187,6 +193,11 @@
                             <div class="col-lg-12">Désignation *</div>
                             <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
                         </div>
+                        <div class="col-12">
+                            <div class="col-lg-12">Titulaire</div>
+                            <div class="col-lg-12"><input type="text" name="Titulaire" id="Titulaire" class="form-control" style="margin-top: 1%;" value="" required></div>
+                            <input type="hidden" name="ID_Enseignant" id="ID_Enseignant">
+                        </div>
                     </div>
 
                     </form>
@@ -205,6 +216,7 @@
     <script src="plugins/toastr/toastr.min.js"></script>
     <script src="plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="vendor/jquery/jquery-ui.min.js"></script>
     <script type="text/javascript" src="notifica/alertify.min.js"></script>
     <!-- Tabler Core -->
     <script src="./dist/js/tabler.min.js" defer></script>
@@ -214,6 +226,7 @@
     <script src="vendor/datatables-responsive/dataTables.responsive.js"></script>
 
     <script>
+    listeEnseignant=[];
     $(document).ready(function() {
         $.ajax({
                 url:'recherche_option.php',
@@ -225,7 +238,31 @@
                     $('#add_option').after(ret);
                 }
             });
+            $.ajax({
+              url:"recherche_enseignant.php",
+              type:'post',
+              dataType:"json",
+              data:{Ecole:$('#ecole').val()},
+              success:function(donnee){
+                  listeEnseignant.length=0;
+                  $.map(donnee,function(objet){
+                    listeEnseignant.push({
+                          value:objet.Nom,
+                          desc:objet.ID_Enseignant
+                      });
+                  });
+              }
+            });
             $('#iframe').attr('src', "table_classe.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val());
+    });
+    $('#Titulaire').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listeEnseignant,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Enseignant').val(ui.item.desc);
+            $('#enregistrer').focus();
+        }
     });
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
@@ -265,6 +302,21 @@
                     $('#liste_option').focus();
                 }
             });
+            $.ajax({
+              url:"recherche_enseignant.php",
+              type:'post',
+              dataType:"json",
+              data:{Ecole:$('#liste_ecole').val()},
+              success:function(donnee){
+                  listeEnseignant.length=0;
+                  $.map(donnee,function(objet){
+                    listeEnseignant.push({
+                          value:objet.Nom,
+                          desc:objet.ID_Enseignant
+                      });
+                  });
+              }
+            });
         }
     })
     $('#liste_option').change(function(){
@@ -294,7 +346,38 @@
     $('#btn_ajouter').click(function(e){
       e.preventDefault();
       $("#ModalAjout").modal('show');
-      $('#liste_section').val('');
+      if($('#liste_ecole').val()!=''){
+            $.ajax({
+                url:'recherche_option.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#ajouter_option').nextAll().remove();
+                    $('#ajouter_option').after(ret);
+                    $('#liste_option').focus();
+                }
+            });
+            $.ajax({
+              url:"recherche_enseignant.php",
+              type:'post',
+              dataType:"json",
+              data:{Ecole:$('#liste_ecole').val()},
+              success:function(donnee){
+                  listeEnseignant.length=0;
+                  $.map(donnee,function(objet){
+                    listeEnseignant.push({
+                          value:objet.Nom,
+                          desc:objet.ID_Enseignant
+                      });
+                  });
+              }
+            });
+        }
+      $('#liste_option').val('');
+      $('#liste_niveau').val('');
+      $('#ID_Enseignant').val('');
+      $('#Titulaire').val('');
       $('#Design').val('');
       $('#Design').focus();
     })
@@ -309,7 +392,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Option:$('#liste_option').val(), Niveau:$('#liste_niveau').val(), token:$('#tok').val()},
+                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Option:$('#liste_option').val(), Niveau:$('#liste_niveau').val(), Titulaire:$('#ID_Enseignant').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -320,7 +403,7 @@
                                 $('#iframe').attr('src', "table_classe.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val());
                                 fermerDialogue();
                             }else if(ret==2){
-                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette classe existe déjà'); 
                             }else{
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>',ret); 
                             }
