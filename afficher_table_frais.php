@@ -9,6 +9,7 @@
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $niveau=$pdo->query("SELECT * FROM niveau ORDER BY ID_Niveau");
     $liste_niveau=$pdo->query("SELECT * FROM niveau ORDER BY ID_Niveau");
+    $annee=$pdo->query("SELECT * FROM annee ORDER BY ID_Annee");
     if($_SESSION['user_eteelo_app']['ID_Statut']!=1){
         $liste_option=$pdo->query("SELECT * FROM table_option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." ORDER BY Design_Option");
     }
@@ -22,7 +23,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Classes | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Frais | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -73,13 +74,13 @@
                   
                 </div>
                 <h2 class="page-title">
-                    Classes
+                    Frais
                 </h2>
               </div>
               <!-- Page title actions -->
               <div class="col-12">
                 <div class="row" style="border-bottom: 1px solid #EEEEEE; padding-bottom: 20px">
-                    <div class="col-md-3" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                    <div class="col-md-2" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                       <div class="form-group ">
                         <label for="classe" class="control-label col-lg-12" style="text-align: left;">Ecole </label>
                         <div class="col-lg-12">
@@ -127,15 +128,32 @@
                         </div>
                       </div>
                     </div>
+                    <div class="col-md-2">
+                      <div class="form-group ">
+                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Année </label>
+                        <div class="col-lg-12">
+                          <div class="row">
+                            <div class="col-sm-12">
+                                <select name="annee" class="form-control" id="annee">
+                                    <option value="">--</option>
+                                    <?php while($annees=$annee->fetch()){ ?>
+                                    <option value="<?php echo($annees['ID_Annee']) ?>" <?php if($annees['Encours']==1){echo 'selected';} ?>><?php echo(stripslashes($annees['Libelle_Annee'])) ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="col-md-2" style='margin-top: 20px; margin-bottom: 20px;'>
                       <button class="btn btn-default" type="button" id="btn_afficher" style="height: 32px; border-radius: 0; margin-top: 2px"><i class="fa fa-search"></i></button>
                     </div>
                     <div class="col-12 col-md-auto ms-auto d-print-none" style="margin-top: 18px">
                         <div class="btn-list">
-                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter une classe">
+                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter un frais">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            Ajouter une classe
+                            Ajouter un frais
                         </a>
                         </div>
                     </div>
@@ -150,64 +168,6 @@
             <iframe src="" style="width: 100%; height: 1500px; border: none;" id="iframe"></iframe>
         </div>
       </div>
-    </div>
-    <div id="ModalAjout" class="modal fade" data-backdrop="static" style="margin-top: 100px">
-        <div class="modal-dialog" style="border: 1px solid #E6E7E9">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Nouvelle classe</h4>
-                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
-                </div>
-                <div class="modal-body">
-                   <form method="post" action="">
-                    <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="row">
-                        <div class="col-6" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
-                            <div class="col-lg-12">Ecole *</div>
-                            <select name="liste_ecole" class="form-control" id="liste_ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
-                                <option value="">--</option>
-                                <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
-                                <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <div class="col-lg-12">Option *</div>
-                            <select name="liste_option" class="form-control" id="liste_option">
-                                <option value="" id="ajouter_option">--</option>
-                                <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($liste_options=$liste_option->fetch()){ ?>
-                                <option value="<?php echo($liste_options['ID_Option']) ?>"><?php echo(stripslashes($liste_options['Design_Option'])) ?></option>
-                                <?php }} ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <div class="col-lg-12">Niveau *</div>
-                            <select name="liste_niveau" class="form-control" id="liste_niveau">
-                                <option value="">--</option>
-                                <?php while($liste_niv=$liste_niveau->fetch()){ ?>
-                                <option value="<?php echo($liste_niv['ID_Niveau']) ?>"><?php echo(stripslashes($liste_niv['Design_Niveau'])) ?></option>
-                                <?php } ?>
-                            </select>
-                        </div>
-                        <div class="col-6">
-                            <div class="col-lg-12">Désignation *</div>
-                            <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
-                        </div>
-                        <div class="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'col-6';}else{echo 'col-12';} ?>">
-                            <div class="col-lg-12">Titulaire</div>
-                            <div class="col-lg-12"><input type="text" name="Titulaire" id="Titulaire" class="form-control" style="margin-top: 1%;" value="" required></div>
-                            <input type="hidden" name="ID_Enseignant" id="ID_Enseignant">
-                        </div>
-                    </div>
-
-                    </form>
-                </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="enregistrer">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogue()">Annuler</button>
-            </div>
-            </div>
-        </div>
     </div>
     <script src="./dist/libs/apexcharts/dist/apexcharts.min.js" defer></script>
     <script src="./dist/libs/jsvectormap/dist/js/jsvectormap.min.js" defer></script>
@@ -226,7 +186,6 @@
     <script src="vendor/datatables-responsive/dataTables.responsive.js"></script>
 
     <script>
-    listeEnseignant=[];
     $(document).ready(function() {
         $.ajax({
                 url:'recherche_option.php',
@@ -253,16 +212,7 @@
                   });
               }
             });
-            $('#iframe').attr('src', "table_classe.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val());
-    });
-    $('#Titulaire').autocomplete({source:function(request,response){
-        var resultat=$.ui.autocomplete.filter(listeEnseignant,request.term);
-        response(resultat.slice(0,15));
-        },
-        select:function(event,ui){
-            $('#ID_Enseignant').val(ui.item.desc);
-            $('#enregistrer').focus();
-        }
+            $('#iframe').attr('src', "table_frais.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val()+"&Annee="+$('#annee').val());
     });
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
@@ -289,130 +239,12 @@
             $('#btn_afficher').focus();
         }
     })
-    $('#liste_ecole').change(function(){
-        if($('#liste_ecole').val()!=''){
-            $.ajax({
-                url:'recherche_option.php',
-                type:'post',
-                dataType:'html', 
-                data:{Ecole:$('#liste_ecole').val()},
-                success:function(ret){
-                    $('#ajouter_option').nextAll().remove();
-                    $('#ajouter_option').after(ret);
-                    $('#liste_option').focus();
-                }
-            });
-            $.ajax({
-              url:"recherche_enseignant.php",
-              type:'post',
-              dataType:"json",
-              data:{Ecole:$('#liste_ecole').val()},
-              success:function(donnee){
-                  listeEnseignant.length=0;
-                  $.map(donnee,function(objet){
-                    listeEnseignant.push({
-                          value:objet.Nom,
-                          desc:objet.ID_Enseignant
-                      });
-                  });
-              }
-            });
-        }
-    })
-    $('#liste_option').change(function(){
-        if($('#liste_option').val()!=''){
-            $('#liste_niveau').focus();
-        }
-    })
-    $('#liste_niveau').change(function(){
-        if($('#liste_niveau').val()!=''){
-            $('#Design').focus();
-        }
-    })
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_classe.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val());
+        $('#iframe').attr('src', "table_frais.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val()+"&Annee="+$('#annee').val());
     })
-    function fermerDialogue(){
-        $("#ModalAjout").modal('hide');
-    }
-  $(function() {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 5000
-    });
-
     $('#btn_ajouter').click(function(e){
-      e.preventDefault();
-      $("#ModalAjout").modal('show');
-      if($('#liste_ecole').val()!=''){
-            $.ajax({
-                url:'recherche_option.php',
-                type:'post',
-                dataType:'html', 
-                data:{Ecole:$('#liste_ecole').val()},
-                success:function(ret){
-                    $('#ajouter_option').nextAll().remove();
-                    $('#ajouter_option').after(ret);
-                    $('#liste_option').focus();
-                }
-            });
-            $.ajax({
-              url:"recherche_enseignant.php",
-              type:'post',
-              dataType:"json",
-              data:{Ecole:$('#liste_ecole').val()},
-              success:function(donnee){
-                  listeEnseignant.length=0;
-                  $.map(donnee,function(objet){
-                    listeEnseignant.push({
-                          value:objet.Nom,
-                          desc:objet.ID_Enseignant
-                      });
-                  });
-              }
-            });
-        }
-      $('#liste_option').val('');
-      $('#liste_niveau').val('');
-      $('#ID_Enseignant').val('');
-      $('#Titulaire').val('');
-      $('#Design').val('');
-      $('#Design').focus();
+        e.preventDefault();
+        window.location.replace('ajouter_frais.php?Ecole='+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val()+"&Annee="+$('#annee').val()); 
     })
-    $('#enregistrer').click(function(){
-        if($('#Design').val()=='' || $('#liste_ecole').val()=='' || $('#liste_option').val()=='' || $('#liste_niveau').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design').focus();
-        }else{
-                $.ajax({
-                        url:'enreg_classe.php',
-                        type:'post',
-                        beforeSend:function(){
-                        },
-                        dataType:'text',
-                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Option:$('#liste_option').val(), Niveau:$('#liste_niveau').val(), Titulaire:$('#ID_Enseignant').val(), token:$('#tok').val()},
-                        success:function(ret){
-                            if(ret==1){
-                                alertify.success("L'opération a réussi");
-                                Toast.fire({
-                                    icon: 'success',
-                                    title: 'Enregistrement éffectué'
-                                })
-                                $('#iframe').attr('src', "table_classe.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val());
-                                fermerDialogue();
-                            }else if(ret==2){
-                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette classe existe déjà'); 
-                            }else{
-                                alertify.alert('<?php echo $app_infos['Design_App']; ?>',ret); 
-                            }
-                        }
-                    });
-        }
-    });
-
-
-  });
     </script>
 </body>

@@ -277,7 +277,7 @@
                           Année scolaire
                         </a>
                         <?php } ?>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_classe.php">
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_cat_frais.php">
                           Catégories frais
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_cat_eleve.php">
@@ -285,6 +285,15 @@
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_classe.php">
                           Classes
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_compte.php">
+                          Comptes
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_devise.php">
+                          Devises
+                        </a>
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_discipline.php">
+                          Disciplines
                         </a>
                         <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
                         <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
@@ -294,20 +303,14 @@
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_enseignant.php">
                           Enseignants
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_frais.php">
                           Frais
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_devise.php">
-                          Devises
-                        </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_discipline.php">
-                          Disciplines
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_journal.php">
+                          Journaux
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_option.php">
                           Options
-                        </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_option.php">
-                          Plan comptable
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_section.php">
                           Sections

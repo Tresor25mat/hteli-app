@@ -181,15 +181,17 @@
                 <div class="modal-body">
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="col-lg-12">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                     <select name="liste_ecole" class="form-control" id="liste_ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                         <option value="">--</option>
                         <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
-                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>"><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
+                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
+                    </div>
                     <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
                     </form>
                 </div>
             <div class="modal-footer">
@@ -228,8 +230,8 @@
       $("#ModalModSection").modal('show');
       $('#ID_Section').val(a);
       $('#liste_ecole').val(b);
-      $('#Design_Etablissement').val(c);
-      $('#Design_Etablissement').focus();
+      $('#Design').val(c);
+      $('#Design').focus();
   }
   $(function() {
     const Toast = Swal.mixin({
@@ -240,9 +242,9 @@
     });
 
     $('#enregsection').click(function(){
-        if($('#Design_Etablissement').val()=='' || $('#liste_ecole').val()==''){
+        if($('#Design').val()=='' || $('#liste_ecole').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement').focus();
+                $('#Design').focus();
         }else{
                 $.ajax({
                         url:'Edit_Section.php',
@@ -250,7 +252,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), token:$('#tok').val(), ID_Section:$('#ID_Section').val()},
+                        data: {Design:$('#Design').val(), token:$('#tok').val(), ID_Section:$('#ID_Section').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");

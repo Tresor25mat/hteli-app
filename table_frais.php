@@ -5,18 +5,21 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT * FROM classe INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE classe.ID_Classe!=0";
+    $query="SELECT frais.*, type_frais.Libelle_Type_Frais, taux_change.Symbole, table_option.Design_Option, niveau.Design_Niveau, categorie_eleve.* from frais inner join table_option on frais.ID_Option=table_option.ID_Option inner join niveau on frais.ID_Niveau=niveau.ID_Niveau inner join taux_change on frais.ID_Taux=taux_change.ID_Taux inner join type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais inner join annee on frais.ID_Annee=annee.ID_Annee inner join section on table_option.ID_Section=section.ID_Section inner join categorie_eleve on frais.ID_Cat_Eleve=categorie_eleve.ID_Categorie where frais.ID_Frais!=''";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
         $query.=" AND section.ID_Etablissement=".$_GET['Ecole'];
         $liste_option=$pdo->query("SELECT * FROM table_option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$_GET['Ecole']." ORDER BY Design_Option");
     }
     if(isset($_GET['Option']) && $_GET['Option']!=''){
-        $query.=" AND classe.ID_Option=".$_GET['Option'];
+        $query.=" AND table_option.ID_Option=".$_GET['Option'];
     }
     if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){
-        $query.=" AND classe.ID_Niveau=".$_GET['Niveau'];
+        $query.=" AND niveau.ID_Niveau=".$_GET['Niveau'];
     }
-    $query.=" ORDER BY classe.Design_Classe";
+    if(isset($_GET['Annee']) && $_GET['Annee']!=''){
+        $query.=" AND annee.ID_Annee =".$_GET['Annee']; 
+    }
+    $query.=" ORDER BY type_frais.Libelle_Type_Frais";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
     $totalparpage=10;
@@ -102,7 +105,7 @@
         <div class="page-body">
           <div class="container-xl" style="border: 1px solid #E6E7E9">
             <div class="row row-deck row-cards">
-            <input type="hidden" name="ID_Classe" id="ID_Classe">
+            <input type="hidden" name="ID_Frais" id="ID_Frais">
             <input type="hidden" name="ID_Enseignant" id="ID_Enseignant">
             <input type="hidden" name="ID_Etab" id="ID_Etab" value="<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>">
             <input type="hidden" name="Option" id="Option" value="<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>">
@@ -114,25 +117,27 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Niveau</th>
+                                        <th>Option</th>
+                                        <th>Catégorie élève</th>
                                         <th>Désignation</th>
-                                        <th>Titulaire</th>
+                                        <th>Montant</th>
                                         <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($selections=$selection->fetch()){
-                $titulaire=$pdo->query("SELECT * FROM enseignant WHERE ID_Enseignant=".$selections['ID_Enseignant']);
-                $titulaires=$titulaire->fetch();
-                $noms=strtoupper(stripslashes($titulaires['Nom_Enseignant'].' '.$titulaires['Pnom_Enseignant'].' '.$titulaires['Prenom_Enseignant']));
-                $Nbr++; ?>
+    <?php while($selections=$selection->fetch()){$Nbr++; ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
-            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Classe'])); ?></td>
-            <td><!-- <center> --><?php echo strtoupper(stripslashes($titulaires['Nom_Enseignant'].' '.$titulaires['Pnom_Enseignant'].' '.$titulaires['Prenom_Enseignant'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Niveau'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Option'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Categorie'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Libelle_Type_Frais'])); ?></td>
+            <td><!-- <center> --><?php echo number_format($selections['Montant_Frais'], 2, ',', ' ').stripslashes($selections['Symbole']); ?></td>
             <td><center>
-                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Classe']); ?>, <?php echo($selections['ID_Etablissement']); ?>, <?php echo($selections['ID_Option']); ?>, <?php echo($selections['ID_Niveau']); ?>, <?php echo($selections['ID_Enseignant']); ?>, '<?php echo $noms; ?>', '<?php echo strtoupper(stripslashes($selections['Design_Classe'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <a href="#" onclick="Function_Modifier()" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette classe ?\n Toutes les informations concernant cette classe seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_classe.php?ID=<?php echo($selections['ID_Classe']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Option=<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>&Niveau=<?php if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){echo $_GET['Niveau']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer ce frais ?\n Toutes les informations concernant ce frais seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_frais.php?ID=<?php echo($selections['ID_Frais']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Option=<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>&Niveau=<?php if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){echo $_GET['Niveau']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
             </td>
         </tr>
@@ -328,7 +333,7 @@
     })
   function Function_Modifier(a, b, c, d, e, f, g){
       $("#ModalMod").modal('show');
-      $('#ID_Classe').val(a);
+      $('#ID_Frais').val(a);
       $('#liste_ecole').val(b);
       if($('#liste_ecole').val()!=''){
         $.ajax({
@@ -385,7 +390,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Option:$('#liste_option').val(), Niveau:$('#liste_niveau').val(), Titulaire:$('#ID_Enseignant').val(), token:$('#tok').val(), ID_Classe:$('#ID_Classe').val()},
+                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Option:$('#liste_option').val(), Niveau:$('#liste_niveau').val(), Titulaire:$('#ID_Enseignant').val(), token:$('#tok').val(), ID_Frais:$('#ID_Frais').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");

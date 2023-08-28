@@ -5,13 +5,13 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT * FROM categorie_eleve WHERE ID_Categorie!=0";
+    $query="SELECT * FROM table_journal INNER JOIN type_journal ON table_journal.ID_Type_Journal=type_journal.ID_Type_Journal WHERE table_journal.ID_Journal!=0";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
-        $query.=" AND ID_Etablissement=".$_GET['Ecole'];
+        $query.=" AND table_journal.ID_Etablissement=".$_GET['Ecole'];
     }
-    $query.=" ORDER BY Design_Categorie";
-    $req_section=$pdo->query($query);
-    $Total=$req_section->rowCount();
+    $query.=" ORDER BY table_journal.ID_Journal";
+    $req=$pdo->query($query);
+    $Total=$req->rowCount();
     $totalparpage=10;
     $pagesTotales=ceil($Total/$totalparpage);
     if (isset($_GET['page']) AND !empty($_GET['page']) AND $_GET['page'] > 0 AND $_GET['page']<=$pagesTotales) {
@@ -24,6 +24,7 @@
     $query.=" LIMIT ".$depart.",".$totalparpage;
     $selection=$pdo->query($query);
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    $type_journal=$pdo->query("SELECT * FROM type_journal ORDER BY ID_Type_Journal");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
@@ -34,7 +35,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Catégories élèves | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Devises | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -88,7 +89,7 @@
         <div class="page-body">
           <div class="container-xl" style="border: 1px solid #E6E7E9">
             <div class="row row-deck row-cards">
-            <input type="hidden" name="ID_Categorie" id="ID_Categorie">
+            <input type="hidden" name="ID_Journal" id="ID_Journal">
             <input type="hidden" name="ID_Etab" id="ID_Etab" value="<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>">
                 <!-- <div class="col-md-12 col-lg-12"> -->
                     <!-- <div class="panel panel-default"> -->
@@ -97,23 +98,26 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Désignation</th>
-                                        <th>Date</th>
+                                        <th>Code</th>
+                                        <th>Intitulé</th>
+                                        <th>Type</th>
                                         <th>Active</th>
                                         <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($selections=$selection->fetch()){$Nbr++; ?>
+    <?php while($selections=$selection->fetch()){
+                $Nbr++; ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
-            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Categorie'])); ?></td>
-            <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Date_Enreg'])); ?></td>
-            <td><center><?php if ($selections['Active']==1){ echo 'Default';}else{ echo '<a class="btn btn-info" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_cat_eleve.php?ID='.$selections['ID_Categorie'].'&token='.$_SESSION['user_eteelo_app']['token'].'&Etab='.$selections['ID_Etablissement'].'&Ecole='.$_GET['Ecole'].'" title="Définir par defaut" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
-            <td style="padding-left: 230px"><!--<center> -->
-                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Categorie']); ?>, <?php echo($selections['ID_Etablissement']); ?>, '<?php echo (stripslashes($selections['Design_Categorie'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Code_Journal'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Journal'])); ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Type_Journal'])); ?></td>
+            <td><center><?php if ($selections['Active']==1){ echo 'Default';}else{ echo '<a class="btn btn-info" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_journal.php?ID='.$selections['ID_Journal'].'&token='.$_SESSION['user_eteelo_app']['token'].'&Etab='.$selections['ID_Etablissement'].'&Ecole='.$_GET['Ecole'].'" title="Définir par defaut" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
+            <td style="padding-left: 150px"><!-- <center> -->
+                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Journal']); ?>, <?php echo($selections['ID_Etablissement']); ?>, <?php echo($selections['ID_Type_Journal']); ?>, '<?php echo strtoupper(stripslashes($selections['Code_Journal'])); ?>', '<?php echo strtoupper(stripslashes($selections['Design_Journal'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php if($selections['Active']!=1 && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_cat_eleve.php?ID=<?php echo($selections['ID_Categorie']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a><!--</center> -->
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_journal.php?ID=<?php echo($selections['ID_Journal']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a><!--</center> -->
                 <?php } ?>
             </td>
         </tr>
@@ -125,7 +129,7 @@
                                 <?php 
                                 if($pageCourante>1){
                                     $page=$pageCourante-1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$page.'&Ecole='.$_GET['Ecole'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_journal.php?page='.$page.'&Ecole='.$_GET['Ecole'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }
@@ -136,28 +140,28 @@
                                     $pageAvantPrecedente=$pageCourante-2;
                                     $pagesAvantTotales=$pagesTotales-1;
                                     if($pageCourante==1){
-                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==2){
-                                        echo '<li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="table_journal.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==$pagesAvantTotales){
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li>';
                                     }else if($pageCourante==$pagesTotales){
-                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
                                     }else{
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_journal.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
                                     }
                                 }else{
                                     for ($i=1; $i <= $pagesTotales ; $i++) { 
                                         if ($i==$pageCourante) {
                                             echo '<li class="page-item active"><a class="page-link" href="#">'.$i.'</a></li>';
                                         }else{
-                                            echo '<li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$i.'&Ecole='.$_GET['Ecole'].'">'.$i.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="table_journal.php?page='.$i.'&Ecole='.$_GET['Ecole'].'">'.$i.'</a></li>';
                                         }
                                     } 
                                 }
                                 if($pagesTotales>$pageCourante){
                                     $page=$pageCourante+1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_cat_eleve.php?page='.$page.'&Ecole='.$_GET['Ecole'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_journal.php?page='.$page.'&Ecole='.$_GET['Ecole'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }
@@ -179,7 +183,7 @@
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Modification motif</h4>
+                    <h4 class="modal-title">Modification jounal</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
@@ -194,8 +198,21 @@
                         <?php } ?>
                     </select>
                     </div>
-                    <div class="col-lg-12">Designation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Type journal *</div>
+                    <select name="type_journal" class="form-control" id="type_journal">
+                        <option value="">--</option>
+                        <?php while($type_journals=$type_journal->fetch()){ ?>
+                        <option value="<?php echo($type_journals['ID_Type_Journal']) ?>"><?php echo(stripslashes($type_journals['Design_Type_Journal'])) ?></option>
+                        <?php } ?>
+                    </select>
+                    <div class="col-lg-12">Code journal *</div>
+                    <div class="col-lg-12">
+                        <input type="text" class="form-control" autocomplete="off" name="code_journal" id="code_journal" style="margin-top: 1%">
+                    </div>
+                    <div class="col-lg-12">Désignation *</div>
+                    <div class="col-lg-12">
+                        <input type="text" class="form-control" autocomplete="off" name="design" id="design" style="margin-top: 1%">
+                    </div>
                     </form>
                 </div>
             <div class="modal-footer">
@@ -230,12 +247,14 @@
   function fermerDialogue(){
         $("#ModalMod").modal('hide');
   }
-  function Function_Modifier(a, b, c){
+  function Function_Modifier(a, b, c, d, e){
       $("#ModalMod").modal('show');
-      $('#ID_Categorie').val(a);
+      $('#ID_Journal').val(a);
       $('#liste_ecole').val(b);
-      $('#Design').val(c);
-      $('#Design').focus();
+      $('#type_journal').val(c);
+      $('#code_journal').val(d);
+      $('#design').val(e);
+      $('#type_journal').focus();
   }
   $(function() {
     const Toast = Swal.mixin({
@@ -246,17 +265,17 @@
     });
 
     $('#enregistrer').click(function(){
-        if($('#Design').val()=='' || $('#liste_ecole').val()==''){
+        if($('#type_journal').val()=='' || $('#liste_ecole').val()=='' || $('#code_journal').val()=='' || $('#design').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#nombre_point').focus();
+                $('#taux_devise').focus();
         }else{
                 $.ajax({
-                        url:'edit_cat_eleve.php',
+                        url:'edit_journal.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design').val(), token:$('#tok').val(), ID_Categorie:$('#ID_Categorie').val()},
+                        data: {Design:$('#design').val(), Code:$('#code_journal').val(), Type:$('#type_journal').val(), token:$('#tok').val(), ID_Journal:$('#ID_Journal').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -264,7 +283,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_cat_eleve.php?Ecole='+$('#ID_Etab').val());
+                                window.location.replace('table_journal.php?Ecole='+$('#ID_Etab').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{

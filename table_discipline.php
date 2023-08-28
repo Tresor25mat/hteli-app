@@ -185,13 +185,15 @@
                 <div class="modal-body">
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="col-lg-12">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                     <select name="liste_ecole" class="form-control" id="liste_ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                         <option value="">--</option>
                         <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
-                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>"><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
+                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
+                    </div>
                     <div class="col-lg-12">Designation *</div>
                     <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
                     <div class="col-lg-12">Nombre des points *</div>

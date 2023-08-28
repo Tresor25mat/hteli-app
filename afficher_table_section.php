@@ -68,7 +68,7 @@
               <!-- Page title actions -->
               <div class="col-12">
                 <div class="row" style="border-bottom: 1px solid #EEEEEE; padding-bottom: 20px">
-                    <div class="col-md-3">
+                    <div class="col-md-3" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                       <div class="form-group ">
                         <label for="classe" class="control-label col-lg-12" style="text-align: left;">Ecole </label>
                         <div class="col-lg-12">
@@ -85,7 +85,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-3" style='margin-top: 20px; margin-bottom: 20px;'>
+                    <div class="col-md-3" style='margin-top: 20px; margin-bottom: 20px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>'>
                       <button class="btn btn-default" type="button" id="btn_afficher" style="height: 32px; border-radius: 0; margin-top: 2px"><i class="fa fa-search"></i></button>
                     </div>
                     <div class="col-12 col-md-auto ms-auto d-print-none" style="margin-top: 18px">
@@ -119,15 +119,17 @@
                 <div class="modal-body">
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="col-lg-12">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                     <select name="liste_ecole" class="form-control" id="liste_ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                         <option value="">--</option>
                         <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
                         <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
+                    </div>
                     <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
                     </form>
                 </div>
             <div class="modal-footer">
@@ -163,7 +165,7 @@
     })
     $('#liste_ecole').change(function(){
         if($('#liste_ecole').val()!=''){
-            $('#Design_Etablissement').focus();
+            $('#Design').focus();
         }
     })
     $('#btn_afficher').click(function(){
@@ -183,13 +185,13 @@
     $('#ajouter_section').click(function(e){
       e.preventDefault();
       $("#ModalAjoutSection").modal('show');
-      $('#Design_Etablissement').val('');
-      $('#Design_Etablissement').focus();
+      $('#Design').val('');
+      $('#Design').focus();
     })
     $('#enregsection').click(function(){
-        if($('#Design_Etablissement').val()=='' || $('#liste_ecole').val()==''){
+        if($('#Design').val()=='' || $('#liste_ecole').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
-                $('#Design_Etablissement').focus();
+                $('#Design').focus();
         }else{
                 $.ajax({
                         url:'enreg_section.php',
@@ -197,7 +199,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), Ecole:$('#liste_ecole').val(), token:$('#tok').val()},
+                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");

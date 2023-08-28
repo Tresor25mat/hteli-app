@@ -150,7 +150,7 @@
                     <?php } ?>
                     <div class="text-muted"><?php echo $utilisateurs['Statut']; ?></div>
                     <div class="mt-3">
-                      <span class="badge bg-purple-lt"><?php echo stripslashes($ecoles['Design_Etablissement']); ?></span>
+                      <span class="badge bg-purple-lt"><?php echo stripslashes('Ecole: '.$ecoles['Design_Etablissement']); ?></span>
                     </div>
                   </div>
                   <div class="d-flex">

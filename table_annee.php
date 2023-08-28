@@ -69,11 +69,8 @@
             <div class="row g-2 align-items-center">
               <div class="col">
                 <!-- Page pre-title -->
-                <div class="page-pretitle">
-                  
-                </div>
                 <h2 class="page-title">
-                    Année scolaire
+                Année scolaire
                 </h2>
               </div>
               <!-- Page title actions -->
@@ -137,9 +134,11 @@
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($annees['Libelle_Annee'])); ?></td>
             <td><center><?php if ($annees['Encours']==1){echo 'Année en cours';}else{ echo '<a class="btn btn-success" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_annee.php?ID='.$annees['ID_Annee'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Définir comme année en cours" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
-            <td><center>
+            <td style="padding-left: 250px"><!-- <center> -->
                 <a href="#" onclick="Function_Modifier(<?php echo($annees['ID_Annee']); ?>, '<?php echo (stripslashes($annees['Libelle_Annee'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette année?\n Toutes les informations concernant cette année seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_annee.php?ID=<?php echo($annees['ID_Annee']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
+                <?php if($annees['Encours']!=1){ ?>
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette année?\n Toutes les informations concernant cette année seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_annee.php?ID=<?php echo($annees['ID_Annee']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a><!-- </center>-->
+                <?php } ?>
             </td>
         </tr>
     <?php } ?>

@@ -8,7 +8,8 @@
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     if($_SESSION['user_eteelo_app']['ID_Statut']!=1){
-        $liste_section=$pdo->query("SELECT * FROM section WHERE ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." ORDER BY Design_Section");
+        $compte_debit=$pdo->query("SELECT * FROM compte INNER JOIN categorie_compte ON compte.ID_Categorie=categorie_compte.ID_Categorie WHERE compte.ID_Nature=8 AND compte.ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+        $compte_credit=$pdo->query("SELECT * FROM compte INNER JOIN categorie_compte ON compte.ID_Categorie=categorie_compte.ID_Categorie WHERE compte.ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." AND (compte.ID_Nature=2 OR compte.ID_Nature=3)");
     }
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
@@ -20,7 +21,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Options | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Catégories frais | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -65,7 +66,7 @@
                   
                 </div>
                 <h2 class="page-title">
-                  Options
+                    Catégories frais
                 </h2>
               </div>
               <!-- Page title actions -->
@@ -88,29 +89,15 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-3">
-                      <div class="form-group ">
-                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Section </label>
-                        <div class="col-lg-12">
-                          <div class="row">
-                            <div class="col-sm-12">
-                                <select name="section" class="form-control" id="section">
-                                    <option value="" id="add_section">--</option>
-                                </select>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-3" style='margin-top: 20px; margin-bottom: 20px;'>
+                    <div class="col-md-3" style="margin-top: 20px; margin-bottom: 20px;  <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                       <button class="btn btn-default" type="button" id="btn_afficher" style="height: 32px; border-radius: 0; margin-top: 2px"><i class="fa fa-search"></i></button>
                     </div>
                     <div class="col-12 col-md-auto ms-auto d-print-none" style="margin-top: 18px">
                         <div class="btn-list">
-                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter une option">
+                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter une catégorie">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            Ajouter une option
+                            Ajouter une catégorie
                         </a>
                         </div>
                     </div>
@@ -130,7 +117,7 @@
         <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Nouvelle option</h4>
+                    <h4 class="modal-title">Nouvelle catégorie</h4>
                     <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
@@ -145,15 +132,22 @@
                         <?php } ?>
                     </select>
                     </div>
-                    <div class="col-lg-12">Section *</div>
-                    <select name="liste_section" class="form-control" id="liste_section">
-                        <option value="" id="ajouter_section">--</option>
-                        <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($liste_sections=$liste_section->fetch()){ ?>
-                        <option value="<?php echo($liste_sections['ID_Section']) ?>"><?php echo(stripslashes($liste_sections['Design_Section'])) ?></option>
-                        <?php }} ?>
-                    </select>
                     <div class="col-lg-12">Désignation *</div>
                     <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Compte debit *</div>
+                    <select name="compte_debit" class="form-control" id="compte_debit">
+                        <option value="" id="ajouter_compte_debit">--</option>
+                        <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($compte_debits=$compte_debit->fetch()){ ?>
+                        <option value="<?php echo($compte_debits['ID_Compte']) ?>"><?php echo(stripslashes($compte_debits['Cod_Categorie'].$compte_debits['Cod_Compte'].' '.$compte_debits['Design_Compte'])) ?></option>
+                        <?php }} ?>
+                    </select>
+                    <div class="col-lg-12">Compte credit *</div>
+                    <select name="compte_credit" class="form-control" id="compte_credit">
+                        <option value="" id="ajouter_compte_credit">--</option>
+                        <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($compte_credits=$compte_credit->fetch()){ ?>
+                        <option value="<?php echo($compte_credits['ID_Compte']) ?>"><?php echo(stripslashes($compte_credits['Cod_Categorie'].$compte_credits['Cod_Compte'].' '.$compte_credits['Design_Compte'])) ?></option>
+                        <?php }} ?>
+                    </select>
                     </form>
                 </div>
             <div class="modal-footer">
@@ -180,60 +174,50 @@
 
     <script>
     $(document).ready(function() {
-        $.ajax({
-                url:'recherche_section.php',
-                type:'post',
-                dataType:'html', 
-                data:{Ecole:$('#ecole').val()},
-                success:function(ret){
-                    $('#add_section').nextAll().remove();
-                    $('#add_section').after(ret);
-                }
-            });
-        $('#iframe').attr('src', "table_option.php?Ecole="+$('#ecole').val()+"&Section="+$('#section').val());
+        $('#iframe').attr('src', "table_cat_frais.php?Ecole="+$('#ecole').val());
     });
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
-            $.ajax({
-                url:'recherche_section.php',
-                type:'post',
-                dataType:'html', 
-                data:{Ecole:$('#ecole').val()},
-                success:function(ret){
-                    $('#add_section').nextAll().remove();
-                    $('#add_section').after(ret);
-                    $('#section').focus();
-                }
-            });
-        }
-    })
-    $('#section').change(function(){
-        if($('#section').val()!=''){
             $('#btn_afficher').focus();
         }
     })
     $('#liste_ecole').change(function(){
         if($('#liste_ecole').val()!=''){
             $.ajax({
-                url:'recherche_section.php',
+                url:'recherche_compte_debit.php',
                 type:'post',
                 dataType:'html', 
                 data:{Ecole:$('#liste_ecole').val()},
                 success:function(ret){
-                    $('#ajouter_section').nextAll().remove();
-                    $('#ajouter_section').after(ret);
-                    $('#liste_section').focus();
+                    $('#ajouter_compte_debit').nextAll().remove();
+                    $('#ajouter_compte_debit').after(ret);
                 }
             });
-        }
-    })
-    $('#liste_section').change(function(){
-        if($('#liste_section').val()!=''){
+            $.ajax({
+                url:'recherche_compte_credit.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#ajouter_compte_credit').nextAll().remove();
+                    $('#ajouter_compte_credit').after(ret);
+                }
+            });
             $('#Design').focus();
         }
     })
+    $('#compte_debit').change(function(){
+        if($('#compte_debit').val()!=''){
+            $('#compte_credit').focus();
+        }
+    })
+    $('#compte_credit').change(function(){
+        if($('#compte_credit').val()!=''){
+            $('#enregistrer').focus();
+        }
+    })
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_option.php?Ecole="+$('#ecole').val()+"&Section="+$('#section').val());
+        $('#iframe').attr('src', "table_cat_frais.php?Ecole="+$('#ecole').val());
     })
     function fermerDialogue(){
         $("#ModalAjout").modal('hide');
@@ -249,22 +233,23 @@
     $('#btn_ajouter').click(function(e){
       e.preventDefault();
       $("#ModalAjout").modal('show');
-      $('#liste_section').val('');
+      $('#compte_debit').val('');
+      $('#compte_credit').val('');
       $('#Design').val('');
       $('#Design').focus();
     })
     $('#enregistrer').click(function(){
-        if($('#Design').val()=='' || $('#liste_ecole').val()=='' || $('#liste_section').val()==''){
+        if($('#Design').val()=='' || $('#liste_ecole').val()=='' || $('#compte_debit').val()=='' || $('#compte_credit').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
                 $('#Design').focus();
         }else{
                 $.ajax({
-                        url:'enreg_option.php',
+                        url:'enreg_cat_frais.php',
                         type:'post',
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design').val(), Ecole:$('#liste_ecole').val(), Section:$('#liste_section').val(), token:$('#tok').val()},
+                        data: {Design:$('#Design').val(), Compte_Debit:$('#compte_debit').val(), Compte_Credit:$('#compte_credit').val(), Ecole:$('#liste_ecole').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -272,7 +257,7 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                $('#iframe').attr('src', "table_option.php?Ecole="+$('#ecole').val()+"&Section="+$('#section').val());
+                                $('#iframe').attr('src', "table_cat_frais.php?Ecole="+$('#ecole').val());
                                 fermerDialogue();
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 

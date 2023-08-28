@@ -100,19 +100,19 @@
             <div class="row row-cards">
               <div class="col-md-12">
                 <div class="card">
-                  <ul class="nav nav-tabs l0" data-bs-toggle="tabs">
+                  <!-- <ul class="nav nav-tabs l0" data-bs-toggle="tabs">
                     <li class="nav-item">
                       <a href="#tabs-home-12" id="a0" class="nav-link active" data-bs-toggle="tab">Informations</a>
                     </li>
-                    <!-- <li class="nav-item l1 disabled">
+                    <li class="nav-item l1 disabled">
                       <a href="#" class="nav-link " id="a1" data-bs-toggle="tab">Picture</a>
-                    </li> -->
-<!--                     <li class="nav-item ms-auto">
+                    </li>
+                    <li class="nav-item ms-auto">
                       <a href="#tabs-settings-7" class="nav-link" title="Settings" data-bs-toggle="tab">Download SVG icon from http://tabler-icons.io/i/settings
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><circle cx="12" cy="12" r="3" /></svg>
                       </a>
-                    </li> -->
-                  </ul>
+                    </li>
+                  </ul> -->
                   <div class="card-body">
                     <form id="UtilisateurForm" method="post" action="" enctype="multipart/form-data">
                     <div class="tab-content">
@@ -234,7 +234,7 @@
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE; <?php if($Utilisateurs['ID_Statut']==1){ echo 'display: none';} ?>" id="privileges">
                                     <div class="col-md-10" style="margin-bottom: 10px">
                                     <div class="row">
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">

@@ -114,10 +114,10 @@
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Devise'])); ?></td>
             <td style="text-align: right;"><?php echo "1".$defaults['Symbole']." = ".number_format($selections['Montant'], 2, ',', ' ').$selections['Symbole']; ?></td>
             <td><center><?php if ($selections['Active']==1){ echo 'Default';}else{ echo '<a class="btn btn-info" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_devise.php?ID='.$selections['ID_Taux_Change'].'&token='.$_SESSION['user_eteelo_app']['token'].'&Etab='.$selections['ID_Etablissement'].'&Ecole='.$_GET['Ecole'].'" title="Définir par defaut" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
-            <td><center>
+            <td style="padding-left: 250px"><!--<center> -->
                 <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Taux_Change']); ?>, <?php echo($selections['ID_Etablissement']); ?>, <?php echo($selections['ID_Taux']); ?>, '<?php echo number_format($selections['Montant'], 2, '.', ''); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_devise.php?ID=<?php echo($selections['ID_Taux_Change']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
+                <?php if($selections['Active']!=1 && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?>
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_devise.php?ID=<?php echo($selections['ID_Taux_Change']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a><!--</center> -->
                 <?php } ?>
             </td>
         </tr>
@@ -189,13 +189,15 @@
                 <div class="modal-body">
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                    <div class="col-lg-12">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                     <select name="liste_ecole" class="form-control" id="liste_ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                         <option value="">--</option>
                         <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
-                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>"><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
+                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
                         <?php } ?>
                     </select>
+                    </div>
                     <div class="col-lg-12">Devise *</div>
                     <select name="liste_devise" class="form-control" id="liste_devise">
                         <option value="">--</option>
