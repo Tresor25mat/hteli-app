@@ -6,7 +6,8 @@
     }
     require_once('connexion.php');
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
-    $nature=$pdo->query("SELECT * FROM nature_compte ORDER BY Design_Nature");
+    $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    $niveau=$pdo->query("SELECT * FROM niveau ORDER BY ID_Niveau");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -50,7 +51,8 @@
         <div class="container-xl">
           <!-- Page title -->
           <input type="hidden" name="ID_Etab" id="ID_Etab" value="<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>">
-          <input type="hidden" name="Categ" id="Categ" value="<?php if(isset($_GET['Categorie']) && $_GET['Categorie']!=''){echo $_GET['Categorie']; } ?>">
+          <input type="hidden" name="Liste_Opt" id="Liste_Opt" value="<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>">
+          <input type="hidden" name="Liste_Niv" id="Liste_Niv" value="<?php if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){echo $_GET['Niveau']; } ?>">
           <div class="page-header d-print-none">
             <div class="row g-2 align-items-center">
               <div class="col">
@@ -109,7 +111,7 @@
                     <div class="tab-content">
                       <div class="tab-pane active show" id="tabs-home-12">
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE">
-                                      <div class="col-md-3" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                                      <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">
@@ -124,55 +126,87 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-3" style="margin-bottom: 10px">
+                                      <div class="col-md-4" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Catégorie *</label>
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
                                           <div class="col-lg-12">
                                             <div class="input-group">
-                                                    <select name="categorie" class="form-control" id="categorie">
-                                                        <option value="" id="add_categorie">--</option>
+                                                    <select name="type_frais" class="form-control" id="type_frais">
+                                                        <option value="" id="addtype_frais">--</option>
                                                     </select>
                                                 <div class="input-group-btn">
-                                                    <button type="button" class="btn btn-primary" id="ajouter_categorie" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-plus"></i></button>
+                                                    <button type="button" class="btn btn-primary" id="ajouter_type_frais" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-plus"></i></button>
                                                 </div>
                                             </div> 
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-3" style="margin-bottom: 10px">
+                                      <div class="col-md-4" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">N°compte *</label>
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Option *</label>
                                           <div class="col-lg-12">
-                                              <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                  <span class="input-group-text" id="afficher_code" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; height: 38px"></span>
-                                                </div>
-                                                <input class="form-control " id="numero_compte" type="text" name="numero_compte">
-                                              </div> 
+                                                <select name="option" class="form-control" id="option">
+                                                    <option value="" id="add_option">--</option>
+                                                </select>
+                                            </div> 
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-3" style="margin-bottom: 10px">
+                                    <div class="row" style="border-bottom: 1px solid #EEEEEE">
+                                      <div class="col-md-4" style="margin-bottom: 10px;">
                                         <div class="form-group ">
-                                          <label for="profil" class="control-label col-lg-12" style="text-align: left;">Intitulé du compte *</label>
+                                        <input type="checkbox" name="btn_check_all_categories" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_categories" checked>
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Toutes les classes (*)</label>
                                           <div class="col-lg-12">
-                                            <input class="form-control " id="design" type="text" name="design">
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-md-3" style="margin-bottom: 10px">
-                                        <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Nature *</label>
-                                          <div class="col-lg-12">
-                                          <select name="nature" class="form-control" id="nature">
+                                          <select name="niveau" class="form-control" id="niveau">
                                                 <option value="">--</option>
-                                                <?php while($natures=$nature->fetch()){ ?>
-                                                <option value="<?php echo($natures['ID_Nature']) ?>"><?php echo(stripslashes($natures['Design_Nature'])) ?></option>
+                                                <?php while($niv=$niveau->fetch()){ ?>
+                                                <option value="<?php echo($niv['ID_Niveau']) ?>"><?php echo(stripslashes($niv['Design_Niveau'])) ?></option>
                                                 <?php } ?>
                                             </select>
                                           </div>
                                         </div>
                                       </div>
+                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                        <div class="form-group ">
+                                          <input type="checkbox" name="btn_check_all_categories" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_categories" checked>
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Toutes les catégories (*)</label>
+                                          <div class="col-lg-12">
+                                                <select name="categorie" class="form-control" id="categorie">
+                                                    <option value="" id="add_categorie">--</option>
+                                                </select>
+                                            </div> 
+                                          </div>
+                                        </div>
+                                      <div class="col-md-2" style="margin-bottom: 10px; padding-top: 21px">
+                                        <div class="form-group ">
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Devise *</label>
+                                          <div class="col-lg-12">
+                                                <select name="devise" class="form-control" id="devise">
+                                                    <option value="" id="add_devise">--</option>
+                                                </select>
+                                            </div> 
+                                          </div>
+                                        </div>
+                                        <div class="col-md-2" style="margin-bottom: 10px; padding-top: 21px">
+                                        <div class="form-group ">
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
+                                          <div class="col-lg-12">
+                                                <input type="number" class="form-control" step="any" name="montant" id="montant">
+                                            </div> 
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="row" style="marging-bottom: 20px">
+                                        <div class="form-group col-4" style="padding-top: 15px">
+                                          <div class="form-group ">
+                                              <div class="col-4">
+                                                  <input type="checkbox" name="btn_check_tranches" style="border-radius: 0; width:17px; height:17px; " id="btn_check_tranches">
+                                              </div>
+                                              <label for="curl" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
+                                          </div>
+                                        </div>
+                                    </div>
                                     </div>
                                     <div class="row" style="margin-top: 10px; padding-bottom: 10px">
                                             <div class="col-lg-12">
@@ -295,8 +329,34 @@
 
     })(jQuery);
     $(document).ready(function(){
-        $.ajax({
-                url:'recherche_categorie_compte.php',
+
+    })
+
+    $('#ecole').change(function(){
+        if($('#ecole').val()!=''){
+            $.ajax({
+                url:'recherche_type_frais.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#addtype_frais').nextAll().remove();
+                    $('#addtype_frais').after(ret);
+                    $('#type_frais').focus();
+                }
+            });
+            $.ajax({
+                url:'recherche_option.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_option').nextAll().remove();
+                    $('#add_option').after(ret);
+                }
+            });
+            $.ajax({
+                url:'recherche_cat_eleve.php',
                 type:'post',
                 dataType:'html', 
                 data:{Ecole:$('#ecole').val()},
@@ -305,19 +365,14 @@
                     $('#add_categorie').after(ret);
                 }
             });
-    })
-
-    $('#ecole').change(function(){
-        if($('#ecole').val()!=''){
             $.ajax({
-                url:'recherche_categorie_compte.php',
+                url:'recherche_devises.php',
                 type:'post',
                 dataType:'html', 
                 data:{Ecole:$('#ecole').val()},
                 success:function(ret){
-                    $('#add_categorie').nextAll().remove();
-                    $('#add_categorie').after(ret);
-                    $('#categorie').focus();
+                    $('#add_devise').nextAll().remove();
+                    $('#add_devise').after(ret);
                 }
             });
             $('#ID_Etablissement').val($('#ecole').val());
@@ -414,11 +469,6 @@
             });
         }
     })  
-    $('#nature').change(function(){
-        if($('#nature').val()!=''){
-            $('#btn_enregistrer').focus();
-        }
-    })
     $('#btn_annuler').click(function(){
         $('#numero_compte').val('');
         $('#design').val('');
@@ -429,7 +479,7 @@
     })
     $('#retour_table').click(function(e){
         e.preventDefault();
-        window.location.replace('afficher_table_compte.php?Ecole='+$('#ID_Etab').val()+'&Categorie='+$('#Categ').val());
+        window.location.replace('afficher_table_frais.php?Ecole='+$('#ID_Etab').val()+'&Option='+$('#Liste_Opt').val()+'&Niveau='+$('#Liste_Niv').val());
     })
     </script>
 </body>

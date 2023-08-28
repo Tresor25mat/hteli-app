@@ -98,7 +98,7 @@
                     </div>
                     <div class="col-md-2">
                       <div class="form-group ">
-                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Section </label>
+                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Option </label>
                         <div class="col-lg-12">
                           <div class="row">
                             <div class="col-sm-12">

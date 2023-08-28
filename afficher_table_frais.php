@@ -89,7 +89,7 @@
                                 <select name="ecole" class="form-control" id="ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                                     <option value="">--</option>
                                     <?php while($ecoles=$ecole->fetch()){ ?>
-                                    <option value="<?php echo($ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($ecoles['Design_Etablissement'])) ?></option>
+                                    <option value="<?php echo($ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';}else if(isset($_GET['Ecole']) && $_GET['Ecole']!='' && $_GET['Ecole']==$ecoles['ID_Etablissement']){echo 'selected';} ?>><?php echo(stripslashes($ecoles['Design_Etablissement'])) ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -99,10 +99,11 @@
                     </div>
                     <div class="col-md-2">
                       <div class="form-group ">
-                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Section </label>
+                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Option </label>
                         <div class="col-lg-12">
                           <div class="row">
                             <div class="col-sm-12">
+                                <input type="hidden" name="opt" id="opt" value="<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option'];} ?>">
                                 <select name="option" class="form-control" id="option">
                                     <option value="" id="add_option">--</option>
                                 </select>
@@ -120,7 +121,7 @@
                                 <select name="niveau" class="form-control" id="niveau">
                                     <option value="">--</option>
                                     <?php while($niv=$niveau->fetch()){ ?>
-                                    <option value="<?php echo($niv['ID_Niveau']) ?>"><?php echo(stripslashes($niv['Design_Niveau'])) ?></option>
+                                    <option value="<?php echo($niv['ID_Niveau']) ?>" <?php if(isset($_GET['Niveau']) && $_GET['Niveau']!='' && $_GET['Niveau']==$niv['ID_Niveau']){echo 'selected';} ?>><?php echo(stripslashes($niv['Design_Niveau'])) ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -195,24 +196,10 @@
                 success:function(ret){
                     $('#add_option').nextAll().remove();
                     $('#add_option').after(ret);
+                    $('#option').val($('#opt').val());
+                    $('#iframe').attr('src', "table_frais.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val()+"&Annee="+$('#annee').val());
                 }
             });
-            $.ajax({
-              url:"recherche_enseignant.php",
-              type:'post',
-              dataType:"json",
-              data:{Ecole:$('#ecole').val()},
-              success:function(donnee){
-                  listeEnseignant.length=0;
-                  $.map(donnee,function(objet){
-                    listeEnseignant.push({
-                          value:objet.Nom,
-                          desc:objet.ID_Enseignant
-                      });
-                  });
-              }
-            });
-            $('#iframe').attr('src', "table_frais.php?Ecole="+$('#ecole').val()+"&Option="+$('#option').val()+"&Niveau="+$('#niveau').val()+"&Annee="+$('#annee').val());
     });
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
