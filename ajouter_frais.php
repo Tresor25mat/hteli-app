@@ -7,6 +7,10 @@
     require_once('connexion.php');
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    if($_SESSION['user_eteelo_app']['ID_Statut']!=1){
+        $compte_debit=$pdo->query("SELECT * FROM compte INNER JOIN categorie_compte ON compte.ID_Categorie=categorie_compte.ID_Categorie WHERE compte.ID_Nature=8 AND compte.ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+        $compte_credit=$pdo->query("SELECT * FROM compte INNER JOIN categorie_compte ON compte.ID_Categorie=categorie_compte.ID_Categorie WHERE compte.ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." AND (compte.ID_Nature=2 OR compte.ID_Nature=3)");
+    }
     $niveau=$pdo->query("SELECT * FROM niveau ORDER BY ID_Niveau");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
@@ -107,7 +111,7 @@
                     </li>
                   </ul> -->
                   <div class="card-body">
-                    <form id="CompteForm" method="post" action="" enctype="multipart/form-data">
+                    <form id="FormFrais" method="post" action="" enctype="multipart/form-data">
                     <div class="tab-content">
                       <div class="tab-pane active show" id="tabs-home-12">
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE">
@@ -155,10 +159,10 @@
                                     <div class="row" style="border-bottom: 1px solid #EEEEEE">
                                       <div class="col-md-4" style="margin-bottom: 10px;">
                                         <div class="form-group ">
-                                        <input type="checkbox" name="btn_check_all_categories" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_categories" checked>
+                                        <input type="checkbox" name="btn_check_all_classes" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_classes" checked value="1">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Toutes les classes (*)</label>
                                           <div class="col-lg-12">
-                                          <select name="niveau" class="form-control" id="niveau">
+                                          <select name="niveau" class="form-control" id="niveau" disabled>
                                                 <option value="">--</option>
                                                 <?php while($niv=$niveau->fetch()){ ?>
                                                 <option value="<?php echo($niv['ID_Niveau']) ?>"><?php echo(stripslashes($niv['Design_Niveau'])) ?></option>
@@ -169,10 +173,10 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <input type="checkbox" name="btn_check_all_categories" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_categories" checked>
+                                          <input type="checkbox" name="btn_check_all_categories" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_categories" checked value="1">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Toutes les catégories (*)</label>
                                           <div class="col-lg-12">
-                                                <select name="categorie" class="form-control" id="categorie">
+                                                <select name="categorie" class="form-control" id="categorie" disabled>
                                                     <option value="" id="add_categorie">--</option>
                                                 </select>
                                             </div> 
@@ -197,16 +201,35 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="row" style="marging-bottom: 20px">
+                                      <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
                                         <div class="form-group col-4" style="padding-top: 15px">
-                                          <div class="form-group ">
-                                              <div class="col-4">
-                                                  <input type="checkbox" name="btn_check_tranches" style="border-radius: 0; width:17px; height:17px; " id="btn_check_tranches">
-                                              </div>
-                                              <label for="curl" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
-                                          </div>
+                                            <div class="col-4">
+                                                <input type="checkbox" name="btn_check_tranches" style="border-radius: 0; width:17px; height:17px; " id="btn_check_tranches" value="0">
+                                            </div>
+                                            <label for="curl" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
                                         </div>
                                     </div>
+                                    <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE; display: none" id="div_tranche">
+                                        <div class="form-group col-4" style="margin-bottom: 5px; padding-top: 15px">
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
+                                          <div class="col-lg-12">
+                                                <input type="text" class="form-control" name="design_tranche" id="design_tranche">
+                                            </div> 
+                                          </div>
+                                          <div class="col-4" style="margin-bottom: 5px; padding-top: 15px">
+                                        <div class="form-group ">
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
+                                          <div class="col-lg-12">
+                                                <input type="number" class="form-control" step="any" name="montant_tranche" id="montant_tranche">
+                                            </div> 
+                                          </div>
+                                        </div>
+                                        <div class="col-2" style="margin-bottom: 5px; padding-top: 35px">
+                                            <button class="btn btn-primary" type="button" id="btn_ajouter">Ajouter</button>
+                                        </div>
+                                        <div class="col-9" style="margin-bottom: 10px;">
+                                            <iframe src="" style="width: 100%; height: 150px;border: 1px solid #EEEEEE; margin-top: 20px" id="iframe_tranche"></iframe>
+                                        </div>
                                     </div>
                                     <div class="row" style="margin-top: 10px; padding-bottom: 10px">
                                             <div class="col-lg-12">
@@ -230,22 +253,46 @@
         </div>
       </div>
     </div>
-    <div id="ModalCategorie" class="modal fade" data-backdrop="static" style="margin-top: 100px">
-        <div class="modal-dialog modal-sm">
+    <div id="ModalAjout" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
-                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueCategorie()">&times;</button> -->
-                    <h4 class="modal-title">Ajouter catégorie</h4>
+                    <h4 class="modal-title">Nouvelle catégorie</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
                 </div>
                 <div class="modal-body">
-                    <div class="col-lg-12">Code *</div>
-                    <div class="col-lg-12"><input type="number" name="code_categorie" id="code_categorie" class="form-control" style="margin-top: 1%;" min="0" step="1" maxlength="2"></div>
+                   <form method="post" action="">
+                    <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">Ecole *</div>
+                    <div class="col-lg-12" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                    <select name="liste_ecole" class="form-control" id="liste_ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
+                        <option value="">--</option>
+                        <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
+                        <option value="<?php echo($liste_ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo(stripslashes($liste_ecoles['Design_Etablissement'])) ?></option>
+                        <?php } ?>
+                    </select>
+                    </div>
                     <div class="col-lg-12">Désignation *</div>
-                    <div class="col-lg-12"><input type="text" name="design_categorie" id="design_categorie" class="form-control" style="margin-top: 1%;"></div>
+                    <div class="col-lg-12"><input type="text" name="Design" id="Design" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Compte debit *</div>
+                    <select name="compte_debit" class="form-control" id="compte_debit">
+                        <option value="" id="ajouter_compte_debit">--</option>
+                        <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($compte_debits=$compte_debit->fetch()){ ?>
+                        <option value="<?php echo($compte_debits['ID_Compte']) ?>"><?php echo(stripslashes($compte_debits['Cod_Categorie'].$compte_debits['Cod_Compte'].' '.$compte_debits['Design_Compte'])) ?></option>
+                        <?php }} ?>
+                    </select>
+                    <div class="col-lg-12">Compte credit *</div>
+                    <select name="compte_credit" class="form-control" id="compte_credit">
+                        <option value="" id="ajouter_compte_credit">--</option>
+                        <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ while($compte_credits=$compte_credit->fetch()){ ?>
+                        <option value="<?php echo($compte_credits['ID_Compte']) ?>"><?php echo(stripslashes($compte_credits['Cod_Categorie'].$compte_credits['Cod_Compte'].' '.$compte_credits['Design_Compte'])) ?></option>
+                        <?php }} ?>
+                    </select>
+                    </form>
                 </div>
             <div class="modal-footer">
-                <button  class="btn btn-primary" id="btn_enreg_categorie">Enregistrer</button>
-                <button  class="btn btn-danger" onclick="fermerDialogueCategorie()">Annuler</button>
+                <button type="button" class="btn btn-primary" id="enregistrer">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogue()">Annuler</button>
             </div>
             </div>
         </div>
@@ -329,9 +376,145 @@
 
     })(jQuery);
     $(document).ready(function(){
-
+        if($('#ecole').val()!=''){
+            $.ajax({
+                url:'recherche_type_frais.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#addtype_frais').nextAll().remove();
+                    $('#addtype_frais').after(ret);
+                }
+            });
+            $.ajax({
+                url:'recherche_option.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_option').nextAll().remove();
+                    $('#add_option').after(ret);
+                }
+            });
+            $.ajax({
+                url:'recherche_cat_eleve.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_categorie').nextAll().remove();
+                    $('#add_categorie').after(ret);
+                }
+            });
+            $.ajax({
+                url:'recherche_devises.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_devise').nextAll().remove();
+                    $('#add_devise').after(ret);
+                }
+            });
+        }
     })
-
+    $('#type_frais').change(function() {
+        if($('#type_frais').val()!=''){
+            $('#option').focus();
+        }
+    })
+    $('#option').change(function() {
+        if($('#option').val()!=''){
+            $('#devise').focus();
+        }
+    })
+    $('#devise').change(function() {
+        if($('#devise').val()!=''){
+            $('#montant').focus();
+        }
+    })
+    $('#categorie').change(function() {
+        if($('#categorie').val()!=''){
+            $('#devise').focus();
+        }
+    })
+    $('#niveau').change(function() {
+        if($('#niveau').val()!=''){
+            $('#categorie').focus();
+        }
+    })
+    $('#liste_ecole').change(function(){
+        if($('#liste_ecole').val()!=''){
+            $.ajax({
+                url:'recherche_compte_debit.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#ajouter_compte_debit').nextAll().remove();
+                    $('#ajouter_compte_debit').after(ret);
+                }
+            });
+            $.ajax({
+                url:'recherche_compte_credit.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#liste_ecole').val()},
+                success:function(ret){
+                    $('#ajouter_compte_credit').nextAll().remove();
+                    $('#ajouter_compte_credit').after(ret);
+                }
+            });
+            $('#Design').focus();
+        }
+    })
+    $('#btn_check_all_categories').click(function(){
+        if($('#btn_check_all_categories').val()==0){
+            $('#categorie').attr('disabled', true);
+            $('#categorie').val('');
+            $('#btn_check_all_categories').val(1);
+        }else{
+            $('#categorie').attr('disabled', false);
+            $('#categorie').val('').focus();
+            $('#btn_check_all_categories').val(0);
+        }
+    })
+    $('#btn_check_all_classes').click(function(){
+        if($('#btn_check_all_classes').val()==0){
+            $('#niveau').attr('disabled', true);
+            $('#niveau').val('');
+            $('#btn_check_all_classes').val(1);
+        }else{
+            $('#niveau').attr('disabled', false);
+            $('#niveau').val('').focus();
+            $('#btn_check_all_classes').val(0);
+        }
+    })
+    $('#btn_check_tranches').click(function(){
+        if($('#btn_check_tranches').val()==0){
+            $('#div_tranche').slideDown('slow', function(){
+                $('#design_tranche').focus();
+            });
+            $('#btn_check_tranches').val(1);
+        }else{
+            $('#div_tranche').slideUp('slow', function(){
+                $('#design_tranche').val('');
+                $('#montant_tranche').val('');
+            });
+            $('#btn_check_tranches').val(0);
+        }
+    })
+    $('#compte_debit').change(function(){
+        if($('#compte_debit').val()!=''){
+            $('#compte_credit').focus();
+        }
+    })
+    $('#compte_credit').change(function(){
+        if($('#compte_credit').val()!=''){
+            $('#enregistrer').focus();
+        }
+    })
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
             $.ajax({
@@ -378,47 +561,9 @@
             $('#ID_Etablissement').val($('#ecole').val());
         }
     })
-    function fermerDialogueCategorie(){
-            $("#ModalCategorie").modal('hide');
-        };
-    $('#ajouter_categorie').click(function(e){
-      e.preventDefault();
-      if($('#ecole').val()!=''){
-          $("#ModalCategorie").modal('show');
-          $('#code_categorie').val('');
-          $('#design_categorie').val('');
-          $('#code_categorie').focus();
-      }else{
-        alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez choisir une école svp!");
-      }
-    })
-    $('#btn_enreg_categorie').click(function(){
-        if($('#code_categorie').val()=='' || $('#design_categorie').val()==''){
-            alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez saisir le code et la désignation svp!");
-        }else{
-                $.ajax({
-                    url:'enreg_cat_compte.php',
-                    type:'post',
-                    dataType:'text', 
-                    data:{Code:$('#code_categorie').val(), Design:$('#design_categorie').val(), Ecole:$('#ID_Etablissement').val(), token:$('#token').val()},
-                    success:function(ret){
-                        // alertify.alert('<?php echo $app_infos['Design_App']; ?>', ret);
-                        if(ret==2){
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Ce code existe déjà!");
-                        }else{
-                            alertify.success("L'opération a réussi");
-                            $('#add_categorie').nextAll().remove();
-                            $('#add_categorie').after(ret);
-                            $('#afficher_code').text($('#code_categorie').val());
-                            $("#ModalCategorie").modal('hide');
-                            $('#numero_compte').val('');
-                            $('#numero_compte').focus()
-                        }
-                    }
-                });
-        }
-    })
-        $('#CompteForm').submit(function(e){
+
+
+        $('#FormFrais').submit(function(e){
             e.preventDefault();
             var formData = new FormData(this);
             // formData.append('content', CKEDITOR.instances['descript'].getData());
@@ -481,5 +626,56 @@
         e.preventDefault();
         window.location.replace('afficher_table_frais.php?Ecole='+$('#ID_Etab').val()+'&Option='+$('#Liste_Opt').val()+'&Niveau='+$('#Liste_Niv').val());
     })
+
+    function fermerDialogue(){
+        $("#ModalAjout").modal('hide');
+    }
+  $(function() {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 5000
+    });
+
+    $('#ajouter_type_frais').click(function(e){
+      e.preventDefault();
+      $("#ModalAjout").modal('show');
+      $('#compte_debit').val('');
+      $('#compte_credit').val('');
+      $('#Design').val('');
+      $('#Design').focus();
+    })
+    $('#enregistrer').click(function(){
+        if($('#Design').val()=='' || $('#liste_ecole').val()=='' || $('#compte_debit').val()=='' || $('#compte_credit').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
+                $('#Design').focus();
+        }else{
+                $.ajax({
+                        url:'enreg_cat_frais.php',
+                        type:'post',
+                        beforeSend:function(){
+                        },
+                        dataType:'text',
+                        data: {Design:$('#Design').val(), Compte_Debit:$('#compte_debit').val(), Compte_Credit:$('#compte_credit').val(), Ecole:$('#liste_ecole').val(), token:$('#tok').val()},
+                        success:function(ret){
+                            if(ret==1){
+                                alertify.success("L'opération a réussi");
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Enregistrement éffectué'
+                                })
+                                $('#iframe').attr('src', "table_cat_frais.php?Ecole="+$('#ecole').val());
+                                fermerDialogue();
+                            }else if(ret==2){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                            }else{
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>',ret); 
+                            }
+                        }
+                    });
+        }
+    });
+  });
     </script>
 </body>
