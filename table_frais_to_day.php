@@ -5,7 +5,7 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT frais.*, type_frais.Libelle_Type_Frais, taux_change.Symbole, table_option.Design_Option, niveau.Design_Niveau, categorie_eleve.*, classe_frais.* from frais inner join table_option on frais.ID_Option=table_option.ID_Option INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais inner join niveau on classe_frais.ID_Niveau=niveau.ID_Niveau inner join taux_change on frais.ID_Taux=taux_change.ID_Taux inner join type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais inner join annee on frais.ID_Annee=annee.ID_Annee inner join section on table_option.ID_Section=section.ID_Section inner join categorie_eleve on classe_frais.ID_Cat_Eleve=categorie_eleve.ID_Categorie where frais.ID_Frais!=''";
+    $query="SELECT frais.*, type_frais.Libelle_Type_Frais, taux_change.Symbole, table_option.Design_Option, niveau.Design_Niveau, categorie_eleve.* from frais inner join table_option on frais.ID_Option=table_option.ID_Option INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais inner join niveau on classe_frais.ID_Niveau=niveau.ID_Niveau inner join taux_change on frais.ID_Taux=taux_change.ID_Taux inner join type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais inner join annee on frais.ID_Annee=annee.ID_Annee inner join section on table_option.ID_Section=section.ID_Section inner join categorie_eleve on classe_frais.ID_Cat_Eleve=categorie_eleve.ID_Categorie where frais.ID_Frais!=''";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
         $query.=" AND section.ID_Etablissement=".$_GET['Ecole'];
         $liste_option=$pdo->query("SELECT * FROM table_option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$_GET['Ecole']." ORDER BY Design_Option");
@@ -19,7 +19,7 @@
     if(isset($_GET['Annee']) && $_GET['Annee']!=''){
         $query.=" AND annee.ID_Annee =".$_GET['Annee']; 
     }
-    $query.=" ORDER BY type_frais.Libelle_Type_Frais";
+    $query.=" AND frais.Date_Enreg like '".date("Y-m-d")."%' ORDER BY type_frais.Libelle_Type_Frais";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
     $totalparpage=10;
@@ -103,7 +103,7 @@
 
 </div>
         <div class="page-body">
-          <div class="container-xl" style="border: 1px solid #E6E7E9">
+          <div class="container-xl">
             <div class="row row-deck row-cards">
             <input type="hidden" name="ID_Frais" id="ID_Frais">
             <input type="hidden" name="ID_Enseignant" id="ID_Enseignant">
@@ -122,24 +122,17 @@
                                         <th>Catégorie élève</th>
                                         <th>Désignation</th>
                                         <th>Montant</th>
-                                        <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
     <?php while($selections=$selection->fetch()){$Nbr++; ?>
-        <tr class="odd gradeX" style="background: transparent;">
+        <tr class="odd gradeX" style="background: transparent">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Niveau'])); ?></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Option'])); ?></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Categorie'])); ?></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Libelle_Type_Frais'])); ?></td>
             <td><!-- <center> --><?php echo number_format($selections['Montant_Frais'], 2, ',', ' ').stripslashes($selections['Symbole']); ?></td>
-            <td><center>
-                <a href="modifier_frais.php?ID=<?php echo($selections['ID_Classe_Frais']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Option=<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>&Niveau=<?php if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){echo $_GET['Niveau']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer ce frais ?\n Toutes les informations concernant ce frais seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_frais.php?ID=<?php echo($selections['ID_Classe_Frais']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Option=<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>&Niveau=<?php if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){echo $_GET['Niveau']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
-                <?php } ?>
-            </td>
         </tr>
     <?php } ?>
 </tbody>
@@ -149,7 +142,7 @@
                                 <?php 
                                 if($pageCourante>1){
                                     $page=$pageCourante-1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_frais.php?page='.$page.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$page.'&Ecole='.$_GET['Ecole'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }
@@ -160,28 +153,28 @@
                                     $pageAvantPrecedente=$pageCourante-2;
                                     $pagesAvantTotales=$pagesTotales-1;
                                     if($pageCourante==1){
-                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==2){
-                                        echo '<li class="page-item"><a class="page-link" href="table_frais.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==$pagesAvantTotales){
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pageNexte.'</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li>';
                                     }else if($pageCourante==$pagesTotales){
-                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
                                     }else{
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_frais.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
                                     }
                                 }else{
                                     for ($i=1; $i <= $pagesTotales ; $i++) { 
                                         if ($i==$pageCourante) {
                                             echo '<li class="page-item active"><a class="page-link" href="#">'.$i.'</a></li>';
                                         }else{
-                                            echo '<li class="page-item"><a class="page-link" href="table_frais.php?page='.$i.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">'.$i.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$i.'&Ecole='.$_GET['Ecole'].'">'.$i.'</a></li>';
                                         }
                                     } 
                                 }
                                 if($pagesTotales>$pageCourante){
                                     $page=$pageCourante+1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_frais.php?page='.$page.'&Ecole='.$_GET['Ecole'].'&Option='.$_GET['Option'].'&Niveau='.$_GET['Niveau'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_frais_to_day.php?page='.$page.'&Ecole='.$_GET['Ecole'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }
@@ -398,7 +391,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_frais.php?Ecole='+$('#ID_Etab').val()+"&Option="+$('#Option').val()+"&Niveau="+$('#Niveau').val());
+                                window.location.replace('table_frais_to_day.php?Ecole='+$('#ID_Etab').val()+"&Option="+$('#Option').val()+"&Niveau="+$('#Niveau').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{

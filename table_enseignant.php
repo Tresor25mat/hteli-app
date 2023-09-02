@@ -180,7 +180,7 @@
       </div>
     </div>
     <div id="ModalMod" class="modal fade" data-backdrop="static" style="margin-top: 100px">
-        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+        <div class="modal-dialog" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Modification d'un(e) enseignant(e)</h4>

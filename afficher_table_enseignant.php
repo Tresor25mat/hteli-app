@@ -122,7 +122,7 @@
       </div>
     </div>
     <div id="ModalAjout" class="modal fade" data-backdrop="static" style="margin-top: 100px">
-        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+        <div class="modal-dialog" style="border: 1px solid #E6E7E9">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Ajout d'un(e) enseignant(e)</h4>
