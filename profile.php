@@ -83,7 +83,7 @@
                   <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                   <input class="form-control" id="mimg" type="file" name="mimg" style="display: none;" accept=".jpg, .jpeg, .png">
                     <a href="#" id="mapercu" title="Changer la photo">
-                    <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(<?php if($Utilisateurs['Photo']==''){if($Utilisateurs['ID_Profil']==1){echo('images/photo_femme.jpg');}else{echo('images/photo.jpg');}}else{ echo('images/profil/'.$Utilisateurs['Photo']);} ?>); border: 1px solid #DEE2E6;" id="miamge"></span></a>
+                    <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(<?php if($Utilisateurs['Photo']==''){if($Utilisateurs['ID_Profil']==1){echo('images/photo_femme.jpg');}else{echo('images/photo.jpg');}}else{ echo('images/profil/'.$Utilisateurs['Photo']);} ?>); border: 1px solid #DEE2E6;" id="miamge"><?php if($Utilisateurs['Etat']==1){echo("<img src='images/connecte.gif' style='width: 12px; height: 12px; margin-top: 85px; margin-left: 78px'>");} ?></span></a>
                     <h3 class="m-0 mb-1"><!-- <a href="#"> --><?php echo $Utilisateurs['Prenom'].' '.$Utilisateurs['Nom']; ?></h3>
                     <div class="text-muted"><?php echo $Utilisateurs['Statut']; ?></div>
                     <?php if($Utilisateurs['Statut']!='Admin'){ ?>
