@@ -188,7 +188,7 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-                        <a class="dropdown-item gonow" href="#" ver="select_vols_vente_simple.php">
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_inscription.php">
                           Inscription
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="select_vols_importation.php">
