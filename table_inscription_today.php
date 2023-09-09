@@ -18,7 +18,7 @@
     if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){
         $query.=" AND (UCASE(Prenom_Eleve) LIKE '%".strtoupper($_GET['Eleve'])."%' OR UCASE(Nom_Eleve) LIKE '%".strtoupper($_GET['Eleve'])."%' OR UCASE(Pnom_Eleve) LIKE '%".strtoupper($_GET['Eleve'])."%')";
     }
-    $query.=" ORDER BY Nom_Eleve, Pnom_Eleve";
+    $query.=" AND inscription.Date_Enreg like '".date("Y-m-d")."%' ORDER BY Nom_Eleve, Pnom_Eleve";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
     $totalparpage=10;
@@ -112,7 +112,6 @@
                                         <th>Classe</th>
                                         <th>Catégorie</th>
                                         <th>Date d'inscription</th>
-                                        <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
@@ -124,12 +123,6 @@
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Classe']); ?></td>
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Categorie']); ?></td>
             <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Date_Enreg'])); ?></td>
-            <td><center>
-                <a href="modifier_inscription.php?ID=<?php echo($selections['ID_Inscription']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_inscription.php?ID=<?php echo($selections['ID_Inscription']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
-                <?php } ?>
-            </td>
         </tr>
     <?php } ?>
 </tbody>

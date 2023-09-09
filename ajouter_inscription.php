@@ -7,6 +7,7 @@
     require_once('connexion.php');
     $profil=$pdo->query("SELECT * FROM profil ORDER BY ID_Profil");
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $lieu=$pdo->query("SELECT * FROM lieu ORDER BY Design_Lieu");
     $commune=$pdo->query("SELECT * FROM commune WHERE ID_Ville=1 ORDER BY Design_Commune");
     $annee=$pdo->query("SELECT * FROM annee ORDER BY ID_Annee");
@@ -45,6 +46,16 @@
       .mylink:hover{
           font-weight: bold;
           text-decoration: none;
+      }
+      .alertify .ajs-dialog {
+        top: 17%;
+        transform: translateY(-50%);
+        margin: auto;
+    }
+    .ui-autocomplete{
+        background-color:#CCC ! important;
+        z-index: 10000;
+        width: 200px
       }
   </style>
 </head>
@@ -120,7 +131,7 @@
                                     <div class="row">
                                       <div class="col-md-4" style="margin-bottom: 5px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
+                                          <label for="ecole" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">
                                             <select name="ecole" id="ecole" class="form-control " <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                                               <option value="">--</option>
@@ -134,7 +145,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
+                                          <label for="classe" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
                                           <div class="col-lg-12">
                                             <select name="classe" class="form-control" id="classe">
                                                 <option value="" id="add_classe">--</option>
@@ -144,7 +155,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                            <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Année scolaire *</label>
+                                            <label for="annee" class="control-label col-lg-12" style="text-align: left;">Année scolaire *</label>
                                             <select name="annee" class="form-control" id="annee">
                                                 <option value="">--</option>
                                                 <?php while($annees=$annee->fetch()){ ?>
@@ -161,9 +172,18 @@
                                     <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE">
                                     <div class="col-md-10" style="margin-bottom: 5px">
                                     <div class="row">
+                                    <div class="col-md-12" style="margin-bottom: 5px;">
+                                        <div class="form-group ">
+                                          <label for="ancien_eleve" class="control-label col-lg-12" style="text-align: left;">Ancien élève </label>
+                                          <div class="col-lg-12">
+                                          <input type="text" class="form-control" id="ancien_eleve" name="ancien_eleve">
+                                          <input type="hidden" name="ID_Eleve" id="ID_Eleve">
+                                          </div>
+                                        </div>
+                                      </div>
                                     <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Matricule </label>
+                                          <label for="matricule" class="control-label col-lg-12" style="text-align: left;">Matricule </label>
                                           <div class="col-lg-12">
                                             <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                                             <input class="form-control " id="matricule" type="text" name="matricule" autofocus="autofocus">
@@ -180,7 +200,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Nom *</label>
+                                          <label for="nom" class="control-label col-lg-12" style="text-align: left;">Nom *</label>
                                           <div class="col-lg-12">
                                             <input class="form-control " id="nom" type="text" name="nom">
                                           </div>
@@ -188,7 +208,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Post-nom </label>
+                                          <label for="pnom" class="control-label col-lg-12" style="text-align: left;">Post-nom </label>
                                           <div class="col-lg-12">
                                             <input class="form-control " id="pnom" type="text" name="pnom">
                                           </div>
@@ -196,7 +216,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="profil" class="control-label col-lg-12" style="text-align: left;">Sexe *</label>
+                                          <label for="sexe" class="control-label col-lg-12" style="text-align: left;">Sexe *</label>
                                           <div class="col-lg-12">
                                             <select name="sexe" id="sexe" class="form-control ">
                                               <option value="">--</option>
@@ -208,7 +228,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Adresse </label>
+                                          <label for="adresse" class="control-label col-lg-12" style="text-align: left;">Adresse </label>
                                           <div class="col-lg-12">
                                             <input class="form-control" id="adresse" type="text" name="adresse">
                                           </div>
@@ -216,7 +236,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="profil" class="control-label col-lg-12" style="text-align: left;">Commune </label>
+                                          <label for="commune" class="control-label col-lg-12" style="text-align: left;">Commune </label>
                                           <div class="col-lg-12">
                                             <select name="commune" id="commune" class="form-control ">
                                               <option value="">--</option>
@@ -229,13 +249,13 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Lieu de naissance </label>
+                                          <label for="lieu_naiss" class="control-label col-lg-12" style="text-align: left;">Lieu de naissance </label>
                                           <div class="col-lg-12">
                                               <div class="input-group">
                                                 <select name="lieu_naiss" class="form-control" id="lieu_naiss">
                                                     <option value="" id="addlieu">--</option>
                                                     <?php while ($lieus=$lieu->fetch()){ ?>
-                                                    <option value="<?php echo($lieus['ID_Lieu']); ?>"><?php echo(stripslashes($lieus['Design_Lieu'])); ?></option>
+                                                    <option value="<?php echo($lieus['ID_Lieu']); ?>"><?php echo(stripslashes(strtoupper($lieus['Design_Lieu']))); ?></option>
                                                     <?php } ?>
                                                 </select>
                                                 <div class="input-group-btn">
@@ -247,9 +267,10 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Date de naissance </label>
+                                          <label for="datenaiss" class="control-label col-lg-12" style="text-align: left;">Date de naissance </label>
                                           <div class="col-lg-12">
                                             <input class="form-control date" id="datenaiss" type="text" name="datenaiss">
+                                            <input type="hidden" name="daten" id="daten">
                                           </div>
                                         </div>
                                       </div>
@@ -257,7 +278,7 @@
                                       </div>
                                       <div class="col-md-2" style="margin-bottom: 5px">
                                     <div class="form-group ">
-                                      <label for="curl" class="control-label col-lg-12" style="text-align: left;">Picture</label>
+                                      <label for="miamge" class="control-label col-lg-12" style="text-align: left;">Picture</label>
                                       <div class="col-lg-12">
                                         <input class="form-control " id="mimg" type="file" name="mimg" style="display: none;" accept=".jpg, .jpeg, .png">
                                         <a href="#" id="mapercu" title="Choisir l'image">
@@ -272,7 +293,7 @@
                                     <div class="row">
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Catégorie *</label>
+                                          <label for="categorie" class="control-label col-lg-12" style="text-align: left;">Catégorie *</label>
                                           <div class="col-lg-12">
                                             <select name="categorie" id="categorie" class="form-control ">
                                               <option value="" id="add_categorie">--</option>
@@ -282,7 +303,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole de provenance </label>
+                                          <label for="provenance" class="control-label col-lg-12" style="text-align: left;">Ecole de provenance </label>
                                           <div class="col-lg-12">
                                             <input class="form-control" id="provenance" type="text" name="provenance">
                                             <input id="ID_Ecole_Provenance" type="hidden" name="ID_Ecole_Provenance">
@@ -306,7 +327,7 @@
                                             <div class="col-4">
                                                 <input type="checkbox" name="btn_check_informations" style="border-radius: 0; width:17px; height:17px; " id="btn_check_informations" value="0">
                                             </div>
-                                            <label for="curl" class="control-label" style="text-align: left; margin-bottom: 5px">Autres informations </label>
+                                            <label for="btn_check_informations" class="control-label" style="text-align: left; margin-bottom: 5px">Autres informations </label>
                                         </div>
                                     </div>
                                     <div style="display: none" id="autres_info">
@@ -315,7 +336,7 @@
                                     <div class="row" style="padding-top: 5px">
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Province d'origine </label>
+                                          <label for="province" class="control-label col-lg-12" style="text-align: left;">Province d'origine </label>
                                           <div class="col-lg-12">
                                             <select name="province" id="province" class="form-control ">
                                               <option value="">--</option>
@@ -328,7 +349,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Territoire / Ville </label>
+                                          <label for="territoire" class="control-label col-lg-12" style="text-align: left;">Territoire / Ville </label>
                                           <div class="col-lg-12">
                                             <div class="input-group">
                                                 <select name="territoire" id="territoire" class="form-control ">
@@ -343,7 +364,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Secteur / Commune </label>
+                                          <label for="secteur" class="control-label col-lg-12" style="text-align: left;">Secteur / Commune </label>
                                           <div class="col-lg-12">
                                             <div class="input-group">
                                                 <select name="secteur" id="secteur" class="form-control ">
@@ -366,15 +387,16 @@
                                     <div class="row" style="padding-top: 5px">
                                       <div class="col-md-12" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Responsable </label>
+                                          <label for="noms" class="control-label col-lg-12" style="text-align: left;">Responsable </label>
                                           <div class="col-lg-12">
                                           <input type="text" class="form-control" id="noms" name="noms">
+                                          <input type="hidden" name="ID_Responsable" id="ID_Responsable">
                                           </div>
                                         </div>
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Prénom </label>
+                                          <label for="prenom_responsable" class="control-label col-lg-12" style="text-align: left;">Prénom </label>
                                           <div class="col-lg-12">
                                           <input type="text" class="form-control" id="prenom_responsable" name="prenom_responsable"> 
                                           </div>
@@ -382,7 +404,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Nom </label>
+                                          <label for="nom_responsable" class="control-label col-lg-12" style="text-align: left;">Nom </label>
                                           <div class="col-lg-12">
                                           <input type="text" class="form-control" id="nom_responsable" name="nom_responsable"> 
                                           </div>
@@ -390,7 +412,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Post-nom </label>
+                                          <label for="pnom_responsable" class="control-label col-lg-12" style="text-align: left;">Post-nom </label>
                                           <div class="col-lg-12">
                                           <input type="text" class="form-control" id="pnom_responsable" name="pnom_responsable"> 
                                           </div>
@@ -398,7 +420,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Sexe </label>
+                                          <label for="sexe_responsable" class="control-label col-lg-12" style="text-align: left;">Sexe </label>
                                           <div class="col-lg-12">
                                             <select name="sexe_responsable" class="form-control" id="sexe_responsable">
                                                   <option value="">--</option>
@@ -410,7 +432,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Téléphone </label>
+                                          <label for="tel_responsable" class="control-label col-lg-12" style="text-align: left;">Téléphone </label>
                                           <div class="col-lg-12">
                                           <input type="text" class="form-control" id="tel_responsable" name="tel_responsable"> 
                                           </div>
@@ -418,7 +440,7 @@
                                       </div>
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
-                                            <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Lien de parenté *</label>
+                                            <label for="lien_responsable" class="control-label col-lg-12" style="text-align: left;">Lien de parenté *</label>
                                             <select name="lien_responsable" class="form-control" id="lien_responsable">
                                                 <option value="">--</option>
                                                 <?php while ($degres=$degre->fetch()){ ?>
@@ -441,6 +463,10 @@
                                               </div>
                                             </div>
                                         </div>
+                                        <div class="form-panel" style="border-top: solid 1px RGB(231,231,231);">
+                                            <iframe src="" style="width: 100%; height: 1000px;border: 1px solid #E6E7E9; margin-top: 20px; padding: 7px; background: #F5F7FB" id="iframe"></iframe>  
+                                        <!-- /form-panel -->
+                                        </div>
                                 <!-- </div> -->
                       </div>
                     </div>
@@ -452,6 +478,78 @@
           </div>
         </div>
       </div>
+    </div>
+    <div id="ModalAjoutLieuNaiss" class="modal fade" data-backdrop="static" style="margin-top: 200px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Ajout d'une ville</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
+                </div>
+                <div class="modal-body">
+                   <form method="post" action="">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="col-lg-12">Désignation *</div>
+                            <div class="col-lg-12"><input type="text" name="design_ville" id="design_ville" class="form-control" style="margin-top: 1%;" value="" required></div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="enregistrer_lieu">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogueLieuNaiss()">Annuler</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div id="ModalAjoutTerritoire" class="modal fade" data-backdrop="static" style="margin-top: 300px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Ajout d'un territoire</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
+                </div>
+                <div class="modal-body">
+                   <form method="post" action="">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="col-lg-12">Désignation *</div>
+                            <div class="col-lg-12"><input type="text" name="design_territoire" id="design_territoire" class="form-control" style="margin-top: 1%;" value="" required></div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="enregistrer_territoire">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogueTerritoire()">Annuler</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div id="ModalAjoutSecteur" class="modal fade" data-backdrop="static" style="margin-top: 300px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Ajout d'un secteur</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
+                </div>
+                <div class="modal-body">
+                   <form method="post" action="">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="col-lg-12">Désignation *</div>
+                            <div class="col-lg-12"><input type="text" name="design_secteur" id="design_secteur" class="form-control" style="margin-top: 1%;" value="" required></div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="enregistrer_secteur">Enregistrer</button>
+                <button  class="btn btn-danger" onclick="fermerDialogueSecteur()">Annuler</button>
+            </div>
+            </div>
+        </div>
     </div>
     <script src="./dist/libs/apexcharts/dist/apexcharts.min.js" defer></script>
     <script src="./dist/libs/jsvectormap/dist/js/jsvectormap.min.js" defer></script>
@@ -531,8 +629,82 @@
     };
 
     })(jQuery);
-    let modules = [];
+
+    listeref=[];
+    function recheche_provenance(){
+        $.ajax({
+          url:"recherche_provenance.php",
+          dataType:"json",
+          success:function(donnee){
+              listeref.length=0;
+              $.map(donnee,function(objet){
+                  listeref.push({
+                      value:objet.Design,
+                      desc:objet.ID_Ecole_Provenance
+                  });
+              });
+          }
+        });
+    }
+    listeleve=[]; 
+    function recheche_eleve(){
+        $.ajax({
+          url:"recherche_eleve.php",
+          type:'post',
+          dataType:"json",
+          data:{Ecole:$('#ecole').val()},
+          success:function(donnee){
+              listeleve.length=0;
+              $.map(donnee,function(objet){
+                  listeleve.push({
+                      value:objet.Nom,
+                      desc:objet.ID_Eleve
+                  });
+              });
+          }
+        });
+    }
+    $('#datenaiss').change(function(){
+        if($('#datenaiss').val()==''){
+          let date_naiss = $('#datenaiss').val();
+          date_naissance = date_naiss.replace(/\//g, "-");
+          alertify.alert('Salut', date_naissance);
+          // $('#daten').val(date_naissance);
+        }
+    })
+    $('#provenance').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listeref,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Ecole_Provenance').val(ui.item.desc);
+            $('#btn_enregistrer').focus();
+        }
+    
+    });
+
+    listerefe=[]; 
+    function recheche_responsable(){
+        $.ajax({
+          url:"recherche_responsable.php",
+          type:'post',
+          dataType:"json",
+          data:{Ecole:$('#ecole').val()},
+          success:function(donnee){
+              listerefe.length=0;
+              $.map(donnee,function(objet){
+                  listerefe.push({
+                      value:objet.Nom,
+                      desc:objet.ID_Responsable
+                  });
+              });
+          }
+        });
+    }
     $(document).ready(function(){
+        recheche_responsable();
+        recheche_provenance();
+        recheche_eleve();
         $.ajax({
                 url:'recherche_classe.php',
                 type:'post',
@@ -553,6 +725,92 @@
                     $('#add_categorie').after(ret);
                 }
             });
+            $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val());
+    })
+    $('#noms').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listerefe,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Responsable').val(ui.item.desc);
+
+              $.ajax({
+                  url:"recherche_responsables.php",
+                  type:"post",
+                  // beforeSend:function(){
+                  //       waitingDialog.show('Veuillez patienter svp!');
+                  // },
+                  dataType:"json",
+                  data:{ID_Responsable:$('#ID_Responsable').val()},
+                  success:function(donnee){
+                      $.map(donnee,function(objet){
+                            $('#prenom_responsable').val(objet.Prenom);
+                            $('#nom_responsable').val(objet.Nom);
+                            $('#pnom_responsable').val(objet.Pnom);
+                            $('#sexe_responsable').val(objet.Sexe);
+                            $('#tel_responsable').val(objet.Tel);
+                            $('#lien_responsable').focus();
+                      })
+                  }
+              })
+        }
+    });
+    $('#ancien_eleve').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listeleve,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Eleve').val(ui.item.desc);
+
+              // $.ajax({
+              //     url:"recherche_responsables.php",
+              //     type:"post",
+              //     dataType:"json",
+              //     data:{ID_Responsable:ID_Responsable},
+              //     success:function(donnee){
+              //         $.map(donnee,function(objet){
+              //               $('#prenom_responsable').val(objet.Prenom);
+              //               $('#nom_responsable').val(objet.Nom);
+              //               $('#pnom_responsable').val(objet.Pnom);
+              //               $('#sexe_responsable').val(objet.Sexe);
+              //               $('#tel_responsable').val(objet.Tel);
+              //               $('#lien_responsable').focus();
+              //         })
+              //     }
+              // })
+        }
+    });
+    function fermerDialogueLieuNaiss(){
+        $("#ModalAjoutLieuNaiss").modal('hide');
+    }
+    function fermerDialogueTerritoire(){
+        $("#ModalAjoutTerritoire").modal('hide');
+    }
+    function fermerDialogueSecteur(){
+        $("#ModalAjoutSecteur").modal('hide');
+    }
+    $('#ajouter_ville').click(function(){
+      $("#ModalAjoutLieuNaiss").modal('show');
+      $('#design_ville').val('');
+      $('#design_ville').focus();
+    })
+    $('#ajouter_territoire').click(function(){
+      if($('#province').val()==''){
+          alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner une province svp!', function(){$('#province').focus();});
+      }else{
+          $("#ModalAjoutTerritoire").modal('show');
+          $('#design_territoire').val('');
+          $('#design_territoire').focus();
+      }
+    })
+    $('#ajouter_secteur').click(function(){
+      if($('#province').val()=='' || $('#territoire').val()==''){
+          alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner une province et un territoire svp!', function(){$('#province').focus();});
+      }else{
+          $("#ModalAjoutSecteur").modal('show');
+          $('#design_secteur').val('');
+          $('#design_secteur').focus();
+      }
     })
     $('#ecole').change(function(){
         if($('#ecole').val()!=''){
@@ -581,9 +839,55 @@
     })
     $('#classe').change(function(){
         if($('#classe').val()!=''){
-            $('#annee').focus();
+            $('#matricule').focus();
         }
     })
+    $('#province').change(function(){
+        $('#territoire').val('');
+        $('#secteur').val('');
+        if ($('#province').val()!=""){
+            $.ajax({
+                url:'recharge_list.php',
+                type:'post',
+                dataType:'html', 
+                data:{province:$('#province').val(), liste:"province"},
+                success:function(ret){
+                    $('#addterritoire').nextAll().remove();
+                    $('#addterritoire').after(ret);
+                    $('#territoire').focus();
+                    }
+            });
+        }
+    });
+    $('#territoire').change(function(){  
+        $('#secteur').val('');
+        if ($(this).val()!=""){   
+            $.ajax({
+                url:'recharge_list.php',
+                type:'post',
+                dataType:'html', 
+                data:{ville:$('#territoire').val(), liste:"ville"},
+                success:function(ret){
+                    $('#addsecteur').nextAll().remove();
+                    $('#addsecteur').after(ret);
+                    $('#secteur').focus();
+                }
+            });   
+        }
+    });
+    $('#secteur').change(function(){  
+        $('#noms').focus();
+    });
+    $('#sexe_responsable').change(function(){
+        if($('#sexe_responsable').val()!=''){
+            $('#tel_responsable').focus();
+        }
+    });
+    $('#lien_responsable').change(function(){
+        if($('#lien_responsable').val()!=''){
+            $('#btn_enregistrer').focus();
+        }
+    });
     $('#btn_check_informations').click(function(){
         if($('#btn_check_informations').val()==0){
             $('#autres_info').slideDown('slow', function(){
@@ -595,6 +899,14 @@
                 $('#province').val('');
                 $('#territoire').val('');
                 $('#secteur').val('');
+                $('#prenom_responsable').val('');
+                $('#nom_responsable').val('');
+                $('#pnom_responsable').val('');
+                $('#sexe_responsable').val('');
+                $('#tel_responsable').val('');
+                $('#lien_responsable').val('');
+                $('#noms').val('');
+                $('#ID_Responsable').val('');
             });
             $('#btn_check_informations').val(0);
         }
@@ -625,18 +937,6 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-    $('#afficher_modep').click(function(e){
-        e.preventDefault();
-        if($('#afficher_modep').attr('title')=='Afficher'){
-            $('#password').attr('type', 'text');
-            $('#afficher_modep').attr('title', 'Masquer');
-            $('#micon').attr('class', 'fa fa-times');
-        }else{
-            $('#password').attr('type', 'password');
-            $('#afficher_modep').attr('title', 'Afficher');
-            $('#micon').attr('class', 'fa fa-eye'); 
-        }
-    })
 
     $('#ecole').change(function() {
         if($('#ecole').val()=='') {
@@ -647,64 +947,29 @@
         }
     })
 
-    $('#ajouter_module').click(function(){
-        if($('#module').val()==''){
-            alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner un module svp!', function(){$('#module').focus();});
-        }else{
-          if (!modules.includes($('#module').val())) {
-              modules.push($('#module').val());
-              $.ajax({
-                      url:'ajout_module.php',
-                      type:'post',
-                      dataType:'text',
-                      data:{Modules:modules},
-                      success:function(ret){
-                          $('#mydiv').html(ret);
-                          $('#modules').val(modules);
-                          $('#module').val('').focus();
-                      }
-              });
-          }else{
-            alertify.alert('<?php echo $app_infos['Design_App']; ?>','Ce module existe déjà !', function(){$('#module').val('').focus();});
-          }
-        }
-    });
-
-    function delete_module(mod){
-            let newModules = []
-            modules.forEach(m => {
-                if(m != mod){
-                    newModules.push(m)
-                    return
-                }
-            })
-            modules = newModules
-            // alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Modules :' + modules.length);
-            $.ajax({
-                      url:'ajout_module.php',
-                      type:'post',
-                      dataType:'text',
-                      data:{Modules:modules},
-                      success:function(ret){
-                          $('#mydiv').html(ret);
-                          $('#modules').val(modules);
-                          $('#module').val('');
-                      }
-              });
-    }
-    $('#module').change(function(){
-        if($('#module').val()!=''){
-            $('#ajouter_module').focus();
-        }
-    })
-          $('#profil').change(function(){
-            $('#tel').focus();
+          $('#sexe').change(function(){
+            $('#adresse').focus();
             if($('#mimg').val()==''){
-              if($('#profil').val()==1){
+              if($('#sexe').val()=='F'){
                   $('#miamge').attr('src', 'images/photo_femme.jpg');
               }else{
                   $('#miamge').attr('src', 'images/photo.jpg');
               }
+            }
+          })
+          $('#commune').change(function(){
+            if($('#commune').val()!=''){
+                $('#lieu_naiss').focus();
+            }
+          })
+          $('#lieu_naiss').change(function(){
+            if($('#lieu_naiss').val()!=''){
+                $('#datenaiss').focus();
+            }
+          })
+          $('#categorie').change(function(){
+            if($('#categorie').val()!=''){
+                $('#provenance').focus();
             }
           })
     $('#mapercu').click(function(e){
@@ -714,41 +979,8 @@
     $('#mimg').change(function(){
          readURL(this);
     })
-    $('#mail').change(function(){
-        $.ajax({
-            url:'validationmail.php',
-            type:'post',
-            dataType:'text',
-            data: {Mail:$('#mail').val()},
-            success:function(ret){
-                if(ret==1){
-                    $('#mail').css('border-color', 'RGB(234,234,234)');
-                    $('#btn_next').attr('disabled', false);
-                }else if(ret==2){
-                    alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Please enter a valid email address!", function(){
-                      $('#mail').css('border-color', 'RGB(215,76,71)');
-                      $('#mail').val($('#mail').val());
-                      $('#btn_next').attr('disabled', true);
-                      $('#mail').focus();
-                    });
-                }
-            }
-        }); 
-    })
 
-    $('#nom').blur(function(){
-            $.ajax({
-                    url:'count_utilisateur.php',
-                    type:'post',
-                    dataType:'text',
-                    success:function(ret){
-                        var str = $('#prenom').val()+'.'+$('#nom').val()+ret;
-                        var res = str.toLowerCase().replace(/ /g, "");
-                        $('#login').val(res);
-                        $('#password').val('1234');
-                    }
-                });
-          })
+
   $(function() {
     const Toast = Swal.mixin({
       toast: true,
@@ -757,20 +989,111 @@
       timer: 5000
     });
 
+
+    $('#enregistrer_lieu').click(function(){
+        if($('#design_ville').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez saisir une désignation svp!');
+                $('#design_ville').focus();
+        }else{
+                $.ajax({
+                        url:'enreg_lieu.php',
+                        type:'post',
+                        beforeSend:function(){
+                        },
+                        dataType:'text',
+                        data: {Design:$('#design_ville').val()},
+                        success:function(ret){
+                            if(ret==2){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                            }else{
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Enregistrement éffectué'
+                                })
+                                $('#addlieu').nextAll().remove();
+                                $('#addlieu').after(ret);
+                                $('#datenaiss').focus();    
+                                fermerDialogueLieuNaiss();
+                            }
+                        }
+                    });
+        }
+    });
+
+    $('#enregistrer_territoire').click(function(){
+        if($('#design_territoire').val()=='' || $('#province').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Vous devez selectionner une province et saisir une désignation svp!');
+                $('#design_territoire').focus();
+        }else{
+                $.ajax({
+                        url:'recharge_list.php',
+                        type:'post',
+                        beforeSend:function(){
+                        },
+                        dataType:'text',
+                        data: {province:$('#province').val(),designville:$('#design_territoire').val(),liste:"ajoutville"},
+                        success:function(ret){
+                            if(ret==2){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                            }else{
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Enregistrement éffectué'
+                                })
+                                $('#addterritoire').nextAll().remove();
+                                $('#addterritoire').after(ret);
+                                $('#secteur').focus();    
+                                fermerDialogueTerritoire();
+                            }
+                        }
+                    });
+        }
+    });
+
+    $('#enregistrer_secteur').click(function(){
+        if($('#design_secteur').val()=='' || $('#province').val()=='' || $('#territoire').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Vous devez selectionner une province, un territoire et saisir une désignation svp!');
+                $('#design_secteur').focus();
+        }else{
+                $.ajax({
+                        url:'recharge_list.php',
+                        type:'post',
+                        beforeSend:function(){
+                        },
+                        dataType:'text',
+                        data: {ville:$('#territoire').val(),designsecteur:$('#design_secteur').val(),liste:"ajoutsecteur"},
+                        success:function(ret){
+                            if(ret==2){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
+                            }else{
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Enregistrement éffectué'
+                                })
+                                $('#addsecteur').nextAll().remove();
+                                $('#addsecteur').after(ret);
+                                $('#noms').focus();    
+                                fermerDialogueSecteur();
+                            }
+                        }
+                    });
+        }
+    });
+
         $('#EleveForm').submit(function(e){
             e.preventDefault();
+            let date_naiss = $('#datenaiss').val();
+            date_naissance = date_naiss.replace(/\//g, "-");
+            $('#daten').val(date_naissance);
             var formData = new FormData(this);
-
-            if($('#prenom').val()=='' || $('#password').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()=='' || $('#statut').val()==''){
+            if($('#prenom').val()=='' || $('#nom').val()=='' || $('#sexe').val()=='' || $('#categorie').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#prenom').focus();});
-            }else if($('#statut').val()!=1 && (modules.length==0 || $('#ecole').val()=='')){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir l\'école et les modules svp!', function(){$('#ecole').focus();});
             }else{
                 $.ajax({
-                    url:'enreg_utilisateur.php',
+                    url:'enreg_eleve.php',
                     type:'post',
                     beforeSend:function(){
-                        waitingDialog.show('Please wait!');
+                      waitingDialog.show('Veuillez patienter...');
                     },
                     dataType:'text',
                     data: formData,
@@ -788,40 +1111,17 @@
                                 icon: 'success',
                                 title: 'Enregistré'
                              })
-                             window.location.replace('table_utilisateur.php');
+                             $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val());
+                             $('#btn_annuler_tout').click();
                          }else{
                             alertify.alert(ret);
                          }
-
                     }
                 });
             }
           })
   })
 
-          $('#generer_modep').click(function(){
-            $.ajax({
-                    url:'generer_modep.php',
-                    type:'post',
-                    dataType:'text',
-                    success:function(ret){
-                        $('#password').val(ret);
-                    }
-                });
-          })
-          $('#statut').change(function(){
-                if($('#statut').val()!=''){
-                      if($('#statut').val()==1){
-                          $('#privileges').slideUp('slow');
-                      }else{
-                        $('#privileges').slideDown('slow');
-                      }
-                      $('#login').focus();
-                }
-          })             
-    $('#btn_annuler').click(function(){
-        window.location.replace('table_utilisateur.php');
-    })
     $('#retour_table').click(function(e){
         e.preventDefault();
         window.location.replace('afficher_table_inscription.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val());
@@ -829,31 +1129,27 @@
     $('#btn_annuler_tout').click(function(){
         $('#prenom').val('');
         $('#nom').val('');
-        $('#profil').val('');
+        $('#pnom').val('');
+        $('#matricule').val('');
         $('#mimg').val('');
-        $('#tel').val('');
-        $('#login').val('');
-        $('#mail').val('');
-        $('#password').val('');
-        $('#statut').val('');
+        $('#sexe').val('');
+        $('#adresse').val('');
+        $('#commune').val('');
+        $('#ancien_eleve').val('');
+        $('#ID_Eleve').val('');
+        $('#lieu_naiss').val('');
+        $('#datenaiss').val('');
+        $('#categorie').val('');
+        $('#provenance').val('');
+        $('#ID_Ecole_Provenance').val('');
         $('#miamge').attr('src','images/photo.jpg');
-        modules = [];
-        $.ajax({
-                      url:'ajout_module.php',
-                      type:'post',
-                      dataType:'text',
-                      data:{Modules:modules},
-                      success:function(ret){
-                          $('#mydiv').html(ret);
-                          $('#module').val('');
-                      }
-              });
-        $('#prenom').focus();
-        $('#privileges').slideUp('slow', function () {
-            if($('#ecole').prop('disabled') == false){
-                $('#ecole').val('');
-            }
-        });
+        $('#matricule').focus();
+        if($('#btn_check_informations').is(':checked')){
+            $('#btn_check_informations').click();
+        }
+        recheche_responsable();
+        recheche_provenance();
+        recheche_eleve();
     })
     $(function(){
         $(".date").datepicker({closeText:'fermer',prevText:'&#x3c;Préc',nextText:'Suiv&#x3e;',currentText:'Courant',dateFormat:"dd/mm/yy", minDate: "01/01/1990",monthNames:["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aoùt","Septembre","Octobre","Novembre","Décembre"],monthNamesShort:["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],dayNamesMin:["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"], changeMonth: true, changeYear: true,onSelect: function(value, date) {

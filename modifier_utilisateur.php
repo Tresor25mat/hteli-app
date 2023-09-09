@@ -583,7 +583,7 @@
                     url:'edit_utilisateur.php',
                     type:'post',
                     beforeSend:function(){
-                        waitingDialog.show('Please wait!');
+                      waitingDialog.show('Veuillez patienter...');
                     },
                     dataType:'text',
                     data: formData,
