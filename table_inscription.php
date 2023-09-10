@@ -5,7 +5,7 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT eleve.*, classe.*, annee.*, inscription.*, categorie_eleve.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN classe ON classe.ID_Classe=inscription.ID_Classe INNER JOIN annee ON annee.ID_Annee=inscription.ID_Annee INNER JOIN table_option ON table_option.ID_Option=classe.ID_Option INNER JOIN section ON section.ID_Section=table_option.ID_Section INNER JOIN categorie_eleve ON inscription.ID_Cat_Eleve=categorie_eleve.ID_Categorie WHERE eleve.ID_Eleve!=''";
+    $query="SELECT eleve.*, classe.*, annee.*, inscription.*, categorie_eleve.*, inscription.Date_Enreg AS mydate FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN classe ON classe.ID_Classe=inscription.ID_Classe INNER JOIN annee ON annee.ID_Annee=inscription.ID_Annee INNER JOIN table_option ON table_option.ID_Option=classe.ID_Option INNER JOIN section ON section.ID_Section=table_option.ID_Section INNER JOIN categorie_eleve ON inscription.ID_Cat_Eleve=categorie_eleve.ID_Categorie WHERE eleve.ID_Eleve!=''";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
         $query.=" AND section.ID_Etablissement=".$_GET['Ecole'];
     }
@@ -123,7 +123,7 @@
             <td><!-- <center> --><?php if($selections['Sexe']=='M'){echo 'Masculin';}else{echo 'Féminin';} ?></td>
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Classe']); ?></td>
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Categorie']); ?></td>
-            <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Date_Enreg'])); ?></td>
+            <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['mydate'])); ?></td>
             <td><center>
                 <a href="modifier_inscription.php?ID=<?php echo($selections['ID_Inscription']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>

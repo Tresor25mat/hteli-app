@@ -6,6 +6,7 @@
     $Classe=htmlentities($_POST['classe']);
     $Annee=htmlentities($_POST['annee']);
     $ID_Eleve=htmlentities($_POST['ID_Eleve']);
+    $ID_Inscription=htmlentities($_POST['ID_Inscription']);
     $Matri=htmlentities($_POST['matricule']);
     $Prenom=Securite::bdd($_POST['prenom']);
     $Nom=Securite::bdd($_POST['nom']);
@@ -13,10 +14,16 @@
     $Sexe=Securite::bdd($_POST['sexe']);
     $ID_Ecole_Provenance=htmlentities($_POST['ID_Ecole_Provenance']);
     $Provenance=Securite::bdd($_POST['provenance']);
-    $Lieu=htmlentities($_POST['lieu_naiss']);
+    $Lieu="";
+    if(isset($_POST['lieu_naiss'])){
+        $Lieu=htmlentities($_POST['lieu_naiss']);
+    }
     $DateN=date('Y-m-d', strtotime(htmlentities($_POST['daten'])));
     $Adresse=Securite::bdd($_POST['adresse']);
-    $Commune=htmlentities($_POST['commune']);
+    $Commune="";
+    if(isset($_POST['commune'])){
+        $Commune=htmlentities($_POST['commune']);
+    }
     $Categorie=htmlentities($_POST['categorie']);
     $Secteur=htmlentities($_POST['secteur']);
     $ID_Responsable=htmlentities($_POST['ID_Responsable']);
@@ -81,8 +88,8 @@
                                         $param=array($chaine, $ID_Eleve, $ID_Responsable, $Lien_responsable, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
                                         $res->execute($param);
                                     }
-                                    $res=$pdo->prepare("INSERT INTO inscription(ID_Inscription, ID_Eleve, ID_Classe, ID_Annee, ID_Cat_Eleve, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
-                                    $param=array($chaine, $ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
+                                    $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
+                                    $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
                                     $res->execute($param);
                                     echo "1";
                                 } 
@@ -103,14 +110,9 @@
                                     $res=$pdo->query("UPDATE eleve_responsable ID_Degre=".$Lien_responsable." WHERE ID_Eleve='".$ID_Eleve."' AND ID_Responsable='".$ID_Responsable."'");
                                 }
                             }
-                            $rech=$pdo->query("SELECT * FROM inscription WHERE ID_Eleve='".$ID_Eleve."' AND ID_Classe=".$Classe." AND ID_Annee=".$Annee);
-                            if($rechs=$rech->fetch()){
-                                $res=$pdo->query("UPDATE inscription SET ID_Cat_Eleve=".$Categorie." WHERE ID_Eleve='".$ID_Eleve."' AND ID_Classe=".$Classe." AND ID_Annee=".$Annee);
-                            }else{
-                                $res=$pdo->prepare("INSERT INTO inscription(ID_Inscription, ID_Eleve, ID_Classe, ID_Annee, ID_Cat_Eleve, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
-                                $param=array($chaine, $ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
-                                $res->execute($param); 
-                            }
+                            $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
+                            $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                            $res->execute($param); 
                             echo "1";
                         } 
                     }
@@ -140,9 +142,9 @@
                                 $param=array($chaine, $ID_Eleve, $ID_Responsable, $Lien_responsable, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
                                 $res->execute($param);
                             }
-                            $res=$pdo->prepare("INSERT INTO inscription(ID_Inscription, ID_Eleve, ID_Classe, ID_Annee, ID_Cat_Eleve, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
-                            $param=array($chaine, $ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
-                            $res->execute($param);
+                            $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
+                            $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                            $res->execute($param); 
                             echo "1";
                         } 
                     }
@@ -162,14 +164,9 @@
                             $res=$pdo->query("UPDATE eleve_responsable ID_Degre=".$Lien_responsable." WHERE ID_Eleve='".$ID_Eleve."' AND ID_Responsable='".$ID_Responsable."'");
                         }
                     }
-                    $rech=$pdo->query("SELECT * FROM inscription WHERE ID_Eleve='".$ID_Eleve."' AND ID_Classe=".$Classe." AND ID_Annee=".$Annee);
-                    if($rechs=$rech->fetch()){
-                        $res=$pdo->query("UPDATE inscription SET ID_Cat_Eleve=".$Categorie." WHERE ID_Eleve='".$ID_Eleve."' AND ID_Classe=".$Classe." AND ID_Annee=".$Annee);
-                    }else{
-                        $res=$pdo->prepare("INSERT INTO inscription(ID_Inscription, ID_Eleve, ID_Classe, ID_Annee, ID_Cat_Eleve, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
-                        $param=array($chaine, $ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
-                        $res->execute($param); 
-                    }
+                    $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
+                    $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                    $res->execute($param); 
                     echo "1";
                 } 
             }
