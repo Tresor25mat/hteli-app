@@ -5,15 +5,14 @@
         header("location: connection");
     }
     require_once('connexion.php');
-    $ID=$_GET['ID'];
-    $inscription=$pdo->query("SELECT eleve.*, classe.*, annee.*, inscription.*, categorie_eleve.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN classe ON classe.ID_Classe=inscription.ID_Classe INNER JOIN annee ON annee.ID_Annee=inscription.ID_Annee INNER JOIN table_option ON table_option.ID_Option=classe.ID_Option INNER JOIN section ON section.ID_Section=table_option.ID_Section INNER JOIN categorie_eleve ON inscription.ID_Cat_Eleve=categorie_eleve.ID_Categorie WHERE inscription.ID_Inscription='".$ID."'");
-    $inscriptions=$inscription->fetch();
     $profil=$pdo->query("SELECT * FROM profil ORDER BY ID_Profil");
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
+    $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $lieu=$pdo->query("SELECT * FROM lieu ORDER BY Design_Lieu");
     $commune=$pdo->query("SELECT * FROM commune WHERE ID_Ville=1 ORDER BY Design_Commune");
     $annee=$pdo->query("SELECT * FROM annee ORDER BY ID_Annee");
+    $anneee=$pdo->query("SELECT * FROM annee ORDER BY ID_Annee");
     $degre=$pdo->query("SELECT * FROM degre ORDER BY Design_Degre");
     $province=$pdo->query("SELECT * FROM province ORDER BY Design_Prov");
     $app_info=$pdo->query("SELECT * FROM app_infos");
@@ -25,7 +24,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>Modification d'un élève | <?php echo $app_infos['Design_App']; ?></title>
+    <title>Saisie d'un paiement | <?php echo $app_infos['Design_App']; ?></title>
     <!-- CSS files -->
     <!-- DataTables CSS -->
     <link href="vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
@@ -80,7 +79,7 @@
                   
                 </div>
                 <h2 class="page-title">
-                    Modification d'un élève
+                Saisie d'un paiement
                 </h2>
               </div>
               <!-- Page title actions -->
@@ -91,6 +90,13 @@
                       New view
                     </a>
                   </span> -->
+                  <a href="#" id="retour_table" class="btn btn-primary d-sm-inline-block" title="Retour">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply" viewBox="0 0 16 16">
+                      <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z"/>
+                    </svg>
+                    Retour
+                  </a>
 <!--                   <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
                     Download SVG icon from http://tabler-icons.io/i/plus
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -108,9 +114,9 @@
                   <!-- <ul class="nav nav-tabs l0" data-bs-toggle="tabs"> -->
                     <!-- <li class="nav-item">
                       <a href="#tabs-home-12" id="a0" class="nav-link active" data-bs-toggle="tab">Saisie d'un élève</a>
-                    </li> -->
-                    <!-- <li class="nav-item l1 disabled">
-                      <a href="#" class="nav-link " id="a1" data-bs-toggle="tab">Importation</a>
+                    </li>
+                    <li class="nav-item l1 disabled">
+                      <a href="#tabs-home-13" class="nav-link " id="a1" data-bs-toggle="tab">Importation</a>
                     </li> -->
                     <!-- <li class="nav-item ms-auto">
                       <a href="#tabs-settings-7" class="nav-link" title="Settings" data-bs-toggle="tab">Download SVG icon from http://tabler-icons.io/i/settings
@@ -119,11 +125,11 @@
                     </li> -->
                   <!-- </ul> -->
                   <div class="card-body">
-                    <form id="EleveForm" method="post" action="" enctype="multipart/form-data">
                     <div class="tab-content">
                       <div class="tab-pane active show" id="tabs-home-12">
-                      <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE;">
-                                    <div class="col-md-10" style="margin-bottom: 5px">
+                      <form id="EleveForm" method="post" action="" enctype="multipart/form-data">
+                          <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE;">
+                                <div class="col-md-10" style="margin-bottom: 5px">
                                     <div class="row">
                                       <div class="col-md-4" style="margin-bottom: 5px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
@@ -143,7 +149,6 @@
                                         <div class="form-group ">
                                           <label for="classe" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
                                           <div class="col-lg-12">
-                                            <input type="hidden" name="ID_Classe" id="ID_Classe" value="<?php echo $inscriptions['ID_Classe']; ?>">
                                             <select name="classe" class="form-control" id="classe">
                                                 <option value="" id="add_classe">--</option>
                                             </select>
@@ -156,25 +161,32 @@
                                             <select name="annee" class="form-control" id="annee">
                                                 <option value="">--</option>
                                                 <?php while($annees=$annee->fetch()){ ?>
-                                                <option value="<?php echo($annees['ID_Annee']) ?>" <?php if($annees['ID_Annee']==$inscriptions['ID_Annee']){echo 'selected';} ?>><?php echo(stripslashes($annees['Libelle_Annee'])) ?></option>
+                                                <option value="<?php echo($annees['ID_Annee']) ?>" <?php if($annees['Encours']==1){echo 'selected';} ?>><?php echo(stripslashes($annees['Libelle_Annee'])) ?></option>
                                                 <?php } ?>
                                             </select>
                                         </div>
                                       </div>
-                                      </div>
-                                      </div>
-                                      <div class="col-md-2" style="margin-bottom: 5px">
                                     </div>
-                                    </div>
-                                    <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE">
-                                    <div class="col-md-10" style="margin-bottom: 5px">
-                                    <div class="row">
+                                  </div>
+                                <div class="col-md-2" style="margin-bottom: 5px">
+                              </div>
+                          </div>
+                          <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE">
+                              <div class="col-md-10" style="margin-bottom: 5px">
+                                  <div class="row">
+                                    <div class="col-md-12" style="margin-bottom: 5px;">
+                                        <div class="form-group ">
+                                          <label for="ancien_eleve" class="control-label col-lg-12" style="text-align: left;">Elève </label>
+                                          <div class="col-lg-12">
+                                          <input type="text" class="form-control" id="ancien_eleve" name="ancien_eleve">
+                                          <input type="hidden" name="ID_Eleve" id="ID_Eleve">
+                                          </div>
+                                        </div>
+                                      </div>
                                     <div class="col-md-4" style="margin-bottom: 5px">
                                         <div class="form-group ">
                                           <label for="matricule" class="control-label col-lg-12" style="text-align: left;">Matricule </label>
                                           <div class="col-lg-12">
-                                            <input type="hidden" name="ID_Eleve" id="ID_Eleve" value="<?php echo($inscriptions['ID_Eleve']); ?>">
-                                            <input type="hidden" name="ID_Inscription" id="ID_Inscription" value="<?php echo($ID); ?>">
                                             <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                                             <input class="form-control " id="matricule" type="text" name="matricule" autofocus="autofocus">
                                           </div>
@@ -210,7 +222,7 @@
                                           <div class="col-lg-12">
                                             <select name="sexe" id="sexe" class="form-control ">
                                               <option value="">--</option>
-                                              <option value="M" selected>Masculin</option>
+                                              <option value="M">Masculin</option>
                                               <option value="F">Féminin</option>
                                             </select>
                                           </div>
@@ -276,10 +288,10 @@
                                         </a>
                                       </div>
                                     </div>
-                                    </div>
-                                    </div>
-                                    <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE;">
-                                    <div class="col-md-10" style="margin-bottom: 5px">
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE;">
+                                <div class="col-md-10" style="margin-bottom: 5px">
                                     <div class="row">
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
@@ -310,19 +322,19 @@
                                       </div>
                                       </div>
                                       <div class="col-md-2" style="margin-bottom: 5px">
-                                    </div>
-                                    </div>
-                                    <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
+                                  </div>
+                              </div>
+                              <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
                                         <div class="form-group col-4" style="padding-top: 5px">
                                             <div class="col-4">
                                                 <input type="checkbox" name="btn_check_informations" style="border-radius: 0; width:17px; height:17px; " id="btn_check_informations" value="0">
                                             </div>
                                             <label for="btn_check_informations" class="control-label" style="text-align: left; margin-bottom: 5px">Autres informations </label>
                                         </div>
-                                    </div>
-                                    <div style="display: none" id="autres_info">
-                                    <div class="row" style="margin-bottom: 20px; border-bottom: 1px solid #EEEEEE;">
-                                    <div class="col-md-10" style="margin-bottom: 5px">
+                              </div>
+                              <div style="display: none" id="autres_info">
+                                <div class="row" style="margin-bottom: 20px; border-bottom: 1px solid #EEEEEE;">
+                                  <div class="col-md-10" style="margin-bottom: 5px">
                                     <div class="row" style="padding-top: 5px">
                                       <div class="col-md-4" style="margin-bottom: 5px;">
                                         <div class="form-group ">
@@ -371,9 +383,9 @@
                                       </div>
                                       <div class="col-md-2" style="margin-bottom: 5px">
                                     </div>
-                                    </div>
-                                    <div class="row" style="margin-bottom: 20px; border-bottom: 1px solid #EEEEEE;">
-                                    <div class="col-md-10" style="margin-bottom: 5px">
+                              </div>
+                              <div class="row" style="margin-bottom: 20px; border-bottom: 1px solid #EEEEEE;">
+                                  <div class="col-md-10" style="margin-bottom: 5px">
                                     <div class="row" style="padding-top: 5px">
                                       <div class="col-md-12" style="margin-bottom: 5px;">
                                         <div class="form-group ">
@@ -442,9 +454,9 @@
                                       </div>
                                       </div>
                                       <div class="col-md-2" style="margin-bottom: 5px">
-                                    </div>
-                                    </div>
-                                    </div>
+                                  </div>
+                              </div>
+                            </div>
                                     <div class="row" style="margin-top: 10px; padding-bottom: 10px">
                                             <div class="col-lg-12">
                                               <div class="pull-right">
@@ -453,10 +465,98 @@
                                               </div>
                                             </div>
                                         </div>
-                                <!-- </div> -->
+                          </form>
+                      </div>
+                      <div class="tab-pane" id="tabs-home-13">
+                        <form class="cmxform form-horizontal style-form" id="ImportForm" method="post" action="" enctype="multipart/form-data">
+                            <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE;">
+                                    <div class="col-md-10" style="margin-bottom: 5px">
+                                    <div class="row">
+                                      <div class="col-md-4" style="margin-bottom: 5px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                                        <div class="form-group ">
+                                          <label for="list_ecole" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
+                                          <div class="col-lg-12">
+                                            <select name="list_ecole" id="list_ecole" class="form-control " <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
+                                              <option value="">--</option>
+                                              <?php while($liste_ecoles=$liste_ecole->fetch()){ ?>
+                                              <option value="<?php echo($liste_ecoles['ID_Etablissement'])?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $liste_ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';} ?>><?php echo strtoupper($liste_ecoles['Design_Etablissement']); ?></option>
+                                              <?php } ?>
+                                            </select>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                        <div class="form-group ">
+                                          <label for="list_classe" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
+                                          <div class="col-lg-12">
+                                            <select name="list_classe" class="form-control" id="list_classe">
+                                                <option value="" id="addclasse">--</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4" style="margin-bottom: 5px;">
+                                        <div class="form-group ">
+                                            <label for="anneee" class="control-label col-lg-12" style="text-align: left;">Année scolaire *</label>
+                                            <select name="anneee" class="form-control" id="anneee">
+                                                <option value="">--</option>
+                                                <?php while($anneees=$anneee->fetch()){ ?>
+                                                <option value="<?php echo($anneees['ID_Annee']) ?>" <?php if($anneees['Encours']==1){echo 'selected';} ?>><?php echo(stripslashes($anneees['Libelle_Annee'])) ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                      </div>
+                                      </div>
+                                      </div>
+                                      <div class="col-md-2" style="margin-bottom: 5px">
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE">
+                              <div class="col-md-10" style="margin-bottom: 5px">
+                                  <div class="row">
+                                    <div class="col-md-4" style="margin-bottom: 5px">
+                                        <div class="form-group ">
+                                          <label for="matricule" class="control-label col-lg-12" style="text-align: left;">Ficiher excel *</label>
+                                          <div class="col-lg-12">
+                                          <input type="file" name="classeur" id="classeur" class="form-control" accept=".xls, .xlsx, .xlsm, .csv" title="Sélectionner un fichier excel">
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                        <div class="form-group ">
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Feuille de calcul *</label>
+                                          <div class="col-lg-12">
+                                              <select name="feuille_calcul" id="feuille_calcul" class="form-control" disabled="disabled">
+                                                  <option value="" id="add_feuille">--</option>
+                                              </select>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                        <div class="form-group ">
+                                        <a href="Modeles/Modele_Grille_Importations.xlsx" class="btn btn-primary" style="margin-top: 19px; width: 100%"><i class="fa fa-download" style="margin-right: 7px"></i>Télécharger le modèle</a>
+                                        </div>
+                                      </div>
+                                      </div>
+                                      </div>
+
+                              </div>
+
+                              <div class="row" style="margin-top: 10px; padding-bottom: 10px">
+                                            <div class="col-lg-12">
+                                              <div class="pull-right">
+                                                  <button class="btn btn-primary" type="button" id="btn_importer">Importer</button>
+                                                  <button class="btn btn-primary" type="submit" id="btn_transfert" style="display: none;"></button>
+                                                  <button class="btn btn-danger" type="button" id="btn_annuler">Annuler</button>
+                                              </div>
+                                            </div>
+                                        </div>
+                          </form>
+                      </div>
+                      <div class="form-panel" style="border-top: solid 1px RGB(231,231,231);">
+                          <iframe src="" style="width: 100%; height: 1000px;border: 1px solid #E6E7E9; margin-top: 20px; padding: 7px; background: #F5F7FB" id="iframe"></iframe>  
                       </div>
                     </div>
-                  </form>
                   </div>
                 </div>
               </div>
@@ -699,7 +799,8 @@
                 success:function(ret){
                     $('#add_classe').nextAll().remove();
                     $('#add_classe').after(ret);
-                    $('#classe').val($('#ID_Classe').val());
+                    $('#addclasse').nextAll().remove();
+                    $('#addclasse').after(ret);
                 }
             });
             $.ajax({
@@ -712,7 +813,44 @@
                     $('#add_categorie').after(ret);
                 }
             });
-            $.ajax({
+            $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val());
+    })
+    $('#noms').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listerefe,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Responsable').val(ui.item.desc);
+
+              $.ajax({
+                  url:"recherche_responsables.php",
+                  type:"post",
+                  // beforeSend:function(){
+                  //       waitingDialog.show('Veuillez patienter svp!');
+                  // },
+                  dataType:"json",
+                  data:{ID_Responsable:$('#ID_Responsable').val()},
+                  success:function(donnee){
+                      $.map(donnee,function(objet){
+                            $('#prenom_responsable').val(objet.Prenom);
+                            $('#nom_responsable').val(objet.Nom);
+                            $('#pnom_responsable').val(objet.Pnom);
+                            $('#sexe_responsable').val(objet.Sexe);
+                            $('#tel_responsable').val(objet.Tel);
+                            $('#lien_responsable').focus();
+                      })
+                  }
+              })
+        }
+    });
+    $('#ancien_eleve').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listeleve,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Eleve').val(ui.item.desc);
+
+              $.ajax({
                   url:"recherche_details_eleve.php",
                   type:"post",
                   dataType:"json",
@@ -745,30 +883,6 @@
                         }
                         $('#matricule').focus();
                         $('#btn_check_informations').click();
-                      })
-                  }
-              })
-    })
-    $('#noms').autocomplete({source:function(request,response){
-        var resultat=$.ui.autocomplete.filter(listerefe,request.term);
-        response(resultat.slice(0,15));
-        },
-        select:function(event,ui){
-            $('#ID_Responsable').val(ui.item.desc);
-
-              $.ajax({
-                  url:"recherche_responsables.php",
-                  type:"post",
-                  dataType:"json",
-                  data:{ID_Responsable:$('#ID_Responsable').val()},
-                  success:function(donnee){
-                      $.map(donnee,function(objet){
-                            $('#prenom_responsable').val(objet.Prenom);
-                            $('#nom_responsable').val(objet.Nom);
-                            $('#pnom_responsable').val(objet.Pnom);
-                            $('#sexe_responsable').val(objet.Sexe);
-                            $('#tel_responsable').val(objet.Tel);
-                            $('#lien_responsable').focus();
                       })
                   }
               })
@@ -829,6 +943,35 @@
                     $('#add_categorie').after(ret);
                 }
             });
+            recheche_responsable();
+            recheche_provenance();
+            recheche_eleve();
+            $('#ID_Etablissement').val($('#ecole').val());
+        }
+    })
+    $('#list_ecole').change(function(){
+        if($('#list_ecole').val()!=''){
+            $.ajax({
+                url:'recherche_classe.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#list_ecole').val()},
+                success:function(ret){
+                    $('#addclasse').nextAll().remove();
+                    $('#addclasse').after(ret);
+                    $('#list_classe').focus();
+                }
+            });
+            // $.ajax({
+            //     url:'recherche_cat_eleves.php',
+            //     type:'post',
+            //     dataType:'html', 
+            //     data:{Ecole:$('#ecole').val()},
+            //     success:function(ret){
+            //         $('#add_categorie').nextAll().remove();
+            //         $('#add_categorie').after(ret);
+            //     }
+            // });
         }
     })
     $('#classe').change(function(){
@@ -980,14 +1123,6 @@
             }
         }
 
-    $('#ecole').change(function() {
-        if($('#ecole').val()=='') {
-          alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner une école svp!', function(){$('#ecole').focus();});
-        }else{
-          $('#module').val('').focus();
-          $('#ID_Etablissement').val($('#ecole').val());
-        }
-    })
 
           $('#sexe').change(function(){
             $('#adresse').focus();
@@ -1061,7 +1196,125 @@
                     });
         }
     });
+    $('#btn_annuler').click(function(){
+        reinitialiser();
+    })
+    function reinitialiser(){
+        $('#feuille_calcul').val('');
+        $('#classeur').val('');
+        $('#feuille_calcul').prop("disabled",true);
+        // $('#list_classe').val('');
+        // $('#anneee').val('');
+        $('#classeur').focus();
+    }
+    $('#classeur').change(function(){
+            $('#btn_transfert').click();
+    })
+    $('#list_classe').change(function(){
+        $('#classeur').focus();
+    })
+    $('#anneee').change(function(){
+        $('#btn_importer').focus();
+    })
+    $('#ImportForm').submit(function(e){
+            e.preventDefault();
+            var formData = new FormData(this);
+                    $.ajax({
+                        url:'select_classeur.php',
+                        type:'post',
+                        beforeSend:function(){
+                            waitingDialog.show('Veuillez patienter svp!');
+                        },
+                        dataType:'html', 
+                        data: formData,
+                        processData: false,
+                        cache: false,
+                        contentType: false,
 
+                        success:function(ret){
+                            // alertify.alert(ret);
+                            waitingDialog.hide();
+                            const str = ret;
+                            const valeur = str.split(',');
+                            if(valeur[0]==1){
+                                $('#add_feuille').nextAll().remove();
+                                $('#add_feuille').after(ret);
+                                $('#classe').focus();
+                            }else if(ret==2){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Le fichier sélectionné ne dispose d'aucune donnée!",function(){
+                                    $('#btn_parcourir').focus();
+                                })
+                            }else if(ret==3){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"L'extension du fichier sélectionné ne correspond pas à un fichier Excel/CSV!",function(){
+                                    $('#classeur').focus();
+                                })
+                            }else if(ret==4){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez sélectionner un fichier Excel/CSV svp!",function(){
+                                    $('#classeur').focus();
+                                })
+                            }else{
+                                // alertify.alert(ret);
+                                $('#add_feuille').nextAll().remove();
+                                $('#add_feuille').after(ret);
+                                $('#feuille_calcul').prop("disabled",false);
+                                $('#feuille_calcul').focus();
+                            }
+
+                        }
+                    });
+
+          })
+    $('#feuille_calcul').change(function(){
+        $('#btn_importer').focus();
+    });
+        $('#btn_importer').click(function(){
+            if($('#feuille_calcul').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez sélectionner une feuille svp!",function(){
+                  $('#feuille_calcul').focus();
+                  })
+            }else if($('#list_classe').val()=='' || $('#anneee').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez sélectionner une classe et une année svp!",function(){
+                  $('#feuille_calcul').focus();
+                  })
+            }else{
+              // alertify.alert($('#feuille_calcul').val());
+                  const str_classeur = $('#feuille_calcul').val();
+                  const classeur = str_classeur.split(',');
+                            $.ajax({
+                              url:'importer_eleve.php',
+                              type:'post',
+                              beforeSend:function(){
+                                  waitingDialog.show('Veuillez patienter svp!');
+                              },
+                              dataType:'html', 
+                              data:{classeur:classeur[0], feuille:classeur[1], classe:$('#list_classe').val(), annee:$('#anneee').val(), Ecole:$('#list_ecole').val()},
+                              success:function(ret){
+                                  alertify.alert('<?php echo $app_infos['Design_App']; ?>', ret);
+                                  waitingDialog.hide();
+                                  const str_feuille = ret;
+                                  const valeur_ret = str_feuille.split(',');
+                                  if(valeur_ret[0]==1){
+                                      alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Importation réussie, vous avez enregistré "+valeur_ret[1]+" élèves, le nombre des doublons est "+valeur_ret[2],function(){
+                                            reinitialiser();
+                                            Toast.fire({
+                                                  icon: 'success',
+                                                  title: 'Importation réussie'
+                                              })
+                                        })
+                                        $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val());
+                                  }else if(ret==2){
+                                      alertify.alert('<?php echo $app_infos['Design_App']; ?>',"La feuille sélectionnée ne dispose d'aucune donnée!",function(){
+                                        $('#feuille_calcul').focus();
+                                        reinitialiser();
+                                      })
+                                  }else{
+                                      alertify.alert('<?php echo $app_infos['Design_App']; ?>', ret);
+                                      reinitialiser();
+                                  }
+                              }
+                          });
+            }
+        })
     $('#enregistrer_territoire').click(function(){
         if($('#design_territoire').val()=='' || $('#province').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Vous devez selectionner une province et saisir une désignation svp!');
@@ -1134,7 +1387,7 @@
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez séléctionner la classe et l\'année svp!', function(){$('#classe').focus();});
             }else{
                 $.ajax({
-                    url:'edit_eleve.php',
+                    url:'enreg_eleve.php',
                     type:'post',
                     beforeSend:function(){
                       waitingDialog.show('Veuillez patienter...');
@@ -1155,7 +1408,7 @@
                                 icon: 'success',
                                 title: 'Enregistré'
                              })
-                             $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val());
+                             $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val());
                              $('#btn_annuler_tout').click();
                          }else{
                             alertify.alert(ret);
@@ -1166,9 +1419,35 @@
           })
   })
 
-    $('#btn_annuler_tout').click(function(e){
+    $('#retour_table').click(function(e){
         e.preventDefault();
-        window.location.replace('table_inscription.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val());
+        window.location.replace('afficher_table_paiement.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val());
+    })
+    $('#btn_annuler_tout').click(function(){
+        $('#prenom').val('');
+        $('#nom').val('');
+        $('#pnom').val('');
+        $('#matricule').val('');
+        $('#mimg').val('');
+        $('#sexe').val('');
+        $('#adresse').val('');
+        $('#commune').val('');
+        $('#ancien_eleve').val('');
+        $('#ID_Eleve').val('');
+        $('#lieu_naiss').val('');
+        $('#datenaiss').val('');
+        $('#daten').val('');
+        $('#categorie').val('');
+        $('#provenance').val('');
+        $('#ID_Ecole_Provenance').val('');
+        $('#miamge').attr('src','images/photo.jpg');
+        $('#matricule').focus();
+        if($('#btn_check_informations').is(':checked')){
+            $('#btn_check_informations').click();
+        }
+        recheche_responsable();
+        recheche_provenance();
+        recheche_eleve();
     })
     $(function(){
         $(".date").datepicker({closeText:'fermer',prevText:'&#x3c;Préc',nextText:'Suiv&#x3e;',currentText:'Courant',dateFormat:"dd/mm/yy", minDate: "01/01/1990",monthNames:["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Aoùt","Septembre","Octobre","Novembre","Décembre"],monthNamesShort:["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"],dayNamesMin:["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"], changeMonth: true, changeYear: true,onSelect: function(value, date) {

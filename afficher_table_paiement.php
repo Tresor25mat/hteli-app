@@ -136,10 +136,10 @@
                     </div>
                     <div class="col-12 col-md-auto ms-auto d-print-none" style="margin-top: 18px">
                         <div class="btn-list">
-                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Ajouter des élèves">
+                        <a href="#" id="btn_ajouter" class="btn btn-primary d-sm-inline-block" title="Saisie d'un paiement">
                             <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                            Ajouter des élèves
+                            Saisie d'un paiement
                         </a>
                         </div>
                     </div>
@@ -184,7 +184,7 @@
                     if($('#id_annee').val()!=''){
                         $('#annee').val($('#id_annee').val());
                     }
-                    $('#iframe').attr('src', "table_inscription.php?Ecole="+$('#ecole').val()+'&Annee='+$('#annee').val()+'&Classe='+$('#classe').val()+'&Eleve='+$('#nom_eleve').val());
+                    $('#iframe').attr('src', "table_paiement.php?Ecole="+$('#ecole').val()+'&Annee='+$('#annee').val()+'&Classe='+$('#classe').val()+'&Eleve='+$('#nom_eleve').val());
                 }
             });
     });
@@ -214,12 +214,12 @@
         }
     })
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_inscription.php?Ecole="+$('#ecole').val()+'&Annee='+$('#annee').val()+'&Classe='+$('#classe').val()+'&Eleve='+$('#nom_eleve').val());
+        $('#iframe').attr('src', "table_paiement.php?Ecole="+$('#ecole').val()+'&Annee='+$('#annee').val()+'&Classe='+$('#classe').val()+'&Eleve='+$('#nom_eleve').val());
     })
 
     $('#btn_ajouter').click(function(e){
       e.preventDefault();
-      window.location.replace('ajouter_inscription.php?Ecole='+$('#ecole').val()+'&Annee='+$('#annee').val()+'&Classe='+$('#classe').val()+'&Eleve='+$('#nom_eleve').val()); 
+      window.location.replace('ajouter_paiement.php?Ecole='+$('#ecole').val()+'&Annee='+$('#annee').val()+'&Classe='+$('#classe').val()+'&Eleve='+$('#nom_eleve').val()); 
     })
     </script>
 </body>

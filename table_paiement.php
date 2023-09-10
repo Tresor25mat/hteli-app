@@ -5,7 +5,7 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT eleve.*, classe.*, annee.*, inscription.*, categorie_eleve.*, inscription.Date_Enreg AS mydate FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN classe ON classe.ID_Classe=inscription.ID_Classe INNER JOIN annee ON annee.ID_Annee=inscription.ID_Annee INNER JOIN table_option ON table_option.ID_Option=classe.ID_Option INNER JOIN section ON section.ID_Section=table_option.ID_Section INNER JOIN categorie_eleve ON inscription.ID_Cat_Eleve=categorie_eleve.ID_Categorie WHERE eleve.ID_Eleve!=''";
+    $query="SELECT eleve.*, paiement.*, annee.*, classe.*, recu.*, paiement.Date_Enreg AS Mydate FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement WHERE paiement.ID_Paiement!=''";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
         $query.=" AND section.ID_Etablissement=".$_GET['Ecole'];
     }
@@ -18,7 +18,7 @@
     if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){
         $query.=" AND (UCASE(Prenom_Eleve) LIKE '%".strtoupper($_GET['Eleve'])."%' OR UCASE(Nom_Eleve) LIKE '%".strtoupper($_GET['Eleve'])."%' OR UCASE(Pnom_Eleve) LIKE '%".strtoupper($_GET['Eleve'])."%')";
     }
-    $query.=" ORDER BY Nom_Eleve, Pnom_Eleve";
+    $query.=" ORDER BY paiement.Date_Enreg";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
     $totalparpage=10;
@@ -107,26 +107,39 @@
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Numéro reçu</th>
                                         <th>Noms</th>
-                                        <th>Sexe</th>
                                         <th>Classe</th>
-                                        <th>Catégorie</th>
-                                        <th>Date d'inscription</th>
+                                        <th>Montant payé</th>
+                                        <th>Date de paiement</th>
                                         <th>Opérations</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($selections=$selection->fetch()){$Nbr++; ?>
+    <?php while($selections=$selection->fetch()){$Nbr++; 
+                    $rs_paiement=$pdo->query("SELECT * FROM paiement_tranche WHERE ID_Paiement='".$selections['ID_Paiement']."'");
+                    $Montant_Paie=0;
+                    while ($rs_paiements=$rs_paiement->fetch()) {
+                        $rs_frais=$pdo->query("SELECT * FROM tranche_frais INNER JOIN frais ON tranche_frais.ID_Frais=frais.ID_Frais WHERE tranche_frais.ID_Tranche_Frais=".$rs_paiements['ID_Tranche_Frais']);
+                        $frais=$rs_frais->fetch();
+                        if($frais['ID_Taux']==2){
+                            $Montant_Paie=$Montant_Paie+$rs_paiements['Montant_Paie'];
+                        }else{
+                            $Montant_Paie=$Montant_Paie+($rs_paiements['Montant_Paie']/$rs_paiements['Taux']);
+                        }
+                    }
+        
+        ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
+            <td><?php if($selections['Confirm_Paiement']==2){echo "PRO FORMA";}else{echo stripslashes($selections['Num_Recu']);} ?></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Nom_Eleve'].' '.$selections['Pnom_Eleve'].' '.$selections['Prenom_Eleve'])); ?></td>
-            <td><!-- <center> --><?php if($selections['Sexe']=='M'){echo 'Masculin';}else{echo 'Féminin';} ?></td>
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Classe']); ?></td>
-            <td><!-- <center> --><?php echo strtoupper($selections['Design_Categorie']); ?></td>
-            <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['mydate'])); ?></td>
+            <td><!-- <center> --><?php echo number_format($Montant_Paie, 2, ',', ' ').' USD'; ?></td>
+            <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Mydate'])); ?></td>
             <td><center>
-                <a href="detail_eleve.php?ID=<?php echo($selections['ID_Eleve']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>" title="Afficher les détails" style="margin-right: 5px; border-radius: 0; width: 30px" class="btn btn-success"><i class="fa fa-print fa-fw"></i></a>
-                <a href="modifier_inscription.php?ID=<?php echo($selections['ID_Inscription']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+            <a href="recu.php?paiement=<?php echo($selections['ID_Paiement']) ?>&token=<?php echo($_SESSION['user_siges']['token']) ?>" title="Afficher les détails" style="margin-right: 5px; border-radius: 0; width: 30px" class="btn btn-success"><i class="fa fa-print fa-fw"></i></a>
+                <a href="modifier_paiement.php?ID=<?php echo($selections['ID_Paiement']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_inscription.php?ID=<?php echo($selections['ID_Inscription']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
@@ -140,7 +153,7 @@
                                 <?php 
                                 if($pageCourante>1){
                                     $page=$pageCourante-1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_inscription.php?page='.$page.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_paiement.php?page='.$page.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }
@@ -151,28 +164,28 @@
                                     $pageAvantPrecedente=$pageCourante-2;
                                     $pagesAvantTotales=$pagesTotales-1;
                                     if($pageCourante==1){
-                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pageTrois.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==2){
-                                        echo '<li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==$pagesAvantTotales){
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li>';
                                     }else if($pageCourante==$pagesTotales){
-                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pageAvantPrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
                                     }else{
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_inscription.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pagePrecedente.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_paiement.php?page='.$pageNexte.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
                                     }
                                 }else{
                                     for ($i=1; $i <= $pagesTotales ; $i++) { 
                                         if ($i==$pageCourante) {
                                             echo '<li class="page-item active"><a class="page-link" href="#">'.$i.'</a></li>';
                                         }else{
-                                            echo '<li class="page-item"><a class="page-link" href="table_inscription.php?page='.$i.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$i.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="table_paiement.php?page='.$i.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">'.$i.'</a></li>';
                                         }
                                     } 
                                 }
                                 if($pagesTotales>$pageCourante){
                                     $page=$pageCourante+1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_inscription.php?page='.$page.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_paiement.php?page='.$page.'&Ecole='.$_GET['Ecole'].'&Annee='.$_GET['Annee'].'&Classe='.$_GET['Classe'].'&Eleve='.$_GET['Eleve'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }
@@ -322,7 +335,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_inscription.php?Ecole='+$('#ID_Etab').val()+"&Enseignant="+$('#Enseignant').val());
+                                window.location.replace('table_paiement.php?Ecole='+$('#ID_Etab').val()+"&Enseignant="+$('#Enseignant').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{
