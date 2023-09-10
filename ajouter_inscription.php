@@ -943,16 +943,19 @@
                     $('#add_categorie').after(ret);
                 }
             });
+            recheche_responsable();
+            recheche_provenance();
+            recheche_eleve();
             $('#ID_Etablissement').val($('#ecole').val());
         }
     })
     $('#list_ecole').change(function(){
-        if($('#liste_ecole').val()!=''){
+        if($('#list_ecole').val()!=''){
             $.ajax({
                 url:'recherche_classe.php',
                 type:'post',
                 dataType:'html', 
-                data:{Ecole:$('#liste_ecole').val()},
+                data:{Ecole:$('#list_ecole').val()},
                 success:function(ret){
                     $('#addclasse').nextAll().remove();
                     $('#addclasse').after(ret);

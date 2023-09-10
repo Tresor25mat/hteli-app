@@ -218,7 +218,7 @@
                         <a class="dropdown-item gonow" href="#" ver="select_vols_vente_simple.php">
                           Comptabilité
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="select_vols_importation.php">
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_paiement.php">
                           Paiements
                         </a>
                       </div>
