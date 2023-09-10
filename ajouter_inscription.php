@@ -1437,7 +1437,7 @@
         $('#lieu_naiss').val('');
         $('#datenaiss').val('');
         $('#daten').val('');
-        $('#categorie').val('');
+        // $('#categorie').val('');
         $('#provenance').val('');
         $('#ID_Ecole_Provenance').val('');
         $('#miamge').attr('src','images/photo.jpg');
