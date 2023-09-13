@@ -6,7 +6,6 @@
     }
     require_once('connexion.php');
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
-    $liste_ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     $annee=$pdo->query("SELECT * FROM annee ORDER BY ID_Annee");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
@@ -69,9 +68,9 @@
               <!-- Page title actions -->
               <div class="col-12">
                 <div class="row" style="border-bottom: 1px solid #EEEEEE; padding-bottom: 20px">
-                    <div class="col-md-2" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                    <div class="col-md-3" style="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                       <div class="form-group ">
-                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Ecole </label>
+                        <label for="ecole" class="control-label col-lg-12" style="text-align: left;">Ecole </label>
                         <div class="col-lg-12">
                           <div class="row">
                             <div class="col-sm-12">
@@ -86,13 +85,12 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                       <div class="form-group ">
                         <label for="classe" class="control-label col-lg-12" style="text-align: left;">Classe </label>
                         <div class="col-lg-12">
                           <div class="row">
                             <div class="col-sm-12">
-                                <input type="hidden" name="id_classe" id="id_classe" value="<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe'];} ?>">
                                 <select name="classe" class="form-control" id="classe">
                                     <option value="" id="add_classe">--</option>
                                 </select>
@@ -101,13 +99,12 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                       <div class="form-group ">
-                        <label for="classe" class="control-label col-lg-12" style="text-align: left;">Année scolaire</label>
+                        <label for="annee" class="control-label col-lg-12" style="text-align: left;">Année scolaire</label>
                         <div class="col-lg-12">
                           <div class="row">
                             <div class="col-sm-12">
-                                <input type="hidden" name="id_annee" id="id_annee" value="<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee'];} ?>">
                                 <select name="annee" class="form-control" id="annee">
                                     <option value="">--</option>
                                     <?php while($annees=$annee->fetch()){ ?>
@@ -162,10 +159,6 @@
                 success:function(ret){
                     $('#add_classe').nextAll().remove();
                     $('#add_classe').after(ret);
-                    $('#classe').val($('#id_classe').val());
-                    if($('#id_annee').val()!=''){
-                        $('#annee').val($('#id_annee').val());
-                    }
                     $('#iframe').attr('src', "Dashio/accueil.php");
                 }
             });

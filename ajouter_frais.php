@@ -116,9 +116,9 @@
                     <div class="tab-content">
                       <div class="tab-pane active show" id="tabs-home-12">
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE">
-                                      <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                                      <div class="col-md-2" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
+                                          <label for="ecole" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">
                                           <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                                           <input id="ID_Etablissement" type="hidden" name="ID_Etablissement" value="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo $_SESSION['user_eteelo_app']['ID_Etablissement'];} ?>">
@@ -131,9 +131,9 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-3" style="margin-bottom: 10px; padding-top: 21px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
+                                          <label for="type_frais" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
                                           <div class="col-lg-12">
                                             <div class="input-group">
                                                     <select name="type_frais" class="form-control" id="type_frais">
@@ -146,23 +146,25 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-3" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Option *</label>
+                                          <input type="checkbox" name="btn_check_all_options" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_options" checked value="1">
+                                          <input type="hidden" name="check_all_options" id="check_all_options" value="1">
+                                          <label for="option" class="control-label col-lg-12" style="text-align: left;">Toutes les options (*)</label>
                                           <div class="col-lg-12">
-                                                <select name="option" class="form-control" id="option">
+                                                <select name="option" class="form-control" id="option" disabled>
                                                     <option value="" id="add_option">--</option>
                                                 </select>
                                             </div> 
                                           </div>
                                         </div>
-                                      </div>
-                                    <div class="row" style="border-bottom: 1px solid #EEEEEE">
-                                      <div class="col-md-4" style="margin-bottom: 10px;">
+                                      <!-- </div>
+                                    <div class="row" style="border-bottom: 1px solid #EEEEEE"> -->
+                                      <div class="col-md-2" style="margin-bottom: 10px;">
                                         <div class="form-group ">
                                           <input type="checkbox" name="btn_check_all_classes" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_classes" checked value="1">
                                           <input type="hidden" name="check_all_classes" id="check_all_classes" value="1">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Toutes les classes (*)</label>
+                                          <label for="niveau" class="control-label col-lg-12" style="text-align: left;">Toutes les classes (*)</label>
                                           <div class="col-lg-12">
                                           <select name="niveau" class="form-control" id="niveau" disabled>
                                                 <option value="">--</option>
@@ -173,11 +175,11 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-2" style="margin-bottom: 10px">
                                         <div class="form-group ">
                                           <input type="checkbox" name="btn_check_all_categories" style="border-radius: 0; width:17px; height:17px;" id="btn_check_all_categories" checked value="1">
                                           <input type="hidden" name="check_all_categories" id="check_all_categories" value="1">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Toutes les catégories (*)</label>
+                                          <label for="categorie" class="control-label col-lg-12" style="text-align: left;">Toutes les catégories (*)</label>
                                           <div class="col-lg-12">
                                                 <select name="categorie" class="form-control" id="categorie" disabled>
                                                     <option value="" id="add_categorie">--</option>
@@ -185,9 +187,9 @@
                                             </div> 
                                           </div>
                                         </div>
-                                      <div class="col-md-2" style="margin-bottom: 10px; padding-top: 21px">
+                                      <div class="col-md-1" style="margin-bottom: 10px; padding-top: 21px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Devise *</label>
+                                          <label for="devise" class="control-label col-lg-12" style="text-align: left;">Devise *</label>
                                           <div class="col-lg-12">
                                                 <select name="devise" class="form-control" id="devise">
                                                     <option value="" id="add_devise">--</option>
@@ -195,9 +197,9 @@
                                             </div> 
                                           </div>
                                         </div>
-                                        <div class="col-md-2" style="margin-bottom: 10px; padding-top: 21px">
+                                        <div class="col-md-1" style="margin-bottom: 10px; padding-top: 21px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
+                                          <label for="montant" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
                                           <div class="col-lg-12">
                                                 <input type="number" class="form-control" step="any" name="montant" id="montant">
                                             </div> 
@@ -205,32 +207,32 @@
                                         </div>
                                       </div>
                                       <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
-                                        <div class="form-group col-4" style="padding-top: 15px">
-                                            <div class="col-4">
+                                        <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="col-3">
                                                 <input type="checkbox" name="btn_check_tranches" style="border-radius: 0; width:17px; height:17px; " id="btn_check_tranches" value="0">
                                             </div>
-                                            <label for="curl" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
+                                            <label for="btn_check_tranches" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
                                         </div>
                                     </div>
                                     <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE; display: none" id="div_tranche">
-                                        <div class="form-group col-4" style="margin-bottom: 5px; padding-top: 15px">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
+                                        <div class="form-group col-3" style="margin-bottom: 5px; padding-top: 15px">
+                                          <label for="design_tranche" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
                                           <div class="col-lg-12">
                                                 <input type="text" class="form-control" name="design_tranche" id="design_tranche">
                                             </div> 
                                           </div>
-                                          <div class="col-4" style="margin-bottom: 5px; padding-top: 15px">
+                                          <div class="col-3" style="margin-bottom: 5px; padding-top: 15px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
+                                          <label for="montant_tranche" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
                                           <div class="col-lg-12">
                                                 <input type="number" class="form-control" step="any" name="montant_tranche" id="montant_tranche">
                                             </div> 
                                           </div>
                                         </div>
                                         <div class="col-2" style="margin-bottom: 5px; padding-top: 35px">
-                                            <button class="btn btn-primary" type="button" id="btn_ajouter">Ajouter</button>
+                                            <button class="btn btn-primary" type="button" id="btn_ajouter" style="width: 100%">Ajouter</button>
                                         </div>
-                                        <div class="col-9" style="margin-bottom: 10px;">
+                                        <div class="col-12" style="margin-bottom: 10px;">
                                             <iframe src="" style="width: 100%; height: 180px;border: 1px solid #EEEEEE; margin-top: 20px" id="iframe_tranche"></iframe>
                                         </div>
                                     </div>
@@ -428,7 +430,7 @@
             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez saisir une désignation et un montant svp!",function(){
                   $('#design_tranche').focus();
                 });
-        }else if($('#type_frais').val()=='' || $('#option').val()=='' || $('#devise').val()=='' || $('#montant').val()==''){
+        }else if($('#type_frais').val()=='' || $('#devise').val()=='' || $('#montant').val()==''){
             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez saisir toutes les informations du frais svp!",function(){
                   $('#type_frais').focus();
                 });
@@ -461,7 +463,7 @@
     })
     $('#type_frais').change(function() {
         if($('#type_frais').val()!=''){
-            $('#option').focus();
+            $('#devise').focus();
         }
     })
     $('#option').change(function() {
@@ -533,6 +535,19 @@
             $('#niveau').val('').focus();
             $('#btn_check_all_classes').val(0);
             $('#check_all_classes').val(0);
+        }
+    })
+    $('#btn_check_all_options').click(function(){
+        if($('#btn_check_all_options').val()==0){
+            $('#option').attr('disabled', true);
+            $('#option').val('');
+            $('#btn_check_all_options').val(1);
+            $('#check_all_options').val(1);
+        }else{
+            $('#option').attr('disabled', false);
+            $('#option').val('').focus();
+            $('#btn_check_all_options').val(0);
+            $('#check_all_options').val(0);
         }
     })
     $('#btn_check_tranches').click(function(){
@@ -611,7 +626,7 @@
             e.preventDefault();
             var formData = new FormData(this);
             // formData.append('content', CKEDITOR.instances['descript'].getData());
-          if($('#type_frais').val()=='' || $('#option').val()=='' || $('#devise').val()=='' || $('#montant').val()==''){
+          if($('#type_frais').val()=='' || $('#devise').val()=='' || $('#montant').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez remplir tous les champs obligatoires svp!",function(){
                   $('#type_frais').focus();
                 });
@@ -622,6 +637,10 @@
           }else if($('#check_all_categories').val()==0 && $('#categorie').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir la catégorie d'élève svp!",function(){
                   $('#categorie').focus();
+                });
+          }else if($('#check_all_options').val()==0 && $('#option').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir l'option svp!",function(){
+                  $('#option').focus();
                 });
           }else{
             $.ajax({
@@ -668,7 +687,7 @@
     })  
     $('#btn_annuler').click(function(){
         $('#type_frais').val('');
-        $('#option').val('');
+        // $('#option').val('');
         if(!$('#btn_check_all_classes').is(':checked')){
             $('#btn_check_all_classes').click();
         }
@@ -678,14 +697,9 @@
         if($('#btn_check_tranches').is(':checked')){
             $('#btn_check_tranches').click();
         }
-        // $.ajax({
-        //         url:'annuler_frais.php',
-        //         type:'post',
-        //         dataType:'text', 
-        //         data:{Frais:$('#ID_Frais').val(), token:$('#token').val()},
-        //         success:function(ret){
-        //         }
-        // });
+        if(!$('#btn_check_all_options').is(':checked')){
+            $('#btn_check_all_options').click();
+        }
         $('#ID_Frais').val('');
         $('#devise').val('');
         $('#montant').val('');

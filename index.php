@@ -174,6 +174,7 @@
                     </span>
                   </a>
                 </li>
+                <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1 || $_SESSION['user_eteelo_app']['Discipline']==1 || $_SESSION['user_eteelo_app']['Cotes']==1){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
@@ -188,19 +189,24 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
+                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_inscription.php">
                           Inscription
                         </a>
+                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Discipline']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="select_vols_importation.php">
                           Discipline
                         </a>
+                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Cotes']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="select_vols_importation.php">
                           Gestion des côtes
                         </a>
+                        <?php } ?>
                       </div>
                     </div>
                   </div>
                 </li>
+                <?php }  if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Compta']==1 || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
@@ -215,16 +221,20 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
+                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Compta']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="select_vols_vente_simple.php">
                           Comptabilité
                         </a>
+                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="afficher_table_paiement.php">
                           Paiements
                         </a>
+                        <?php } ?>
                       </div>
                     </div>
                   </div>
                 </li>
+                <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1 || $_SESSION['user_eteelo_app']['Discipline']==1 || $_SESSION['user_eteelo_app']['Cotes']==1 || $_SESSION['user_eteelo_app']['Compta']==1 || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
@@ -240,23 +250,28 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
+                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Compta']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
                           Comptabilité
                         </a>
+                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Cotes']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
                           Cotes
                         </a>
+                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1){ ?>
                         <a class="dropdown-item gonow" href="#" ver="liste_eleve.php">
                           Elèves
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
+                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
+                        <a class="dropdown-item gonow" href="#" ver="rapport_paiement.php">
                           Paiements
                         </a>
+                        <?php } ?>
                       </div>
                     </div>
                   </div>
                 </li>
-                <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT'){ ?>
+                <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT'){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/layout-2 -->
@@ -337,7 +352,7 @@
               <!-- <div class="col"> -->
                 <!-- Page pre-title -->
                 <!-- <div class="page-pretitle"> -->
-                  <iframe src='Dashio/accueil.php' style="width: 100%; height: 2000px; border: none;" id="iframe"></iframe>
+                  <iframe src='Dashio/accueil.php' style="width: 100%; height: 2000px; border: 1px solid #E6E7E9;" id="iframe"></iframe>
                 <!-- </div> -->
 
               <!-- </div> -->

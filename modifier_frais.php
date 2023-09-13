@@ -63,12 +63,12 @@
           <input type="hidden" name="Liste_Opt" id="Liste_Opt" value="<?php if(isset($_GET['Option']) && $_GET['Option']!=''){echo $_GET['Option']; } ?>">
           <input type="hidden" name="Liste_Niv" id="Liste_Niv" value="<?php if(isset($_GET['Niveau']) && $_GET['Niveau']!=''){echo $_GET['Niveau']; } ?>">
           <div class="page-header d-print-none">
-            <div class="row g-2 align-items-center">
+            <div class="row g-2 align-items-center" style="margin-top: -40px">
               <div class="col">
                 <!-- Page pre-title -->
-                <div class="page-pretitle">
+                <!-- <div class="page-pretitle">
                   
-                </div>
+                </div> -->
                 <h2 class="page-title">
                 Modifier frais
                 </h2>
@@ -90,7 +90,7 @@
             </div>
           </div>
         </div>
-        <div class="page-body">
+        <div class="page-body" style="margin-top: -5px">
           <div class="container-xl">
             <div class="row row-cards">
               <div class="col-md-12">
@@ -113,9 +113,9 @@
                     <div class="tab-content">
                       <div class="tab-pane active show" id="tabs-home-12">
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE">
-                                      <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                                      <div class="col-md-2" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
+                                          <label for="ecole" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">
                                           <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                                           <input id="ID_Etablissement" type="hidden" name="ID_Etablissement" value="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo $_SESSION['user_eteelo_app']['ID_Etablissement'];} ?>">
@@ -128,9 +128,9 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-3" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
+                                          <label for="type_frais" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
                                           <div class="col-lg-12">
                                             <div class="input-group">
                                                     <input type="hidden" name="ID_Frais" id="ID_Frais" value="<?php echo $frais['ID_Frais'] ?>">
@@ -146,9 +146,9 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-3" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Option *</label>
+                                          <label for="option" class="control-label col-lg-12" style="text-align: left;">Option *</label>
                                           <div class="col-lg-12">
                                                 <input type="hidden" name="ID_Option" id="ID_Option" value="<?php echo $frais['ID_Option'] ?>">
                                                 <select name="option" class="form-control" id="option">
@@ -157,11 +157,11 @@
                                             </div> 
                                           </div>
                                         </div>
-                                      </div>
-                                    <div class="row" style="border-bottom: 1px solid #EEEEEE">
-                                      <div class="col-md-4" style="margin-bottom: 10px;">
+                                      <!-- </div>
+                                    <div class="row" style="border-bottom: 1px solid #EEEEEE"> -->
+                                      <div class="col-md-2" style="margin-bottom: 10px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
+                                          <label for="niveau" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
                                           <div class="col-lg-12">
                                           <select name="niveau" class="form-control" id="niveau">
                                                 <option value="">--</option>
@@ -172,9 +172,9 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px">
+                                      <div class="col-md-2" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Catégorie *</label>
+                                          <label for="categorie" class="control-label col-lg-12" style="text-align: left;">Catégorie *</label>
                                           <div class="col-lg-12">
                                                 <input type="hidden" name="ID_Cat" id="ID_Cat" value="<?php echo $frais['ID_Cat_Eleve'] ?>">
                                                 <select name="categorie" class="form-control" id="categorie">
@@ -183,9 +183,9 @@
                                             </div> 
                                           </div>
                                         </div>
-                                      <div class="col-md-2" style="margin-bottom: 10px">
+                                      <div class="col-md-1" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Devise *</label>
+                                          <label for="devise" class="control-label col-lg-12" style="text-align: left;">Devise *</label>
                                           <div class="col-lg-12">
                                                 <input type="hidden" name="ID_Taux" id="ID_Taux" value="<?php echo $frais['ID_Taux'] ?>">
                                                 <select name="devise" class="form-control" id="devise">
@@ -194,9 +194,9 @@
                                             </div> 
                                           </div>
                                         </div>
-                                        <div class="col-md-2" style="margin-bottom: 10px;">
+                                        <div class="col-md-1" style="margin-bottom: 10px;">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
+                                          <label for="montant" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
                                           <div class="col-lg-12">
                                                 <input type="number" class="form-control" step="any" name="montant" id="montant" value="<?php echo(number_format($frais['Montant_Frais'], 2, '.', '')); ?>">
                                             </div> 
@@ -204,32 +204,32 @@
                                         </div>
                                       </div>
                                       <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
-                                        <div class="form-group col-4" style="padding-top: 15px">
-                                            <div class="col-4">
+                                        <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="col-3">
                                                 <input type="checkbox" name="btn_check_tranches" style="border-radius: 0; width:17px; height:17px; " id="btn_check_tranches" <?php if($repartitions['NOMBRE']!=0){echo 'checked';} ?> value="<?php if($repartitions['NOMBRE']!=0){echo '1';}else{echo '0';} ?>">
                                             </div>
-                                            <label for="curl" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
+                                            <label for="btn_check_tranches" class="control-label" style="text-align: left; margin-top: 3px;">Répartition en tranches</label>
                                         </div>
                                     </div>
                                     <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE; <?php if($repartitions['NOMBRE']==0){echo 'display: none';} ?>" id="div_tranche">
-                                        <div class="form-group col-4" style="margin-bottom: 5px; padding-top: 15px">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
+                                        <div class="form-group col-3" style="margin-bottom: 5px; padding-top: 15px">
+                                          <label for="design_tranche" class="control-label col-lg-12" style="text-align: left;">Désignation *</label>
                                           <div class="col-lg-12">
                                                 <input type="text" class="form-control" name="design_tranche" id="design_tranche">
                                             </div> 
                                           </div>
-                                          <div class="col-4" style="margin-bottom: 5px; padding-top: 15px">
+                                          <div class="col-3" style="margin-bottom: 5px; padding-top: 15px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
+                                          <label for="montant_tranche" class="control-label col-lg-12" style="text-align: left;">Montant *</label>
                                           <div class="col-lg-12">
                                                 <input type="number" class="form-control" step="any" name="montant_tranche" id="montant_tranche">
                                             </div> 
                                           </div>
                                         </div>
                                         <div class="col-2" style="margin-bottom: 5px; padding-top: 35px">
-                                            <button class="btn btn-primary" type="button" id="btn_ajouter">Ajouter</button>
+                                            <button class="btn btn-primary" type="button" id="btn_ajouter" style="width: 100%">Ajouter</button>
                                         </div>
-                                        <div class="col-9" style="margin-bottom: 10px;">
+                                        <div class="col-12" style="margin-bottom: 10px;">
                                             <iframe src="" style="width: 100%; height: 180px;border: 1px solid #EEEEEE; margin-top: 20px" id="iframe_tranche"></iframe>
                                         </div>
                                     </div>
