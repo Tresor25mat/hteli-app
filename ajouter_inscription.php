@@ -813,7 +813,7 @@
                     $('#add_categorie').after(ret);
                 }
             });
-            $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val());
+            $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val());
     })
     $('#noms').autocomplete({source:function(request,response){
         var resultat=$.ui.autocomplete.filter(listerefe,request.term);
@@ -1408,7 +1408,7 @@
                                 icon: 'success',
                                 title: 'Enregistré'
                              })
-                             $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val());
+                             $('#iframe').attr('src','table_inscription_today.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val());
                              $('#btn_annuler_tout').click();
                          }else{
                             alertify.alert(ret);

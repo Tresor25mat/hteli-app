@@ -2,7 +2,11 @@
     session_start();
 	require_once('connexion.php');
     $Ecole=htmlentities($_POST['Ecole']);
-    $req_agent=$pdo->query("SELECT * FROM eleve WHERE ID_Etablissement=".$Ecole." ORDER BY Nom_Eleve");
+	if(isset($_POST['Annee']) && $_POST['Annee']!=''){
+		$req_agent=$pdo->query("SELECT * FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve WHERE eleve.ID_Etablissement=".$Ecole." AND inscription.ID_Annee=".$_POST['Annee']." ORDER BY Nom_Eleve");
+	}else{
+		$req_agent=$pdo->query("SELECT * FROM eleve WHERE ID_Etablissement=".$Ecole." ORDER BY Nom_Eleve");
+	}
     $tab_gamme=array();
 	while($resulcon=$req_agent->fetch()){
 		if($resulcon['Matricule']!=''){

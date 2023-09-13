@@ -5,7 +5,7 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT eleve.*, paiement.*, annee.*, classe.*, recu.*, paiement.Date_Enreg AS Mydate FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement WHERE paiement.ID_Paiement!=''";
+    $query="SELECT eleve.*, paiement.*, annee.*, classe.*, recu.*, paiement.Date_Enreg AS Mydate, taux_change.*, type_frais.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement INNER JOIN taux_change ON paiement.ID_Taux=taux_change.ID_Taux INNER JOIN frais ON paiement.ID_Frais=frais.ID_Frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE paiement.ID_Paiement!=''";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
         $query.=" AND section.ID_Etablissement=".$_GET['Ecole'];
     }
@@ -110,31 +110,20 @@
                                         <th>Numéro reçu</th>
                                         <th>Noms</th>
                                         <th>Classe</th>
+                                        <th>Désignation</th>
                                         <th>Montant payé</th>
                                         <th>Date de paiement</th>
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($selections=$selection->fetch()){$Nbr++; 
-                    $rs_paiement=$pdo->query("SELECT * FROM paiement_tranche WHERE ID_Paiement='".$selections['ID_Paiement']."'");
-                    $Montant_Paie=0;
-                    while ($rs_paiements=$rs_paiement->fetch()) {
-                        $rs_frais=$pdo->query("SELECT * FROM tranche_frais INNER JOIN frais ON tranche_frais.ID_Frais=frais.ID_Frais WHERE tranche_frais.ID_Tranche_Frais=".$rs_paiements['ID_Tranche_Frais']);
-                        $frais=$rs_frais->fetch();
-                        if($frais['ID_Taux']==2){
-                            $Montant_Paie=$Montant_Paie+$rs_paiements['Montant_Paie'];
-                        }else{
-                            $Montant_Paie=$Montant_Paie+($rs_paiements['Montant_Paie']/$rs_paiements['Taux']);
-                        }
-                    }
-        
-        ?>
+    <?php while($selections=$selection->fetch()){$Nbr++; ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
             <td><?php if($selections['Confirm_Paiement']==2){echo "PRO FORMA";}else{echo stripslashes($selections['Num_Recu']);} ?></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Nom_Eleve'].' '.$selections['Pnom_Eleve'].' '.$selections['Prenom_Eleve'])); ?></td>
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Classe']); ?></td>
-            <td><!-- <center> --><?php echo number_format($Montant_Paie, 2, ',', ' ').' USD'; ?></td>
+            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Libelle_Type_Frais'])); ?></td>
+            <td><!-- <center> --><?php echo number_format($selections['Montant_Paie'], 2, ',', ' ').$selections['Devise']; ?></td>
             <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Mydate'])); ?></td>
         </tr>
     <?php } ?>

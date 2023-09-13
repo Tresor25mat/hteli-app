@@ -5,7 +5,9 @@
     $list="";
     while ($rechs=$rech->fetch()){
         if(isset($_POST['ID_Taux']) && $_POST['ID_Taux']!='' && $_POST['ID_Taux']==$rechs['ID_Taux']){
-            $list.='<option value="'.$rechs['ID_Taux'].'" selected>'.stripslashes($rechs['Devise']).'</option>'; 
+            $list.='<option value="'.$rechs['ID_Taux'].'" selected>'.stripslashes($rechs['Devise']).'</option>';
+        }else if($rechs['Active']==1){
+            $list.='<option value="'.$rechs['ID_Taux'].'" selected>'.stripslashes($rechs['Devise']).'</option>';
         }else{
             $list.='<option value="'.$rechs['ID_Taux'].'">'.stripslashes($rechs['Devise']).'</option>';  
         }
