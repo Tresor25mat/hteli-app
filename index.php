@@ -246,7 +246,7 @@
                         <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
                           Cotes
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
+                        <a class="dropdown-item gonow" href="#" ver="liste_eleve.php">
                           Elèves
                         </a>
                         <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
