@@ -21,7 +21,7 @@
     $recu=$rec->fetch();
     $req_eleve=$pdo->query("SELECT * FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe WHERE eleve.ID_Eleve='".$Eleve."' AND inscription.ID_Annee=".$Annee);
     $eleves=$req_eleve->fetch();
-    $Rech_frai=$pdo->query("SELECT * FROM frais INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE frais.ID_Type_Frais=".$Frais." AND frais.ID_Annee=".$Annee." AND frais.ID_Option=".$eleves['ID_Option']." AND classe_frais.ID_Cat_Eleve=".$eleves['ID_Cat_Eleve']);
+    $Rech_frai=$pdo->query("SELECT * FROM frais INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE frais.ID_Type_Frais=".$Frais." AND frais.ID_Annee=".$Annee." AND classe_frais.ID_Option=".$eleves['ID_Option']." AND classe_frais.ID_Cat_Eleve=".$eleves['ID_Cat_Eleve']);
     $Rech_frais=$Rech_frai->fetch();
     $taux=$pdo->query("SELECT * FROM taux_change INNER JOIN table_taux ON taux_change.ID_Taux=table_taux.ID_Taux WHERE table_taux.ID_Etablissement=".$Ecole." AND table_taux.ID_Taux=1");
     $taux_change=$taux->fetch();

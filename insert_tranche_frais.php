@@ -5,14 +5,13 @@
     $Design_Tranche=Securite::bdd($_POST['Design_Tranche']);
     $Ecole=htmlentities($_POST['Ecole']);
     $Type_frais=htmlentities($_POST['Type_frais']);
-    $Option=htmlentities($_POST['Option']);
     $Devise=htmlentities($_POST['Devise']);
     $Montant=htmlentities($_POST['Montant']);
     $Montant_Tranche=htmlentities($_POST['Montant_Tranche']);
     $annee=$pdo->query("SELECT * FROM annee WHERE Encours=1");
     $annees=$annee->fetch();
     $Id_Frais="";
-    $rech=$pdo->query("SELECT * FROM frais WHERE ID_Type_Frais=".$Type_frais." AND ID_Annee=".$annees['ID_Annee']." AND ID_Option=".$Option." AND ID_Taux=".$Devise." AND Montant_Frais=".$Montant);
+    $rech=$pdo->query("SELECT * FROM frais WHERE ID_Type_Frais=".$Type_frais." AND ID_Annee=".$annees['ID_Annee']." AND ID_Taux=".$Devise." AND Montant_Frais=".$Montant);
     if($rechs=$rech->fetch()){
         $Id_Frais=$rechs['ID_Frais'];
         $rech_tranche=$pdo->query("SELECT * FROM tranche_frais WHERE ID_Frais=".$Id_Frais." AND UCASE(Design_Tranche_Frais)='".strtoupper($Design_Tranche)."'");
@@ -37,8 +36,8 @@
             echo "4";
         }else{
             if($Token==$_SESSION['user_eteelo_app']['token']){
-                $insert_frais=$pdo->query("INSERT INTO frais SET ID_Type_Frais=".$Type_frais.", ID_Annee=".$annees['ID_Annee'].", ID_Option=".$Option.", ID_Taux=".$Devise.", Montant_Frais=".$Montant.", ID_Utilisateur=".$_SESSION['user_eteelo_app']['ID_Utilisateur']);
-                $rech=$pdo->query("SELECT * FROM frais WHERE ID_Type_Frais=".$Type_frais." AND ID_Annee=".$annees['ID_Annee']." AND ID_Option=".$Option." AND ID_Taux=".$Devise." AND Montant_Frais=".$Montant);
+                $insert_frais=$pdo->query("INSERT INTO frais SET ID_Type_Frais=".$Type_frais.", ID_Annee=".$annees['ID_Annee'].", ID_Taux=".$Devise.", Montant_Frais=".$Montant.", ID_Utilisateur=".$_SESSION['user_eteelo_app']['ID_Utilisateur']);
+                $rech=$pdo->query("SELECT * FROM frais WHERE ID_Type_Frais=".$Type_frais." AND ID_Annee=".$annees['ID_Annee']." AND ID_Taux=".$Devise." AND Montant_Frais=".$Montant);
                 $rechs=$rech->fetch();
                 $Id_Frais=$rechs['ID_Frais'];
                 $rs=$pdo->prepare("INSERT INTO tranche_frais(ID_Frais, Design_Tranche_Frais, Montant_Tranche, ID_Utilisateur) VALUES (?,?,?,?)");

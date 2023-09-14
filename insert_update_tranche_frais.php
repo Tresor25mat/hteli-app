@@ -5,7 +5,6 @@
     $Design_Tranche=Securite::bdd($_POST['Design_Tranche']);
     $Ecole=htmlentities($_POST['Ecole']);
     $Type_frais=htmlentities($_POST['Type_frais']);
-    $Option=htmlentities($_POST['Option']);
     $Devise=htmlentities($_POST['Devise']);
     $Montant=htmlentities($_POST['Montant']);
     $Montant_Tranche=htmlentities($_POST['Montant_Tranche']);
@@ -24,7 +23,7 @@
             echo "3";
         }else{
             if($Token==$_SESSION['user_eteelo_app']['token']){
-                $update_frais=$pdo->query("UPDATE frais SET ID_Type_Frais=".$Type_frais.", ID_Annee=".$annees['ID_Annee'].", ID_Option=".$Option.", ID_Taux=".$Devise.", Montant_Frais=".$Montant." WHERE ID_Frais=".$Id_Frais);
+                $update_frais=$pdo->query("UPDATE frais SET ID_Type_Frais=".$Type_frais.", ID_Annee=".$annees['ID_Annee'].", ID_Taux=".$Devise.", Montant_Frais=".$Montant." WHERE ID_Frais=".$Id_Frais);
                 $rs=$pdo->prepare("INSERT INTO tranche_frais(ID_Frais, Design_Tranche_Frais, Montant_Tranche, ID_Utilisateur) VALUES (?,?,?,?)");
                 $params=array($Id_Frais, $Design_Tranche, $Montant_Tranche, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
                 $rs->execute($params);

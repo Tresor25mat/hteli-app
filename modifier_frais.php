@@ -6,7 +6,7 @@
     }
     require_once('connexion.php');
     $ID=$_GET['ID'];
-    $frai=$pdo->query("SELECT * FROM frais inner join table_option on frais.ID_Option=table_option.ID_Option INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais inner join niveau on classe_frais.ID_Niveau=niveau.ID_Niveau inner join taux_change on frais.ID_Taux=taux_change.ID_Taux inner join type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais inner join annee on frais.ID_Annee=annee.ID_Annee inner join section on table_option.ID_Section=section.ID_Section inner join categorie_eleve on classe_frais.ID_Cat_Eleve=categorie_eleve.ID_Categorie where classe_frais.ID_Classe_Frais=".$ID);
+    $frai=$pdo->query("SELECT * FROM frais INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais inner join table_option on classe_frais.ID_Option=table_option.ID_Option inner join niveau on classe_frais.ID_Niveau=niveau.ID_Niveau inner join taux_change on frais.ID_Taux=taux_change.ID_Taux inner join type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais inner join annee on frais.ID_Annee=annee.ID_Annee inner join section on table_option.ID_Section=section.ID_Section inner join categorie_eleve on classe_frais.ID_Cat_Eleve=categorie_eleve.ID_Categorie where classe_frais.ID_Classe_Frais=".$ID);
     $frais=$frai->fetch();
     $repartition=$pdo->query("SELECT COUNT(*) AS NOMBRE FROM tranche_frais WHERE ID_Frais=".$frais['ID_Frais']);
     $repartitions=$repartition->fetch();
