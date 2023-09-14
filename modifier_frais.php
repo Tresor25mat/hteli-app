@@ -164,7 +164,7 @@
                                           <label for="niveau" class="control-label col-lg-12" style="text-align: left;">Classe *</label>
                                           <div class="col-lg-12">
                                           <select name="niveau" class="form-control" id="niveau">
-                                                <option value="">--</option>
+                                                <option value="" id="add_niveau">--</option>
                                                 <?php while($niv=$niveau->fetch()){ ?>
                                                 <option value="<?php echo($niv['ID_Niveau']) ?>" <?php if($niv['ID_Niveau']==$frais['ID_Niveau']){echo 'selected';} ?>><?php echo(stripslashes($niv['Design_Niveau'])) ?></option>
                                                 <?php } ?>
@@ -458,6 +458,16 @@
     })
     $('#option').change(function() {
         if($('#option').val()!=''){
+            $.ajax({
+                url:'recherche_niveau.php',
+                type:'post',
+                dataType:'html', 
+                data:{Option:$('#option').val()},
+                success:function(ret){
+                    $('#add_niveau').nextAll().remove();
+                    $('#add_niveau').after(ret);
+                }
+            });
             $('#devise').focus();
         }
     })
@@ -473,7 +483,7 @@
     })
     $('#niveau').change(function() {
         if($('#niveau').val()!=''){
-            $('#categorie').focus();
+            $('#devise').focus();
         }
     })
     $('#liste_ecole').change(function(){
@@ -598,8 +608,36 @@
         }
     })
 
+    $('#categorie').change(function(){
+        if($('#categorie').val()!=''){
+            $.ajax({
+                url:'select_categorie.php',
+                type:'post',
+                dataType:'text', 
+                data:{categorie:$('#categorie').val()},
+                success:function(ret){
+                    $('#afficher_code').text(ret);
+                    $('#numero_compte').val('');
+                    $('#numero_compte').focus()
+                }
+            });
+        }
+    })  
+    $('#btn_annuler').click(function(){
+        window.location.replace('table_frais.php?Ecole='+$('#ID_Etab').val()+'&Option='+$('#Liste_Opt').val()+'&Niveau='+$('#Liste_Niv').val());
+    })
 
-        $('#FormFrais').submit(function(e){
+    function fermerDialogue(){
+        $("#ModalAjout").modal('hide');
+    }
+  $(function() {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 5000
+    });
+    $('#FormFrais').submit(function(e){
             e.preventDefault();
             var formData = new FormData(this);
             // formData.append('content', CKEDITOR.instances['descript'].getData());
@@ -630,7 +668,10 @@
                     success:function(ret){
                          waitingDialog.hide();
                           if(ret==1){
-                             alertify.success('Enregistrement éffectué');
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Enregistré'
+                             })
                              $('#iframe').attr('src','table_frais_to_day.php?Ecole='+$('#ID_Etab').val());
                              $('#btn_annuler').click();
                          }else if(ret==2){
@@ -642,37 +683,7 @@
                     }
                 });
           }
-          })
-    $('#categorie').change(function(){
-        if($('#categorie').val()!=''){
-            $.ajax({
-                url:'select_categorie.php',
-                type:'post',
-                dataType:'text', 
-                data:{categorie:$('#categorie').val()},
-                success:function(ret){
-                    $('#afficher_code').text(ret);
-                    $('#numero_compte').val('');
-                    $('#numero_compte').focus()
-                }
-            });
-        }
-    })  
-    $('#btn_annuler').click(function(){
-        window.location.replace('table_frais.php?Ecole='+$('#ID_Etab').val()+'&Option='+$('#Liste_Opt').val()+'&Niveau='+$('#Liste_Niv').val());
     })
-
-    function fermerDialogue(){
-        $("#ModalAjout").modal('hide');
-    }
-  $(function() {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 5000
-    });
-
     $('#ajouter_type_frais').click(function(e){
       e.preventDefault();
       $("#ModalAjout").modal('show');

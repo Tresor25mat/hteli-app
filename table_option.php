@@ -112,8 +112,9 @@
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Option'])); ?></td>
             <td><center>
+                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2 || $_SESSION['user_eteelo_app']['ID_Statut']==3 || $_SESSION['user_eteelo_app']['ID_Statut']==4){ ?>
                 <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Option']); ?>, <?php echo($selections['ID_Etablissement']); ?>, <?php echo($selections['ID_Section']); ?>, '<?php echo (stripslashes($selections['Design_Option'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
+                <?php } if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_option.php?ID=<?php echo($selections['ID_Option']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Section=<?php if(isset($_GET['Section']) && $_GET['Section']!=''){echo $_GET['Section']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
             </td>

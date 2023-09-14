@@ -67,6 +67,55 @@
                     }
                 }
             }
+        }else if($Check_all_categories==1 && $Check_all_classes==1 && $Check_all_options==0){
+            $select_categorie=$pdo->query("SELECT * FROM categorie_eleve WHERE ID_Etablissement=".$Ecole);
+            while($select_categories=$select_categorie->fetch()){
+                $select_classe=$pdo->query("SELECT niveau.ID_Niveau FROM niveau INNER JOIN classe ON niveau.ID_Niveau=classe.ID_Niveau INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$Ecole." AND table_option.ID_Option=".$Option." ORDER BY niveau.ID_Niveau");
+                $classe="";
+                while($select_classes=$select_classe->fetch()){
+                    if($classe!=$select_classes['ID_Niveau']){
+                        $classe=$select_classes['ID_Niveau'];
+                        $rech_frais_classe=$pdo->query("SELECT * FROM classe_frais WHERE ID_Frais=".$ID_Frais." AND ID_Cat_Eleve=".$select_categories['ID_Categorie']." AND ID_Niveau=".$classe." AND ID_Option=".$Option);
+                        if(!$rech_frais_classes=$rech_frais_classe->fetch()){
+                            $insert_frais_classe=$pdo->query("INSERT INTO classe_frais SET ID_Frais=".$ID_Frais.", ID_Cat_Eleve=".$select_categories['ID_Categorie'].", ID_Niveau=".$classe.", ID_Option=".$Option);
+                        }
+                    }
+                }
+            }
+        }else if($Check_all_categories==1 && $Check_all_options==1 && $Check_all_classes==0){
+            $select_categorie=$pdo->query("SELECT * FROM categorie_eleve WHERE ID_Etablissement=".$Ecole);
+            while($select_categories=$select_categorie->fetch()){
+                $select_option=$pdo->query("SELECT * FROM table_option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$Ecole." ORDER BY table_option.ID_Option");
+                $option="";
+                while($select_options=$select_option->fetch()){
+                    if($option!=$select_options['ID_Option']){
+                        $option=$select_options['ID_Option'];
+                        $rech_frais_classe=$pdo->query("SELECT * FROM classe_frais WHERE ID_Frais=".$ID_Frais." AND ID_Cat_Eleve=".$select_categories['ID_Categorie']." AND ID_Niveau=".$Niveau." AND ID_Option=".$option);
+                        if(!$rech_frais_classes=$rech_frais_classe->fetch()){
+                            $insert_frais_classe=$pdo->query("INSERT INTO classe_frais SET ID_Frais=".$ID_Frais.", ID_Cat_Eleve=".$select_categories['ID_Categorie'].", ID_Niveau=".$Niveau.", ID_Option=".$option);
+                        }
+                    }
+                }
+            }
+        }else if($Check_all_options==1 && $Check_all_classes==1 && $Check_all_categories==0){
+            $select_option=$pdo->query("SELECT * FROM table_option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$Ecole." ORDER BY table_option.ID_Option");
+            $option="";
+            while($select_options=$select_option->fetch()){
+                if($option!=$select_options['ID_Option']){
+                    $option=$select_options['ID_Option'];
+                    $select_classe=$pdo->query("SELECT niveau.ID_Niveau FROM niveau INNER JOIN classe ON niveau.ID_Niveau=classe.ID_Niveau INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$Ecole." AND table_option.ID_Option=".$option." ORDER BY niveau.ID_Niveau");
+                    $classe="";
+                    while($select_classes=$select_classe->fetch()){
+                        if($classe!=$select_classes['ID_Niveau']){
+                            $classe=$select_classes['ID_Niveau'];
+                            $rech_frais_classe=$pdo->query("SELECT * FROM classe_frais WHERE ID_Frais=".$ID_Frais." AND ID_Cat_Eleve=".$Categorie." AND ID_Niveau=".$classe." AND ID_Option=".$option);
+                            if(!$rech_frais_classes=$rech_frais_classe->fetch()){
+                                $insert_frais_classe=$pdo->query("INSERT INTO classe_frais SET ID_Frais=".$ID_Frais.", ID_Cat_Eleve=".$Categorie.", ID_Niveau=".$classe.", ID_Option=".$option);
+                            }
+                        }
+                    }
+                }
+            }
         }else{
             $select_option=$pdo->query("SELECT * FROM table_option INNER JOIN section ON table_option.ID_Section=section.ID_Section WHERE section.ID_Etablissement=".$Ecole." ORDER BY table_option.ID_Option");
             $option="";

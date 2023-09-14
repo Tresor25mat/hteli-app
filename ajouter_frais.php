@@ -167,7 +167,7 @@
                                           <label for="niveau" class="control-label col-lg-12" style="text-align: left;">Toutes les classes (*)</label>
                                           <div class="col-lg-12">
                                           <select name="niveau" class="form-control" id="niveau" disabled>
-                                                <option value="">--</option>
+                                                <option value="" id="add_niveau">--</option>
                                                 <?php while($niv=$niveau->fetch()){ ?>
                                                 <option value="<?php echo($niv['ID_Niveau']) ?>"><?php echo(stripslashes($niv['Design_Niveau'])) ?></option>
                                                 <?php } ?>
@@ -468,6 +468,16 @@
     })
     $('#option').change(function() {
         if($('#option').val()!=''){
+            $.ajax({
+                url:'recherche_niveau.php',
+                type:'post',
+                dataType:'html', 
+                data:{Option:$('#option').val()},
+                success:function(ret){
+                    $('#add_niveau').nextAll().remove();
+                    $('#add_niveau').after(ret);
+                }
+            });
             $('#devise').focus();
         }
     })
@@ -483,7 +493,7 @@
     })
     $('#niveau').change(function() {
         if($('#niveau').val()!=''){
-            $('#categorie').focus();
+            $('#devise').focus();
         }
     })
     $('#liste_ecole').change(function(){
@@ -621,55 +631,6 @@
         }
     })
 
-
-        $('#FormFrais').submit(function(e){
-            e.preventDefault();
-            var formData = new FormData(this);
-            // formData.append('content', CKEDITOR.instances['descript'].getData());
-          if($('#type_frais').val()=='' || $('#devise').val()=='' || $('#montant').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez remplir tous les champs obligatoires svp!",function(){
-                  $('#type_frais').focus();
-                });
-          }else if($('#check_all_classes').val()==0 && $('#niveau').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir une classe svp!",function(){
-                  $('#niveau').focus();
-                });
-          }else if($('#check_all_categories').val()==0 && $('#categorie').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir la catégorie d'élève svp!",function(){
-                  $('#categorie').focus();
-                });
-          }else if($('#check_all_options').val()==0 && $('#option').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir l'option svp!",function(){
-                  $('#option').focus();
-                });
-          }else{
-            $.ajax({
-                    url:'enreg_frais.php',
-                    type:'post',
-                    beforeSend:function(){
-                        waitingDialog.show('Veuillez patienter svp!');
-                    },
-                    dataType:'text',
-                    data: formData,
-                    processData: false,
-                    cache: false,
-                    contentType: false,
-                    success:function(ret){
-                         waitingDialog.hide();
-                          if(ret==1){
-                             alertify.success('Enregistrement éffectué');
-                             $('#iframe').attr('src','table_frais_to_day.php?Ecole='+$('#ID_Etab').val());
-                             $('#btn_annuler').click();
-                         }else if(ret==2){
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Le numéro entré existe déjà!');
-                         }else{
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>', ret);
-                         }
-
-                    }
-                });
-          }
-          })
     $('#categorie').change(function(){
         if($('#categorie').val()!=''){
             $.ajax({
@@ -700,6 +661,15 @@
         if(!$('#btn_check_all_options').is(':checked')){
             $('#btn_check_all_options').click();
         }
+        $.ajax({
+                url:'recherche_niveau.php',
+                type:'post',
+                dataType:'html', 
+                success:function(ret){
+                    $('#add_niveau').nextAll().remove();
+                    $('#add_niveau').after(ret);
+                }
+            });
         $('#ID_Frais').val('');
         $('#devise').val('');
         $('#montant').val('');
@@ -751,6 +721,57 @@
             });
             $('#Design').focus();
         }
+    })
+    $('#FormFrais').submit(function(e){
+            e.preventDefault();
+            var formData = new FormData(this);
+            // formData.append('content', CKEDITOR.instances['descript'].getData());
+          if($('#type_frais').val()=='' || $('#devise').val()=='' || $('#montant').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Veuillez remplir tous les champs obligatoires svp!",function(){
+                  $('#type_frais').focus();
+                });
+          }else if($('#check_all_classes').val()==0 && $('#niveau').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir une classe svp!",function(){
+                  $('#niveau').focus();
+                });
+          }else if($('#check_all_categories').val()==0 && $('#categorie').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir la catégorie d'élève svp!",function(){
+                  $('#categorie').focus();
+                });
+          }else if($('#check_all_options').val()==0 && $('#option').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Vous devez choisir l'option svp!",function(){
+                  $('#option').focus();
+                });
+          }else{
+            $.ajax({
+                    url:'enreg_frais.php',
+                    type:'post',
+                    beforeSend:function(){
+                        waitingDialog.show('Veuillez patienter svp!');
+                    },
+                    dataType:'text',
+                    data: formData,
+                    processData: false,
+                    cache: false,
+                    contentType: false,
+                    success:function(ret){
+                         waitingDialog.hide();
+                          if(ret==1){
+                            Toast.fire({
+                                icon: 'success',
+                                title: 'Enregistré'
+                             })
+                             $('#iframe').attr('src','table_frais_to_day.php?Ecole='+$('#ID_Etab').val());
+                             $('#btn_annuler').click();
+                         }else if(ret==2){
+                            alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Le numéro entré existe déjà!');
+                         }else{
+                            alertify.alert('<?php echo $app_infos['Design_App']; ?>', ret);
+                         }
+
+                    }
+                });
+          }
     })
     $('#enregistrer').click(function(){
         if($('#Design').val()=='' || $('#liste_ecole').val()=='' || $('#compte_debit').val()=='' || $('#compte_credit').val()==''){

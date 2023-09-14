@@ -110,8 +110,9 @@
                 <td><?php echo stripslashes($comptes['Design_Compte']); ?></td>
                 <td><?php echo stripslashes($comptes['Design_Nature']); ?></td>
                 <td><center>
+                    <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2 || $_SESSION['user_eteelo_app']['ID_Statut']==3 || $_SESSION['user_eteelo_app']['ID_Statut']==4){ ?>
                     <a href="#" onclick="Function_Modifier(<?php echo($comptes['ID_Compte']); ?>, <?php echo($categories['ID_Etablissement']); ?>, <?php echo($categories['ID_Categorie']); ?>, '<?php echo $categories['Cod_Categorie']; ?>', '<?php echo $comptes['Cod_Compte']; ?>', '<?php echo $comptes['Design_Compte']; ?>', <?php echo($comptes['ID_Nature']); ?>)" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                    <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
+                    <?php } if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
                     <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer ce compte?\n Toutes les informations concernant ce compte seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_compte.php?ID=<?php echo($comptes['ID_Compte']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Categorie=<?php if(isset($_GET['Categorie']) && $_GET['Categorie']!=''){echo $_GET['Categorie']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                     <?php } ?>
             </tr>

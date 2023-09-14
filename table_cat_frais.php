@@ -116,8 +116,9 @@
             <td><?php echo stripslashes($compte_debits['Cod_Categorie'].$compte_debits['Cod_Compte']); ?></td>
             <td><?php echo stripslashes($compte_credits['Cod_Categorie'].$compte_credits['Cod_Compte']); ?></td>
             <td><center>
+                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2 || $_SESSION['user_eteelo_app']['ID_Statut']==3 || $_SESSION['user_eteelo_app']['ID_Statut']==4){ ?>
                 <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Type_Frais']); ?>, <?php echo($selections['ID_Etablissement']); ?>, <?php echo($selections['ID_Compte_D']); ?>, <?php echo($selections['ID_Compte_C']); ?>, '<?php echo (stripslashes($selections['Libelle_Type_Frais'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
-                <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
+                <?php } if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_cat_frais.php?ID=<?php echo($selections['ID_Type_Frais']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
             </td>
