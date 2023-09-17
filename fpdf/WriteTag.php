@@ -578,10 +578,9 @@ class PDF_WriteTag extends FPDF
 	function Header()
 	{
 		//Put the watermark
-		// $this->SetFont('Arial','B',160);
-		// $this->SetTextColor(#009ACF);
-		// $this->RotatedText(35,190,'CHESD',40);
-		$this->Image('images/filigrane.png','50','100','120','85','PNG');
+		$this->SetFont('times','B',100);
+		$this->SetTextColor(255,192,203);
+		$this->RotatedText(60,95,'RECU',20);
 	}
 
 	function RotatedText($x, $y, $txt, $angle)

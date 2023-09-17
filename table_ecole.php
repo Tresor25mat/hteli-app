@@ -138,7 +138,7 @@
             <td><!-- <center> --><?php echo strtoupper(stripslashes($ecoles['Design_Etablissement'])); ?></td>
             <td><center><?php if ($ecoles['Active']==1){echo '<a class="btn btn-danger" style="width:25px; margin-right: 5px; border-radius: 0;" href="desactiver_ecole.php?ID='.$ecoles['ID_Etablissement'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Désactiver" style="margin-right: 5px"><i class="fa fa-ban fa-fw"></i></a>';}else{ echo '<a class="btn btn-success" style="width:30px; margin-right: 5px; border-radius: 0;" href="activer_ecole.php?ID='.$ecoles['ID_Etablissement'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Activer" style="margin-right: 5px"><i class="fa fa-check fa-fw"></i></a>';} ?></center></td>
             <td><center>
-                <a href="#" onclick="Function_Modifier(<?php echo($ecoles['ID_Etablissement']); ?>, '<?php echo (stripslashes($ecoles['Design_Etablissement'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <a href="#" onclick="Function_Modifier(<?php echo($ecoles['ID_Etablissement']); ?>, '<?php echo (stripslashes($ecoles['Design_Etablissement'])); ?>', '<?php echo (stripslashes($ecoles['Description_Etablissement'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette école?\n Toutes les informations concernant cette école seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_ecole.php?ID=<?php echo($ecoles['ID_Etablissement']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
             </td>
         </tr>
@@ -208,6 +208,8 @@
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                     <div class="col-lg-12">Désignation *</div>
                     <div class="col-lg-12"><input type="text" name="Design_Etablissement" id="Design_Etablissement" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Description </div>
+                    <div class="col-lg-12"><textarea name="Description_Etablissement" id="Description_Etablissement" cols="30" rows="4" class="form-control" style="margin-top: 1%;"></textarea></div>
                     </form>
                 </div>
             <div class="modal-footer">
@@ -229,6 +231,8 @@
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                     <div class="col-lg-12">Désignation *</div>
                     <div class="col-lg-12"><input type="text" name="Design_Etablissement_mod" id="Design_Etablissement_mod" class="form-control" style="margin-top: 1%;" value="" required></div>
+                    <div class="col-lg-12">Description </div>
+                    <div class="col-lg-12"><textarea name="Description_Etablissement_mod" id="Description_Etablissement_mod" cols="30" rows="4" class="form-control" style="margin-top: 1%;"></textarea></div>
                     </form>
                 </div>
             <div class="modal-footer">
@@ -266,10 +270,11 @@
   function fermerDialogueModEcole(){
         $("#ModalModifEcole").modal('hide');
   }
-  function Function_Modifier(a, b){
+  function Function_Modifier(a, b, c){
       $("#ModalModifEcole").modal('show');
       $('#ID_Etablissement').val(a);
       $('#Design_Etablissement_mod').val(b);
+      $('#Description_Etablissement_mod').val(c);
       $('#Design_Etablissement_mod').focus();
   }
   $(function() {
@@ -284,6 +289,7 @@
       e.preventDefault();
       $("#ModalAjoutEcole").modal('show');
       $('#Design_Etablissement').val('');
+      $('#Description_Etablissement').val('');
       $('#Design_Etablissement').focus();
     })
 
@@ -299,7 +305,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement').val(), token:$('#tok').val()},
+                        data: {Design:$('#Design_Etablissement').val(), Description:$('#Description_Etablissement').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -328,7 +334,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#Design_Etablissement_mod').val(), token:$('#tok').val(), ID:$('#ID_Etablissement').val()},
+                        data: {Design:$('#Design_Etablissement_mod').val(), Description:$('#Description_Etablissement_mod').val(), token:$('#tok').val(), ID:$('#ID_Etablissement').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
