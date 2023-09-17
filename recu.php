@@ -115,8 +115,8 @@ if($eleves['Confirm_Paiement']==2){
 	$filename = "RECU_".$eleves['Num_Recu'];
 	$codeContents = $eleves['Num_Recu']; 
 	QRcode::png($codeContents, $tempDir.''.$filename.'.png', QR_ECLEVEL_L, 5);
-	$pdf->Image('images/temp'. @$filename.'.png','166','14','35','35','PNG');
-	$pdf->SetXY(169,17);
+	$pdf->Image('images/temp'. @$filename.'.png','166','10','35','35','PNG');
+	$pdf->SetXY(169,13);
 	$pdf->MultiCell(29,29,utf8_decode(""),1,'L');
 }
 

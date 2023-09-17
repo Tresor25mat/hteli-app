@@ -88,8 +88,8 @@
                                         $param=array($chaine, $ID_Eleve, $ID_Responsable, $Lien_responsable, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
                                         $res->execute($param);
                                     }
-                                    $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
-                                    $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                                    $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=?, UpdatedBy=? WHERE ID_Inscription=?");
+                                    $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur'], $ID_Inscription);
                                     $res->execute($param);
                                     echo "1";
                                 } 
@@ -97,8 +97,8 @@
                         }
                     }else{
                         if($Token==$_SESSION['user_eteelo_app']['token']){
-                            $rs=$pdo->prepare("UPDATE eleve SET ID_Lieu_Naiss=?, ID_Commune=?, Matricule=?, Prenom_Eleve=?, Nom_Eleve=?, Pnom_Eleve=?, Sexe=?, Date_Naissance=?, Adresse=?, ID_Ecole_Provenance=?, ID_Commune_Orig=?, Photo=? WHERE ID_Eleve=?");
-                            $params=array($Lieu, $Commune, $Matri, $Prenom, $Nom, $Pnom, $Sexe, $DateN, $Adresse, $ID_Ecole_Provenance, $Secteur, $Image, $ID_Eleve);
+                            $rs=$pdo->prepare("UPDATE eleve SET ID_Lieu_Naiss=?, ID_Commune=?, Matricule=?, Prenom_Eleve=?, Nom_Eleve=?, Pnom_Eleve=?, Sexe=?, Date_Naissance=?, Adresse=?, ID_Ecole_Provenance=?, ID_Commune_Orig=?, Photo=?, UpdatedBy=? WHERE ID_Eleve=?");
+                            $params=array($Lieu, $Commune, $Matri, $Prenom, $Nom, $Pnom, $Sexe, $DateN, $Adresse, $ID_Ecole_Provenance, $Secteur, $Image, $_SESSION['user_eteelo_app']['ID_Utilisateur'], $ID_Eleve);
                             $rs->execute($params);
                             if($ID_Responsable!=''){
                                 $rech_eleve_resp=$pdo->query("SELECT * FROM eleve_responsable WHERE ID_Eleve='".$ID_Eleve."' AND ID_Responsable='".$ID_Responsable."'");
@@ -110,8 +110,8 @@
                                     $res=$pdo->query("UPDATE eleve_responsable ID_Degre=".$Lien_responsable." WHERE ID_Eleve='".$ID_Eleve."' AND ID_Responsable='".$ID_Responsable."'");
                                 }
                             }
-                            $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
-                            $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                            $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=?, UpdatedBy=? WHERE ID_Inscription=?");
+                            $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur'], $ID_Inscription);
                             $res->execute($param); 
                             echo "1";
                         } 
@@ -142,8 +142,8 @@
                                 $param=array($chaine, $ID_Eleve, $ID_Responsable, $Lien_responsable, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
                                 $res->execute($param);
                             }
-                            $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
-                            $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                            $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=?, UpdatedBy=? WHERE ID_Inscription=?");
+                            $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur'], $ID_Inscription);
                             $res->execute($param); 
                             echo "1";
                         } 
@@ -151,8 +151,8 @@
                 }
             }else{
                 if($Token==$_SESSION['user_eteelo_app']['token']){
-                    $rs=$pdo->prepare("UPDATE eleve SET ID_Lieu_Naiss=?, ID_Commune=?, Matricule=?, Prenom_Eleve=?, Nom_Eleve=?, Pnom_Eleve=?, Sexe=?, Date_Naissance=?, Adresse=?, ID_Ecole_Provenance=?, ID_Commune_Orig=? WHERE ID_Eleve=?");
-                    $params=array($Lieu, $Commune, $Matri, $Prenom, $Nom, $Pnom, $Sexe, $DateN, $Adresse, $ID_Ecole_Provenance, $Secteur, $ID_Eleve);
+                    $rs=$pdo->prepare("UPDATE eleve SET ID_Lieu_Naiss=?, ID_Commune=?, Matricule=?, Prenom_Eleve=?, Nom_Eleve=?, Pnom_Eleve=?, Sexe=?, Date_Naissance=?, Adresse=?, ID_Ecole_Provenance=?, ID_Commune_Orig=?, UpdatedBy=? WHERE ID_Eleve=?");
+                    $params=array($Lieu, $Commune, $Matri, $Prenom, $Nom, $Pnom, $Sexe, $DateN, $Adresse, $ID_Ecole_Provenance, $Secteur, $_SESSION['user_eteelo_app']['ID_Utilisateur'], $ID_Eleve);
                     $rs->execute($params);
                     if($ID_Responsable!=''){
                         $rech_eleve_resp=$pdo->query("SELECT * FROM eleve_responsable WHERE ID_Eleve='".$ID_Eleve."' AND ID_Responsable='".$ID_Responsable."'");
@@ -164,8 +164,8 @@
                             $res=$pdo->query("UPDATE eleve_responsable ID_Degre=".$Lien_responsable." WHERE ID_Eleve='".$ID_Eleve."' AND ID_Responsable='".$ID_Responsable."'");
                         }
                     }
-                    $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=? WHERE ID_Inscription=?");
-                    $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $ID_Inscription);
+                    $res=$pdo->prepare("UPDATE inscription SET ID_Eleve=?, ID_Classe=?, ID_Annee=?, ID_Cat_Eleve=?, UpdatedBy=? WHERE ID_Inscription=?");
+                    $param=array($ID_Eleve, $Classe, $Annee, $Categorie, $_SESSION['user_eteelo_app']['ID_Utilisateur'], $ID_Inscription);
                     $res->execute($param); 
                     echo "1";
                 } 
