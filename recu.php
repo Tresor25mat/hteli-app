@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once('connexion.php');
-require('fpdf/WriteTag.php');
+require('rotation.php');
 require_once('libs/phpqrcode/qrlib.php');
 require_once('NumberToString.php');
 $Paiement=$_GET['Paiement'];
@@ -104,6 +104,7 @@ $ecoles=$ecole->fetch();
 $pdf->SetFont('Courier','B',13);
 $pdf->Cell(50,7,utf8_decode($ecoles['Design_Etablissement']),0,1,'L');
 $txt=utf8_decode('<p>'.$ecoles['Description_Etablissement'].'</p>');
+$pdf->Cell(1,7,'',0,0,'L');
 $pdf->WriteTag(65,4,$txt,0,"L",0,0);
 $pdf->Ln();
 $pdf->SetFont('Courier','BU',17);
@@ -111,13 +112,14 @@ if($eleves['Confirm_Paiement']==2){
 	$pdf->Cell(190,10,utf8_decode("PRO FORMA"),0,0,'C');
 }else{
 	$pdf->Cell(190,10,utf8_decode("REÇU N° ".$eleves['Num_Recu']),0,0,'C');
-	$tempDir = 'images/temp'; 
+	$tempDir = 'images/temp/'; 
 	$filename = "RECU_".$eleves['Num_Recu'];
 	$codeContents = $eleves['Num_Recu']; 
 	QRcode::png($codeContents, $tempDir.''.$filename.'.png', QR_ECLEVEL_L, 5);
-	$pdf->Image('images/temp'. @$filename.'.png','166','10','35','35','PNG');
+	$pdf->Image('images/temp/'. @$filename.'.png','166','10','35','35','PNG');
 	$pdf->SetXY(169,13);
 	$pdf->MultiCell(29,29,utf8_decode(""),1,'L');
+	@unlink('images/temp/'. @$filename.'.png');
 }
 
 $pdf->Ln(3);
