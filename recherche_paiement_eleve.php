@@ -12,9 +12,9 @@
         $Rech_frai=$pdo->query("SELECT * FROM frais INNER JOIN classe_frais ON frais.ID_Frais=classe_frais.ID_Frais WHERE frais.ID_Type_Frais=".$Frais." AND frais.ID_Annee=".$Annee." AND classe_frais.ID_Option=".$resulcon['ID_Option']." AND classe_frais.ID_Cat_Eleve=".$resulcon['ID_Cat_Eleve']);
         if($Rech_frais=$Rech_frai->fetch()){
             if(isset($_POST['Paiement']) && $_POST['Paiement']!=""){
-                $paiement=$pdo->query("SELECT * FROM paiement WHERE ID_Paiement!='".$_POST['Paiement']."' AND ID_Inscription='".$resulcon['ID_Inscription']."' AND ID_Frais=".$Rech_frais['ID_Frais']." AND Confirm_Paiement=1");
+                $paiement=$pdo->query("SELECT * FROM paiement INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement WHERE paiement.ID_Paiement!='".$_POST['Paiement']."' AND paiement.ID_Inscription='".$resulcon['ID_Inscription']."' AND paiement_frais.ID_Frais=".$Rech_frais['ID_Frais']." AND paiement.Confirm_Paiement=1");
             }else{
-                $paiement=$pdo->query("SELECT * FROM paiement WHERE ID_Inscription='".$resulcon['ID_Inscription']."' AND ID_Frais=".$Rech_frais['ID_Frais']." AND Confirm_Paiement=1");
+                $paiement=$pdo->query("SELECT * FROM paiement INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement WHERE paiement.ID_Inscription='".$resulcon['ID_Inscription']."' AND paiement_frais.ID_Frais=".$Rech_frais['ID_Frais']." AND paiement.Confirm_Paiement=1");
             }
             while($paiements=$paiement->fetch()){
                 if($paiements['ID_Taux']==$Rech_frais['ID_Taux']){

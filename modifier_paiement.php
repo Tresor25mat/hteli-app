@@ -254,7 +254,7 @@
                             </div>
 
                               <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
-                                        <div class="form-group col-4" style="padding-top: 5px">
+                                        <div class="form-group col-4" style="padding-top: 10px">
                                             <div class="col-4">
                                                 <input type="checkbox" name="btn_check_informations" style="border-radius: 0; width:17px; height:17px; " id="btn_check_informations" value="0">
                                             </div>
@@ -263,20 +263,20 @@
                               </div>
                               <div style="display: none" id="autres_info">
                                 <div class="row" style="marging-bottom: 20px;">
-                                            <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="form-group col-3" style="padding-top: 10px">
                                                 <div class="col-4">
                                                     <input type="hidden" name="mode_paiement" id="mode_paiement" value="<?php echo $paiements['Mode_Paiement']; ?>">
                                                     <input type="checkbox" name="btn_check_mode_caisse" style="border-radius: 0; width:17px; height:17px; " id="btn_check_mode_caisse" value="0">
                                                 </div>
                                                 <label for="btn_check_mode_caisse" class="control-label" style="text-align: left; margin-bottom: 5px">En caisse </label>
                                             </div>
-                                            <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="form-group col-3" style="padding-top: 10px">
                                                 <div class="col-4">
                                                     <input type="checkbox" name="btn_check_mode_banque" style="border-radius: 0; width:17px; height:17px; " id="btn_check_mode_banque" value="0">
                                                 </div>
                                                 <label for="btn_check_mode_banque" class="control-label" style="text-align: left; margin-bottom: 5px">En banque </label>
                                             </div>
-                                            <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="form-group col-3" style="padding-top: 10px">
                                                 <div class="col-4">
                                                     <input type="checkbox" name="btn_check_mode_proformat" style="border-radius: 0; width:17px; height:17px; " id="btn_check_mode_proformat" value="0">
                                                 </div>

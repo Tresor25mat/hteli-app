@@ -146,16 +146,6 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-3" style="margin-bottom: 5px">
-                                        <div class="form-group ">
-                                          <label for="frais" class="control-label col-lg-12" style="text-align: left;">Frais *</label>
-                                          <div class="col-lg-12">
-                                            <select name="frais" class="form-control" id="frais">
-                                                <option value="" id="add_frais">--</option>
-                                            </select>
-                                          </div>
-                                        </div>
-                                      </div>
                                       <div class="col-md-3" style="margin-bottom: 5px;">
                                         <div class="form-group ">
                                             <label for="annee" class="control-label col-lg-12" style="text-align: left;">Année scolaire *</label>
@@ -176,22 +166,33 @@
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  </div>
-                          </div>
-                          <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE">
-                              <div class="col-md-12" style="margin-bottom: 5px">
-                                  <div class="row">
-                                    <div class="col-md-12" style="margin-bottom: 5px;">
+                                      <div class="col-md-3" style="margin-bottom: 5px;">
                                         <div class="form-group ">
                                           <label for="ancien_eleve" class="control-label col-lg-12" style="text-align: left;">Elève </label>
                                           <div class="col-lg-12">
                                           <input type="text" class="form-control" id="ancien_eleve" name="ancien_eleve">
                                           <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                                           <input type="hidden" name="ID_Eleve" id="ID_Eleve">
+                                          <input type="hidden" name="ID_Paiement" id="ID_Paiement">
                                           </div>
                                         </div>
                                       </div>
+                                      <div class="col-md-3" style="margin-bottom: 5px">
+                                        <div class="form-group ">
+                                          <label for="frais" class="control-label col-lg-12" style="text-align: left;">Frais *</label>
+                                          <div class="col-lg-12">
+                                            <select name="frais" class="form-control" id="frais">
+                                                <option value="" id="add_frais">--</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                          </div>
+                          <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE">
+                              <div class="col-md-12" style="margin-bottom: 5px">
+                                  <div class="row">
                                       <div class="col-md-3" style="margin-bottom: 5px">
                                         <div class="form-group ">
                                           <label for="paiements_effectues" class="control-label col-lg-12" style="text-align: left;">Déjà payé </label>
@@ -245,8 +246,20 @@
                                       </div>
                                       </div>
                             </div>
-
-                              <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
+                            <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE">
+                                        <div class="form-group col-4" style="padding-top: 5px">
+                                            <div class="col-4">
+                                                <input type="checkbox" name="btn_check_details" style="border-radius: 0; width:17px; height:17px; " id="btn_check_details" value="0">
+                                            </div>
+                                            <label for="btn_check_details" class="control-label" style="text-align: left; margin-bottom: 5px">Détails paiement </label>
+                                        </div>
+                              </div>
+                              <div style="display: none" id="details_paiement">
+                                <div class="row" style="marging-bottom: 20px;">
+                                  <iframe src="" style="width: 100%; height: 200px;border: 1px solid #E6E7E9; margin-top: 20px; padding: 7px; background: #F5F7FB" id="iframe_paiement"></iframe>
+                                </div>
+                            </div>
+                              <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE; padding-top: 5px">
                                         <div class="form-group col-4" style="padding-top: 5px">
                                             <div class="col-4">
                                                 <input type="checkbox" name="btn_check_informations" style="border-radius: 0; width:17px; height:17px; " id="btn_check_informations" value="0">
@@ -256,20 +269,20 @@
                               </div>
                               <div style="display: none" id="autres_info">
                                 <div class="row" style="marging-bottom: 20px;">
-                                            <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="form-group col-3" style="padding-top: 10px">
                                                 <div class="col-4">
                                                     <input type="hidden" name="mode_paiement" id="mode_paiement">
                                                     <input type="checkbox" name="btn_check_mode_caisse" style="border-radius: 0; width:17px; height:17px; " id="btn_check_mode_caisse" value="0">
                                                 </div>
                                                 <label for="btn_check_mode_caisse" class="control-label" style="text-align: left; margin-bottom: 5px">En caisse </label>
                                             </div>
-                                            <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="form-group col-3" style="padding-top: 10px">
                                                 <div class="col-4">
                                                     <input type="checkbox" name="btn_check_mode_banque" style="border-radius: 0; width:17px; height:17px; " id="btn_check_mode_banque" value="0">
                                                 </div>
                                                 <label for="btn_check_mode_banque" class="control-label" style="text-align: left; margin-bottom: 5px">En banque </label>
                                             </div>
-                                            <div class="form-group col-3" style="padding-top: 5px">
+                                            <div class="form-group col-3" style="padding-top: 10px">
                                                 <div class="col-4">
                                                     <input type="checkbox" name="btn_check_mode_proformat" style="border-radius: 0; width:17px; height:17px; " id="btn_check_mode_proformat" value="0">
                                                 </div>
@@ -306,7 +319,7 @@
                                     <div class="row" style="margin-top: 10px; padding-bottom: 10px">
                                             <div class="col-lg-12">
                                               <div class="pull-right">
-                                                  <button class="btn btn-primary" type="submit" id="btn_enregistrer">Enregistrer</button>
+                                                  <button class="btn btn-primary" type="button" id="btn_enregistrer">Enregistrer</button>
                                                   <button class="btn btn-danger" type="button" id="btn_annuler_tout">Annuler</button>
                                               </div>
                                             </div>
@@ -477,39 +490,7 @@
         },
         select:function(event,ui){
             $('#ID_Eleve').val(ui.item.desc);
-            if($('#frais').val()!='' && $('#annee').val()!=''){
-              $.ajax({
-                  url:"recherche_paiement_eleve.php",
-                  type:"post",
-                  dataType:"json",
-                  data:{ID_Eleve:$('#ID_Eleve').val(), Annee:$('#annee').val(), Frais:$('#frais').val()},
-                  success:function(donnee){
-                    //   alertify.alert(donnee);
-                      $.map(donnee,function(objet){
-                            $('#paiements_effectues').val(objet.Montant_paye);
-                            $('#montant_reste').val(objet.Montant_reste);
-                            if(objet.Montant_paye=='0,00' && objet.Montant_reste=='0,00'){
-                                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Le montant du frais séléctionné n\'est pas encore configuré!', function(){
-                                $('#btn_enregistrer').attr('disabled', true);
-                                $('#ID_Eleve').val('');
-                                $('#ancien_eleve').val('');
-                                $('#frais').focus();
-                            })
-                            }else{
-                                $('#btn_enregistrer').attr('disabled', false);
-                                $('#montant_paiement').focus().select();
-                            }
-                      })
-                  }
-              })
-            }else{
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez séléctionner la frais et l\'année svp!', function(){
-                    $('#btn_enregistrer').attr('disabled', true);
-                    $('#ID_Eleve').val('');
-                    $('#ancien_eleve').val('');
-                    $('#frais').focus();
-                })
-            }
+            $('#frais').focus();
         }
     });
     $('#ecole').change(function(){
@@ -558,8 +539,15 @@
             $('#ID_Etablissement').val($('#ecole').val());
         }
     })
-
-
+    $('#btn_check_details').click(function(){
+        if($('#btn_check_details').val()==0){
+            $('#details_paiement').slideDown('slow');
+            $('#btn_check_details').val(1);
+        }else{
+            $('#details_paiement').slideUp('slow');
+            $('#btn_check_details').val(0);
+        }
+    })
     $('#btn_check_informations').click(function(){
         if($('#btn_check_informations').val()==0){
             $('#autres_info').slideDown('slow', function(){
@@ -642,6 +630,56 @@
             $('#montant_paiement').focus();
         }
     })
+    $('#montant_paiement').keypress(function(ev){
+        if(ev.key=='Enter'){
+            let datepaiement = $('#datepaiement').val();
+            datepaie = datepaiement.replace(/\//g, "-");
+            $('#datepaie').val(datepaie);
+            if($('#frais').val()=='' || $('#annee').val()=='' || $('#datepaiement').val()=='' || $('#devise').val()=='' || $('#montant_paiement').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#frais').focus();});
+            }else if($('#ID_Eleve').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez séléctionner un élève dans la liste svp!', function(){$('#ancien_eleve').focus();});
+            }else if($('#paiements_effectues').val()=='0,00' && $('#montant_reste').val()=='0,00'){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Le montant du frais séléctionné n\'est pas encore configuré!', function(){$('#ancien_eleve').focus();});
+            }else if($('#montant_paiement').val()=='0.00'){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez saisir un montant différent de zéro svp!', function(){$('#montant_paiement').focus().select();});
+            }else{
+                $.ajax({
+                    url:'enreg_paiement_frais.php',
+                    type:'post',
+                    beforeSend:function(){
+                      waitingDialog.show('Veuillez patienter...');
+                    },
+                    dataType:'text',
+                    data: formData,
+                    processData: false,
+                    cache: false,
+                    contentType: false,
+                    success:function(ret){
+                         waitingDialog.hide();
+                         const str_ret = ret;
+                         const retour = str_ret.split(',');
+                         if(ret==2){
+                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"La somme des montants payés est supérieur au montant du frais!");
+                             $('#btn_annuler_tout').click();
+                         }else if(ret==3){
+                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Image upload failed!");
+                         }else if(retour[0]==1){
+                             Toast.fire({
+                                icon: 'success',
+                                title: 'Enregistré'
+                             })
+                             $('#iframe_impression').attr('src', 'imprimer.php?Page=recu.php&Paiement='+retour[1]+'&Ecole='+$('#ID_Etab').val());
+                             $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val()+'&Recu='+$('#txt_Recu').val());
+                             $('#btn_annuler_tout').click();
+                         }else{
+                            alertify.alert(ret);
+                         }
+                    }
+                });
+            }
+        }
+    });
     $('#frais').change(function(){
         if($('#frais').val()!=''){
             $.ajax({
@@ -659,8 +697,6 @@
                         $('#paiements_effectues').val('0,00');
                         $('#montant_reste').val('0,00');
                         $('#montant_paiement').val('0.00');
-                        $('#ID_Eleve').val('');
-                        $('#ancien_eleve').val('').focus();
                         $.ajax({
                             url:'recherche_compte_type_frais.php',
                             type:'post',
@@ -686,9 +722,40 @@
                                 }
                             }
                         });
+                        if($('#ID_Eleve').val()!='' && $('#annee').val()!=''){
+                            $.ajax({
+                                url:"recherche_paiement_eleve.php",
+                                type:"post",
+                                dataType:"json",
+                                data:{ID_Eleve:$('#ID_Eleve').val(), Annee:$('#annee').val(), Frais:$('#frais').val()},
+                                success:function(donnee){
+                                  //   alertify.alert(donnee);
+                                    $.map(donnee,function(objet){
+                                          $('#paiements_effectues').val(objet.Montant_paye);
+                                          $('#montant_reste').val(objet.Montant_reste);
+                                          if(objet.Montant_paye=='0,00' && objet.Montant_reste=='0,00'){
+                                              alertify.alert('<?php echo $app_infos['Design_App']; ?>','Le montant du frais séléctionné n\'est pas encore configuré!', function(){
+                                              $('#btn_enregistrer').attr('disabled', true);
+                                              $('#montant_paiement').attr('disabled', true);
+                                          })
+                                          }else{
+                                              $('#montant_paiement').attr('disabled', false);
+                                              $('#btn_enregistrer').attr('disabled', false);
+                                              $('#montant_paiement').focus().select();
+                                          }
+                                    })
+                                }
+                            })
+                          }else{
+                              alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez séléctionner l\'élève et l\'année svp!', function(){
+                                  $('#btn_enregistrer').attr('disabled', true);
+                                  $('#montant_paiement').attr('disabled', true);
+                                  $('#frais').focus();
+                              })
+                          }
                     }else{
                         alertify.alert('<?php echo $app_infos['Design_App']; ?>','Le frais séléctionné n\'est pas encore configuré!', function(){
-                        $('#ancien_eleve').attr('disabled', true);
+                        $('#montant_paiement').attr('disabled', true);
                         $('#devise').attr('disabled', true);
                         $('#montant_paiement').attr('disabled', true);
                             $('#btn_enregistrer').attr('disabled', true);
@@ -698,11 +765,10 @@
                             $('#paiements_effectues').val('0,00');
                             $('#montant_reste').val('0,00');
                             $('#montant_paiement').val('0.00');
-                            $('#ID_Eleve').val('');
-                            $('#ancien_eleve').val('');
                             $('#mode_paiement').val('0');
                             $('#compte_caisse').val('');
                             $('#compte_banque').val('');
+                            $('#frais').focus();
                         });
                     }
                 }

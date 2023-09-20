@@ -5,9 +5,11 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $query="SELECT eleve.*, paiement.*, annee.*, classe.*, recu.*, paiement.Date_Enreg AS Mydate, taux_change.*, type_frais.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement INNER JOIN taux_change ON paiement.ID_Taux=taux_change.ID_Taux INNER JOIN frais ON paiement.ID_Frais=frais.ID_Frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE paiement.ID_Paiement!=''";
+    $query="SELECT eleve.*, paiement.*, annee.*, classe.*, recu.*, paiement.Date_Enreg AS Mydate FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement WHERE paiement.ID_Paiement!=''";
     if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){
         $query.=" AND section.ID_Etablissement=".$_GET['Ecole'];
+        $default_devise=$pdo->query("SELECT * FROM taux_change INNER JOIN table_taux ON taux_change.ID_Taux=table_taux.ID_Taux WHERE table_taux.ID_Etablissement=".$_GET['Ecole']." AND table_taux.Active=1");
+        $default_devises=$default_devise->fetch();
     }
     if(isset($_GET['Annee']) && $_GET['Annee']!=''){
         $query.=" AND annee.ID_Annee =".$_GET['Annee']; 
@@ -116,14 +118,32 @@
                                     </tr>
                                 </thead>
                                 <tbody id="MaTable">
-    <?php while($selections=$selection->fetch()){$Nbr++; ?>
+    <?php while($selections=$selection->fetch()){$Nbr++; 
+        $paiement_frai=$pdo->query("SELECT paiement_frais.*, type_frais.* FROM paiement_frais INNER JOIN frais ON paiement_frais.ID_Frais=frais.ID_Frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE paiement_frais.ID_Paiement='".$selections['ID_Paiement']."'");
+        $Montant_Paie=0;
+        $Titre="";
+        while($paiement_frais=$paiement_frai->fetch()){
+            $Titre.=' - '.strtoupper(stripslashes($paiement_frais['Libelle_Type_Frais'])).'</br>';
+            $frai=$pdo->query("SELECT * FROM frais WHERE ID_Frais=".$paiement_frais['ID_Fra']);
+            $frais=$frai->fetch();
+            if($paiement_frais['ID_Taux']==$default_devises['ID_Taux']){
+                $Montant_Paie+=$paiement_frais['Montant_Paie'];
+            }else{
+                if($paiement_frais['ID_Taux']==1){
+                    $Montant_Paie+=($paiement_frais['Montant_Paie']/$selections['Taux']);
+                }else{
+                    $Montant_Paie+=($paiement_frais['Montant_Paie']*$selections['Taux']);
+                }
+            }
+        }
+        ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
             <td><?php if($selections['Confirm_Paiement']==2){echo "PRO FORMA";}else{echo stripslashes($selections['Num_Recu']);} ?></td>
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Nom_Eleve'].' '.$selections['Pnom_Eleve'].' '.$selections['Prenom_Eleve'])); ?></td>
             <td><!-- <center> --><?php echo strtoupper($selections['Design_Classe']); ?></td>
-            <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Libelle_Type_Frais'])); ?></td>
-            <td><!-- <center> --><?php echo number_format($selections['Montant_Paie'], 2, ',', ' ').$selections['Devise']; ?></td>
+            <td><!-- <center> --><?php echo $Titre; ?></td>
+            <td><!-- <center> --><?php echo number_format($Montant_Paie, 2, ',', ' ').$default_devises['Devise']; ?></td>
             <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Mydate'])); ?></td>
         </tr>
     <?php } ?>

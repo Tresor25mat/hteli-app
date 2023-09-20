@@ -99,7 +99,7 @@
             </div>
           </div>
         </div>
-        <div class="text-muted mt-1">
+        <div class="text-muted mt-1" style="padding-left: 12px; padding-right: 12px">
 
 <?php if($Total!=0){ 
         if($totalparpage<$Total){
@@ -116,7 +116,7 @@
 <?php } ?>
 
 </div>
-        <div class="page-body">
+        <div class="page-body" style="padding-left: 12px; padding-right: 12px">
           <div class="container-xl" style="border: 1px solid #E6E7E9">
             <div class="row row-deck row-cards">
                 <!-- <div class="col-md-12 col-lg-12"> -->

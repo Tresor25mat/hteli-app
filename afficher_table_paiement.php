@@ -11,6 +11,7 @@
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
+    $Ind=0;
 ?>
 <!DOCTYPE html>
 <html lang="fr-FR">
@@ -78,7 +79,7 @@
                                 <select name="ecole" class="form-control" id="ecole" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
                                     <option value="">--</option>
                                     <?php while($ecoles=$ecole->fetch()){ ?>
-                                    <option value="<?php echo($ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';}else if(isset($_GET['Ecole']) && $_GET['Ecole']!='' && $_GET['Ecole']==$ecoles['ID_Etablissement']){echo 'selected';} ?>><?php echo(stripslashes($ecoles['Design_Etablissement'])) ?></option>
+                                    <option value="<?php echo($ecoles['ID_Etablissement']) ?>" <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1 && $ecoles['ID_Etablissement']==$_SESSION['user_eteelo_app']['ID_Etablissement']){ echo 'selected';}else if(isset($_GET['Ecole']) && $_GET['Ecole']!='' && $_GET['Ecole']==$ecoles['ID_Etablissement']){echo 'selected';}else if($_SESSION['user_eteelo_app']['ID_Statut']==1 && $Ind==0){echo 'selected'; $Ind=1;} ?>><?php echo(stripslashes($ecoles['Design_Etablissement'])) ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -163,7 +164,7 @@
           </div>
         </div>
         <div class="page-body">
-            <iframe src="" style="width: 100%; height: 1500px; border: none;" id="iframe"></iframe>
+            <iframe src="" style="width: 100%; height: 1500px; border: none; padding-left: 12px; padding-right: 12px" id="iframe"></iframe>
         </div>
       </div>
     </div>

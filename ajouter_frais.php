@@ -116,7 +116,7 @@
                     <div class="tab-content">
                       <div class="tab-pane active show" id="tabs-home-12">
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE">
-                                      <div class="col-md-2" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
+                                      <div class="col-md-2" style="margin-bottom: 10px; padding-top: 21px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
                                         <div class="form-group ">
                                           <label for="ecole" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
                                           <div class="col-lg-12">

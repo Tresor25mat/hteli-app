@@ -101,7 +101,7 @@
           </div>
         </div>
         <div class="page-body">
-            <iframe src="" style="width: 100%; height: 1500px; border: none;" id="iframe"></iframe>
+            <iframe src="" style="width: 100%; height: 1500px; border: none; padding-left: 12px; padding-right: 12px" id="iframe"></iframe>
         </div>
       </div>
     </div>
