@@ -13,6 +13,8 @@
     $statuts=$rs_statut->fetch();
     $Login=Securite::bdd($_POST['login']);
     $Profil=htmlentities($_POST['profil']);
+    $Type_Photo=htmlentities($_POST['type_photo']);
+    $Photo_Data=htmlentities($_POST['photo_data']);
     $Inscription=0;
     $Discipline=0;
     $Cotes=0;
@@ -61,12 +63,12 @@
                 if($Token==$_SESSION['user_eteelo_app']['token']){
                     if($Password!=''){
                         $Password=sha1($Password);
-                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                        $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Image, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
+                        $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
                         $rs->execute($params);
                     }else{
-                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                        $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Image, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
+                        $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Image, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
                         $rs->execute($params);
                     }
                     echo "1";
@@ -74,6 +76,20 @@
             }else{
                 echo "3";
             }
+        }
+    }else if($Photo_Data!=''){
+        if($Token==$_SESSION['user_eteelo_app']['token']){
+            if($Password!=''){
+                $Password=sha1($Password);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                $rs->execute($params);
+            }else{
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                $rs->execute($params);
+            }
+            echo "1";
         }
     }else{
         if($Token==$_SESSION['user_eteelo_app']['token']){

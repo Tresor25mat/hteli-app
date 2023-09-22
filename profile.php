@@ -31,6 +31,31 @@
     <link href="./dist/css/demo.min.css" rel="stylesheet"/>
     <link href="images/icon.png" rel="icon">
     <link href="images/icon.png" rel="apple-touch-icon">
+    <style>
+      .mylink:hover{
+          font-weight: bold;
+          text-decoration: none;
+      }
+      .btn-default:hover{
+         border: 1px solid #D9DBDE;
+      }
+      .btn-default:focus{
+         border: 1px solid #D9DBDE;
+      }
+      #video {
+          /* border: 1px solid black; */
+          width: 100%;
+          height: auto;
+          border-radius: 3px;
+      }
+      #canvas {
+          display: none;
+      }
+      .camera {
+          width: 340px;
+          display: inline-block;
+      }
+  </style>
   </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" style="overflow: hidden;">
     <div class="page">
@@ -83,7 +108,7 @@
                   <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                   <input class="form-control" id="mimg" type="file" name="mimg" style="display: none;" accept=".jpg, .jpeg, .png">
                     <a href="#" id="mapercu" title="Changer la photo">
-                    <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(<?php if($Utilisateurs['Photo']==''){if($Utilisateurs['ID_Profil']==1){echo('images/photo_femme.jpg');}else{echo('images/photo.jpg');}}else{ echo('images/profil/'.$Utilisateurs['Photo']);} ?>); border: 1px solid #DEE2E6;" id="miamge"><?php if($Utilisateurs['Etat']==1){echo("<img src='images/connecte.gif' style='width: 12px; height: 12px; margin-top: 85px; margin-left: 78px'>");} ?></span></a>
+                    <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(<?php if($Utilisateurs['Photo']!='' && $Utilisateurs['Photo_Type']==1){echo('images/profil/'.$Utilisateurs['Photo']);}else if($Utilisateurs['Photo']!='' && $Utilisateurs['Photo_Type']==2){echo $Utilisateurs['Photo'];}else{if($Utilisateurs['ID_Profil']==1){ echo ('images/photo_femme.jpg');}else{echo('images/photo.jpg');}} ?>); border: 1px solid #DEE2E6;" id="miamge"><?php if($Utilisateurs['Etat']==1){echo("<img src='images/connecte.gif' style='width: 12px; height: 12px; margin-top: 85px; margin-left: 78px'>");} ?></span></a>
                     <h3 class="m-0 mb-1"><!-- <a href="#"> --><?php echo $Utilisateurs['Prenom'].' '.$Utilisateurs['Nom']; ?></h3>
                     <div class="text-muted"><?php echo $Utilisateurs['Statut']; ?></div>
                     <?php if($Utilisateurs['Statut']!='Admin'){ ?>
@@ -141,6 +166,55 @@
                 <button type="button" class="btn btn-primary" id="enregpassword">Enregistrer</button>
                 <button  class="btn btn-danger" onclick="fermerDialoguepassword()">Annuler</button>
             </div>
+            </div>
+        </div>
+    </div>
+    <div id="ModalPhoto" class="modal fade" data-backdrop="static" style="margin-top: 50px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Capturer une photo</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
+                </div>
+                <div class="modal-body">
+                   <form method="post" action="">
+                    <div class="row">
+                        <div class="col-12 camera">
+                            <video id="video">Video stream not available.</video>
+                            <canvas id="canvas"></canvas>
+                            <input type="hidden" name="type_photo" id="type_photo">
+                            <input type="hidden" name="photo_data" id="photo_data">
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="capturer_photo">Capturer</button>
+                <button  class="btn btn-danger" onclick="fermerDialoguePhoto()">Annuler</button>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div id="ModalChoix" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Changer la photo</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
+                </div>
+                <div class="modal-body">
+                   <form method="post" action="">
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" id="btn_capturer" style="width: 100%; margin-bottom: 20px">Capturer</button>
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary" id="btn_parcourir" style="width: 100%; margin-bottom: 20px">Parcourir</button>
+                            <button type="button" class="btn btn-primary" id="btn_enregistrer" style="display: none">Parcourir</button>
+                        </div>
+                    </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -223,20 +297,28 @@
         function fermerDialoguepassword(){
             $("#ModalPassword").modal('hide');
         };
+    function fermerDialoguePhoto(){
+        stopVideo()
+        $("#ModalPhoto").modal('hide');
+    }
           function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
         async function demo() {
             await sleep(2000);
-            $('#submit').click();
+            if($('#type_photo').val()==1){
+              $('#submit').click();
+            }else{
+              $('#btn_enregistrer').click();
+            }
         }
          function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 
                 reader.onload = function (e) {
-
+                    $('#type_photo').val(1);
                     $('#miamge').css('background-image', 'url(images/loading.gif');
                     images = e.target.result;
                     demo()
@@ -245,6 +327,100 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+    var width = 240; // We will scale the photo width to this
+    var height = 0; // This will be computed based on the input stream
+
+    var streaming = false;
+
+    var video = null;
+    var canvas = null;
+    var photo = null;
+    var capturer_photo = null;
+
+    function startup() {
+        video = document.getElementById('video');
+        canvas = document.getElementById('canvas');
+        photo = document.getElementById('miamge');
+        capturer_photo = document.getElementById('capturer_photo');
+
+        navigator.mediaDevices.getUserMedia({
+                video: true,
+                audio: false
+            })
+            .then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function(err) {
+                console.log("An error occurred: " + err);
+            });
+
+        video.addEventListener('canplay', function(ev) {
+            if (!streaming) {
+                height = video.videoHeight / (video.videoWidth / width);
+
+                if (isNaN(height)) {
+                    height = width / (4 / 3);
+                }
+
+                video.setAttribute('width', width);
+                video.setAttribute('height', height);
+                canvas.setAttribute('width', width);
+                canvas.setAttribute('height', height);
+                streaming = true;
+            }
+        }, false);
+
+        capturer_photo.addEventListener('click', function(ev) {
+            takepicture();
+            ev.preventDefault();
+            fermerDialoguePhoto();
+        }, false);
+
+        clearphoto();
+    }
+
+
+    function clearphoto() {
+        var context = canvas.getContext('2d');
+        context.fillStyle = "#AAA";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        var data = canvas.toDataURL('image/png');
+        // photo.setAttribute('src', data);
+    }
+
+    function takepicture() {
+        var context = canvas.getContext('2d');
+        if (width && height) {
+            canvas.width = width;
+            canvas.height = height;
+            context.drawImage(video, 0, 0, width, height);
+
+            var data = canvas.toDataURL('image/png');
+            $('#type_photo').val(2);
+            $('#photo_data').val(data);
+            $('#miamge').css('background-image', 'url(images/loading.gif');
+            images = data;
+            fermerDialoguePhoto();
+            demo()
+        } else {
+            clearphoto();
+        }
+    }
+
+    function stopVideo(){
+      if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        
+        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+          const mystream = video.srcObject;
+          const tracks = mystream.getTracks();
+          tracks.forEach(track => track.stop())
+          video.srcObject = null;
+        });
+      }
+    }
   $(function() {
     const Toast = Swal.mixin({
       toast: true,
@@ -261,16 +437,46 @@
       $('#nouveau2').val('');
       $('#ancien').focus();
     })
-
     $('#mapercu').click(function(e){
       e.preventDefault();
+      $("#ModalChoix").modal('show');
+    })
+    $('#btn_capturer').click(function(e){
+      e.preventDefault();
+      $("#ModalPhoto").modal('show');
+      $("#ModalChoix").modal('hide');
+      startup();
+    })
+    $('#btn_parcourir').click(function(){
       $('#mimg').click();
+      $("#ModalChoix").modal('hide');
     })
         $('#mimg').change(function(){
          readURL(this);
      })
 
-
+$('#btn_enregistrer').click(function(){
+    $.ajax({
+                        url:'edit_photo.php',
+                        type:'post',
+                        beforeSend:function(){
+                        },
+                        dataType:'text',
+                        data: {ID_User:$('#id_user').val(), Photo_Data:$('#photo_data').val(), Type_Photo:$('#type_photo').val(), token:$('#tok').val()},
+                        success:function(ret){
+                            if(ret==1){
+                                alertify.success("L'opération a réussi");
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Modification éffectuée'
+                                })
+                                $('#miamge').css('background-image', 'url('+images+')');
+                            }else if(ret==2){
+                                alertify.alert('<?php echo $app_infos['Design_App']; ?>',"l'ancien mot de passe n'est pas correct");  
+                            }
+                        }
+                    });
+})
 
         $('#ProfilForm').submit(function(e){
             e.preventDefault();

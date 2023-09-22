@@ -106,16 +106,21 @@ $pdf->SetFont('Arial','B',12);
 // Couleur de fond
 $pdf->SetFillColor(200,220,255);
 // Titre
-if($eleves['Photo']==''){
+if($eleves['Photo']!='' && $eleves['Photo_Type']==1){
+	$img='images/eleves/'.$eleves['Photo'];
+	$extension='';
+}else if($eleves['Photo']!='' && $eleves['Photo_Type']==2){
+	$img=$eleves['Photo'];
+	$extension='PNG';
+}else{
 	if($eleves['Sexe']=='F'){
 		$img='images/photo_femme.jpg';
 	}else{
 		$img='images/photo.jpg';
 	}
-}else{
-	$img='images/eleves/'.$eleves['Photo'];
+	$extension='JPG';
 }
-$pdf->Image($img,'150','50','45','52','');
+$pdf->Image($img,'150','50','45','52', $extension);
 $pdf->SetFont('Arial','B','11');
 $pdf->Cell(40 ,5,'Matricule',0,0,'L');
 $pdf->SetFont('Arial','','11');

@@ -12,7 +12,8 @@
     $statuts=$rs_statut->fetch();
     $Login=Securite::bdd($_POST['login']);
     $Profil=htmlentities($_POST['profil']);
-    // echo var_dump($Modules);
+    $Type_Photo=htmlentities($_POST['type_photo']);
+    $Photo_Data=htmlentities($_POST['photo_data']);
     $Inscription=0;
     $Discipline=0;
     $Cotes=0;
@@ -59,14 +60,21 @@
             if(move_uploaded_file($_FILES['mimg']['tmp_name'], $dossier_image . $Image)) //Si la fonction renvoie TRUE, c'est
             {
                 if($Token==$_SESSION['user_eteelo_app']['token']){
-                    $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Statut, Active, Inscription, Discipline, Cotes, Compta, Paiement) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                    $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Image, $statuts['Design_Statut'], 1, $Inscription, $Discipline, $Cotes, $Compta, $Paiement);
+                    $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Photo_Type, Statut, Active, Inscription, Discipline, Cotes, Compta, Paiement) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                    $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], 1, $Inscription, $Discipline, $Cotes, $Compta, $Paiement);
                     $rs->execute($params);
                     echo "1";
                 }
             }else{
                 echo "3";
             }
+        }
+    }else if($Photo_Data!=''){
+        if($Token==$_SESSION['user_eteelo_app']['token']){
+            $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Photo_Type, Statut, Active, Inscription, Discipline, Cotes, Compta, Paiement) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], 1, $Inscription, $Discipline, $Cotes, $Compta, $Paiement);
+            $rs->execute($params);
+            echo "1";
         }
     }else{
         if($Token==$_SESSION['user_eteelo_app']['token']){

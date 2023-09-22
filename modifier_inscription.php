@@ -60,6 +60,25 @@
         z-index: 10000;
         width: 200px
       }
+      .btn-default:hover{
+         border: 1px solid #D9DBDE;
+      }
+      .btn-default:focus{
+         border: 1px solid #D9DBDE;
+      }
+      #video {
+        /* border: 1px solid black; */
+        width: 100%;
+        height: auto;
+        border-radius: 3px;
+    }
+    #canvas {
+        display: none;
+    }
+    .camera {
+        width: 340px;
+        display: inline-block;
+    }
   </style>
 </head>
 
@@ -268,13 +287,25 @@
                                       </div>
                                       <div class="col-md-2" style="margin-bottom: 5px">
                                     <div class="form-group ">
-                                      <label for="miamge" class="control-label col-lg-12" style="text-align: left;">Picture</label>
+                                    <center>
+                                      <label for="miamge" class="control-label col-lg-12" style="text-align: center;">Photo</label>
                                       <div class="col-lg-12">
+                                        <input type="hidden" name="type_photo" id="type_photo">
+                                        <input type="hidden" name="photo_data" id="photo_data">
                                         <input class="form-control " id="mimg" type="file" name="mimg" style="display: none;" accept=".jpg, .jpeg, .png">
-                                        <a href="#" id="mapercu" title="Choisir l'image">
-                                        <img src="images/photo.jpg" style="width: 150px; height: 157px; border: 2px solid RGB(234,234,234); border-radius: 0" id="miamge" class="miamge">
+                                        <!-- <a href="#" id="mapercu" title="Choisir l'image"> -->
+                                        <img src="images/photo.jpg" style="width: 128px; height: 128px; border: 2px solid RGB(234,234,234); border-radius: 3px" id="miamge" class="miamge">
+                                        <!-- </a> -->
+                                      </div>
+                                      <div class="col-lg-12">
+                                        <a href="#" class="btn btn-default" id="capturer" title="Capturer" style="width: 58px">
+                                            <i class="fa fa-camera fa-fw"></i>
+                                        </a>
+                                        <a href="#" class="btn btn-default" id="mapercu" title="Parcourir..." style="width: 58px">
+                                            <i class="fa fa-folder-open fa-fw"></i>
                                         </a>
                                       </div>
+                                      </center>
                                     </div>
                                     </div>
                                     </div>
@@ -537,6 +568,30 @@
             </div>
         </div>
     </div>
+    <div id="ModalPhoto" class="modal fade" data-backdrop="static" style="margin-top: 100px">
+        <div class="modal-dialog modal-sm" style="border: 1px solid #E6E7E9">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Capturer une photo</h4>
+                    <!-- <button type="button" class="close" datadismiss="modal" ariahidden="true" onclick="fermerDialogueEcole()">&times;</button> -->
+                </div>
+                <div class="modal-body">
+                   <form method="post" action="">
+                    <div class="row">
+                        <div class="col-12 camera">
+                            <video id="video">Video stream not available.</video>
+                            <canvas id="canvas"></canvas>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="capturer_photo">Capturer</button>
+                <button  class="btn btn-danger" onclick="fermerDialoguePhoto()">Annuler</button>
+            </div>
+            </div>
+        </div>
+    </div>
     <script src="./dist/libs/apexcharts/dist/apexcharts.min.js" defer></script>
     <script src="./dist/libs/jsvectormap/dist/js/jsvectormap.min.js" defer></script>
     <script src="./dist/libs/jsvectormap/dist/maps/world.js" defer></script>
@@ -734,8 +789,10 @@
                         $('#categorie').val(objet.Categorie);
                         $('#provenance').val(objet.Provenance);
                         $('#ID_Ecole_Provenance').val(objet.ID_Provenance);
-                        if(objet.Photo!=''){
+                        if(objet.Photo!='' && objet.Photo_Type==1){
                             $('#miamge').attr('src','images/eleves/'+objet.Photo);
+                        }else if(objet.Photo!='' && objet.Photo_Type==2){
+                            $('#miamge').attr('src', objet.Photo);
                         }else{
                             if(objet.Sexe=='F'){
                                 $('#miamge').attr('src', 'images/photo_femme.jpg');
@@ -748,6 +805,16 @@
                       })
                   }
               })
+    })
+
+    function fermerDialoguePhoto(){
+        stopVideo()
+        $("#ModalPhoto").modal('hide');
+    }
+    $('#capturer').click(function(e){
+      e.preventDefault();
+      $("#ModalPhoto").modal('show');
+      startup();
     })
     $('#noms').autocomplete({source:function(request,response){
         var resultat=$.ui.autocomplete.filter(listerefe,request.term);
@@ -972,6 +1039,7 @@
                 var reader = new FileReader();
                 
                 reader.onload = function (e) {
+                    $('#type_photo').val(1);
                     $('#miamge').attr('src', 'images/loading.gif');
                     images = e.target.result;
                     demo()
@@ -979,7 +1047,100 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+    // (function() {
 
+var width = 240; // We will scale the photo width to this
+var height = 0; // This will be computed based on the input stream
+
+var streaming = false;
+
+var video = null;
+var canvas = null;
+var photo = null;
+var capturer_photo = null;
+
+function startup() {
+    video = document.getElementById('video');
+    canvas = document.getElementById('canvas');
+    photo = document.getElementById('miamge');
+    capturer_photo = document.getElementById('capturer_photo');
+
+    navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(function(err) {
+            console.log("An error occurred: " + err);
+        });
+
+    video.addEventListener('canplay', function(ev) {
+        if (!streaming) {
+            height = video.videoHeight / (video.videoWidth / width);
+
+            if (isNaN(height)) {
+                height = width / (4 / 3);
+            }
+
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+        }
+    }, false);
+
+    capturer_photo.addEventListener('click', function(ev) {
+        takepicture();
+        ev.preventDefault();
+        fermerDialoguePhoto();
+    }, false);
+
+    clearphoto();
+}
+
+
+function clearphoto() {
+    var context = canvas.getContext('2d');
+    context.fillStyle = "#AAA";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    var data = canvas.toDataURL('image/png');
+    // photo.setAttribute('src', data);
+}
+
+function takepicture() {
+    var context = canvas.getContext('2d');
+    if (width && height) {
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(video, 0, 0, width, height);
+
+        var data = canvas.toDataURL('image/png');
+        $('#type_photo').val(2);
+        $('#photo_data').val(data);
+        $('#miamge').attr('src', 'images/loading.gif');
+        images = data;
+        demo()
+    } else {
+        clearphoto();
+    }
+}
+
+function stopVideo(){
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+      const mystream = video.srcObject;
+      const tracks = mystream.getTracks();
+      tracks.forEach(track => track.stop())
+      video.srcObject = null;
+    });
+  }
+}
     $('#ecole').change(function() {
         if($('#ecole').val()=='') {
           alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner une école svp!', function(){$('#ecole').focus();});

@@ -6,6 +6,7 @@
     $ID=Securite::bdd($_POST['id_user']);
     $Image=basename($_FILES['mimg']['name']);
     $dossier_image = 'images/profil/';
+    $Type_Photo=1;
     if(!is_dir($dossier_image)){
         mkdir($dossier_image);
     }
@@ -23,8 +24,8 @@
             if(move_uploaded_file($_FILES['mimg']['tmp_name'], $dossier_image . $Image)) //Si la fonction renvoie TRUE, c'est
             {
                 if($Token==$_SESSION['user_eteelo_app']['token']){
-                    $rs=$pdo->prepare("UPDATE utilisateur SET Photo=? WHERE ID_Utilisateur=?");
-                    $params=array($Image, $ID);
+                    $rs=$pdo->prepare("UPDATE utilisateur SET Photo=?, Photo_Type=? WHERE ID_Utilisateur=?");
+                    $params=array($Image, $Type_Photo, $ID);
                     $rs->execute($params);
                     echo "1";
                 }

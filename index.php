@@ -7,14 +7,16 @@
     require_once('connexion.php');
     $rs=$pdo->query("SELECT * FROM utilisateur WHERE `ID_Utilisateur`=".$_SESSION['user_eteelo_app']['ID_Utilisateur']);
     $res=$rs->fetch();
-    if($res['Photo']==""){
+    if($res['Photo']!="" && $res['Photo_Type']==1){
+        $Photo="images/profil/".$res['Photo'];
+    }else if($res['Photo']!="" && $res['Photo_Type']==2){
+        $Photo=$res['Photo'];
+    }else{
         if($res['ID_Profil']==1){
             $Photo="images/photo_femme.jpg";
         }else{
             $Photo="images/photo.jpg";
         }
-    }else{
-        $Photo="images/profil/".$res['Photo'];
     }
     $Logo="images/eleve.png";
     $app_info=$pdo->query("SELECT * FROM app_infos");
@@ -1053,7 +1055,7 @@
                     }else if(ret==2){
                         mphoto="images/photo.jpg";
                     }else{
-                        mphoto="images/profil/"+ret;
+                        mphoto=ret;
                     }
                     $('#miamge').css('background-image', 'url('+mphoto+')');
                 }

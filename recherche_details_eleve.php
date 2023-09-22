@@ -23,7 +23,8 @@
             'Categorie'=>stripslashes($Inscriptions['ID_Cat_Eleve']),
             'Provenance'=>stripslashes($provenances['Design_Ecole_Provenance']),
             'ID_Provenance'=>stripslashes($provenances['ID_Ecole_Provenance']),
-            'Photo'=>stripslashes($resulcon['Photo'])
+            'Photo'=>stripslashes($resulcon['Photo']),
+            'Photo_Type'=>stripslashes($resulcon['Photo_Type']),
         );
 	}
 	echo json_encode($tab_gamme);
