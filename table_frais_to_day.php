@@ -19,7 +19,7 @@
     if(isset($_GET['Annee']) && $_GET['Annee']!=''){
         $query.=" AND annee.ID_Annee =".$_GET['Annee']; 
     }
-    $query.=" AND frais.Date_Enreg like '".date("Y-m-d")."%' ORDER BY type_frais.Libelle_Type_Frais";
+    $query.=" AND classe_frais.Date_Enreg like '".date("Y-m-d")."%' ORDER BY type_frais.Libelle_Type_Frais";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
     $totalparpage=10;

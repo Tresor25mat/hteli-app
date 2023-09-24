@@ -10,9 +10,25 @@ $req_eleve=$pdo->query("SELECT eleve.*, paiement.*, annee.*, classe.*, recu.*, u
 $eleves=$req_eleve->fetch();
 $app_info=$pdo->query("SELECT * FROM app_infos");
 $app_infos=$app_info->fetch();
-$devise=$pdo->query("SELECT * FROM taux_change WHERE ID_Taux=".$eleves['ID_Taux']);
-$devises=$devise->fetch();
-$req_frais=$pdo->query("SELECT * from frais INNER JOIN type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE frais.ID_Frais=".$eleves['ID_Frais']);
+$Montant_Taux=0;
+$rs_paiement=$pdo->query("SELECT * FROM paiement INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement WHERE paiement.ID_Paiement='".$Paiement."'");
+$lst_paiement=$pdo->query("SELECT * FROM paiement INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement WHERE paiement.ID_Paiement='".$Paiement."'");
+$montant_total=0;
+$taux=$pdo->query("SELECT * FROM taux_change INNER JOIN table_taux ON taux_change.ID_Taux=table_taux.ID_Taux WHERE table_taux.ID_Etablissement=".$eleves['ID_Etablissement']." AND table_taux.Active=1");
+$taux_change=$taux->fetch();
+while($paiements=$rs_paiement->fetch()){
+	$Montant_Taux=$paiements['Taux'];
+	if($paiements['ID_Taux']==$taux_change['ID_Taux']){
+		$montant_total+=$paiements['Montant_Paie'];
+	}else{
+		if($paiements['ID_Taux']==1){
+			$montant_total+=($paiements['Montant_Paie']/$paiements['Taux']);
+		}else{
+			$montant_total+=($paiements['Montant_Paie']*$paiements['Taux']);
+		}
+		
+	}
+}
 class PDF extends PDF_Rotate
 {
 	function Header()
@@ -155,7 +171,7 @@ $pdf->Cell(73 ,6,utf8_decode(stripslashes($eleves['Design_Classe'])),1,0,'L');
 $pdf->SetFont('Courier','B','11');
 $pdf->Cell(37 ,6,utf8_decode('Montant payé  :'),1,0,'L');
 $pdf->SetFont('Courier','','11');
-$pdf->Cell(41 ,6,number_format($eleves['Montant_Paie'], 2, ',', ' ').' '.$devises['Devise'],1,1,'L');
+$pdf->Cell(41 ,6,number_format($montant_total, 2, ',', ' ').' '.$taux_change['Devise'],1,1,'L');
 
 $pdf->SetFont('Courier','B','11');
 $pdf->Cell(37 ,6,utf8_decode('Année scolaire:'),1,0,'L');
@@ -164,37 +180,37 @@ $pdf->Cell(73 ,6,utf8_decode(stripslashes($eleves['Libelle_Annee'])),1,0,'L');
 $pdf->SetFont('Courier','B','11');
 $pdf->Cell(37 ,6,utf8_decode("Taux de change:"),1,0,'L');
 $pdf->SetFont('Courier','','11');
-$pdf->Cell(41 ,6,number_format($eleves['Taux'], 2, ',', ' '),1,0,'L');
-// $pdf->Cell(0,6,utf8_decode("Nom de l'élève :".stripslashes($eleves['Nom_Eleve'])." ".stripslashes($eleves['Pnom_Eleve'])." ".stripslashes($eleves['Prenom_Eleve'])),0,1,'L',true);
+$pdf->Cell(41 ,6,number_format($Montant_Taux, 2, ',', ' '),1,0,'L');
 $pdf->Ln(7);
 $pdf->SetFont('Courier','B','11');
 $pdf->Cell(7 ,6,utf8_decode("N°"),1,0,'C');
 $pdf->Cell(140 ,6,utf8_decode("Détails frais"),1,0,'C');
-// $pdf->Cell(47 ,5,utf8_decode("Tranche"),1,0,'C');
-// $pdf->Cell(47 ,5,utf8_decode("Montant"),1,0,'C');
 $pdf->Cell(41 ,6,utf8_decode("Montant"),1,0,'C');
 $pdf->Ln();
 $pdf->SetFont('Courier','','11');
-$mont=0;
-$Nbr=1;
-$frais=$req_frais->fetch();
-$pdf->Cell(7 ,6,sprintf('%02d', $Nbr),1,0,'C');
-$pdf->Cell(140 ,6,utf8_decode(stripslashes($frais['Libelle_Type_Frais'])),1,0,'L');
-$pdf->Cell(41 ,6,utf8_decode(number_format($eleves['Montant_Paie'], 2, ',', ' ').' '.$devises['Devise']),1,0,'R');
-$pdf->Ln();
+$Nbr=0;
+while($lst_paiements=$lst_paiement->fetch()){$Nbr++;
+	$devise=$pdo->query("SELECT * FROM taux_change WHERE ID_Taux=".$lst_paiements['ID_Taux']);
+	$devises=$devise->fetch();
+	$req_frais=$pdo->query("SELECT * from frais INNER JOIN type_frais on frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE frais.ID_Frais=".$lst_paiements['ID_Frais']);
+	$frais=$req_frais->fetch();
+	$pdf->Cell(7 ,6,sprintf('%02d', $Nbr),1,0,'C');
+	$pdf->Cell(140 ,6,utf8_decode(stripslashes($frais['Libelle_Type_Frais'])),1,0,'L');
+	$pdf->Cell(41 ,6,utf8_decode(number_format($lst_paiements['Montant_Paie'], 2, ',', ' ').' '.$devises['Devise']),1,0,'R');
+	$pdf->Ln();
+}
 $pdf->SetFont('Courier','B','11');
 $pdf->Cell(147 ,6, utf8_decode('Total'),1,0,'R');
-$pdf->Cell(41 ,6, number_format($eleves['Montant_Paie'], 2, ',', ' ').' '.$devises['Devise'],1,0,'R');
-// $pdf->Cell(47 ,5, utf8_decode(stripslashes($eleves['Devise'])),1,0,'L');
+$pdf->Cell(41 ,6, number_format($montant_total, 2, ',', ' ').' '.$taux_change['Devise'],1,0,'R');
 $pdf->Ln(10);
 $pdf->SetFont('Courier','BI','11');
 $pdf->Cell(50 ,6,utf8_decode('MONTANT EN LETTRES : '),0,0,'L');
 $pdf->SetFont('Courier','I','11');
 $myclass = new NumberToString();
-if($devises['ID_Taux']==1){
-	$pdf->Cell(200 ,6, strtoupper('FRANC CONGOLAIS '.$myclass->getString($eleves['Montant_Paie'], '')),0,0,'L');
+if($taux_change['ID_Taux']==1){
+	$pdf->Cell(200 ,6, strtoupper('FRANC CONGOLAIS '.$myclass->getString($montant_total, '')),0,0,'L');
 }else{
-	$pdf->Cell(200 ,6, strtoupper('DOLLAR AMERICAIN '.$myclass->getString($eleves['Montant_Paie'], '')),0,0,'L');
+	$pdf->Cell(200 ,6, strtoupper('DOLLAR AMERICAIN '.$myclass->getString($montant_total, '')),0,0,'L');
 }
 $pdf->Ln(10);
 $pdf->SetFont('Courier','B','11');

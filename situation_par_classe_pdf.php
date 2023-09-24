@@ -10,9 +10,9 @@ $classes=$sel_classe->fetch();
 $sel_annee=$pdo->query("SELECT * FROM annee WHERE ID_Annee=".$annee);
 $annees=$sel_annee->fetch();
 if(isset($_GET['frais']) && $_GET['frais']!=''){
-	$req_frais=$pdo->query("SELECT frais.*, type_frais.*, taux_change.* FROM frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN paiement ON frais.ID_Frais=paiement.ID_Frais INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN inscription ON paiement.ID_Inscription=inscription.ID_Inscription WHERE inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." AND frais.ID_Type_Frais=".$_GET['frais']." GROUP BY frais.ID_Frais ORDER BY type_frais.Libelle_Type_Frais");
+	$req_frais=$pdo->query("SELECT frais.*, type_frais.*, taux_change.* FROM frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN paiement_frais ON frais.ID_Frais=paiement_frais.ID_Frais INNER JOIN paiement ON paiement_frais.ID_Paiement=paiement.ID_Paiement INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN inscription ON paiement.ID_Inscription=inscription.ID_Inscription WHERE inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." AND frais.ID_Type_Frais=".$_GET['frais']." GROUP BY frais.ID_Frais ORDER BY type_frais.Libelle_Type_Frais");
 }else{
-	$req_frais=$pdo->query("SELECT frais.*, type_frais.*, taux_change.* FROM frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN paiement ON frais.ID_Frais=paiement.ID_Frais INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN inscription ON paiement.ID_Inscription=inscription.ID_Inscription WHERE inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." GROUP BY frais.ID_Frais ORDER BY type_frais.Libelle_Type_Frais");
+	$req_frais=$pdo->query("SELECT frais.*, type_frais.*, taux_change.* FROM frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN paiement_frais ON frais.ID_Frais=paiement_frais.ID_Frais INNER JOIN paiement ON paiement_frais.ID_Paiement=paiement.ID_Paiement INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN inscription ON paiement.ID_Inscription=inscription.ID_Inscription WHERE inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." GROUP BY frais.ID_Frais ORDER BY type_frais.Libelle_Type_Frais");
 }
 $app_info=$pdo->query("SELECT * FROM app_infos");
 $app_infos=$app_info->fetch();
@@ -118,7 +118,7 @@ $pdf->SetFont('Arial','B','10');
 while($frais=$req_frais->fetch()){
 	$devise=$pdo->query("SELECT * FROM taux_change WHERE ID_Taux=".$frais['ID_Taux']);
 	$devises=$devise->fetch();
-	$req_eleve=$pdo->query("SELECT eleve.*, paiement.*, annee.*, classe.*, taux_change.*, type_frais.*, frais.*, inscription.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN frais ON paiement.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE section.ID_Etablissement=".$id_ecole." AND inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." AND frais.ID_Frais=".$frais['ID_Frais']." AND paiement.Confirm_Paiement=1 AND inscription.Confirm_Inscription=1 GROUP BY inscription.ID_Inscription, frais.ID_Frais ORDER BY eleve.Nom_Eleve");
+	$req_eleve=$pdo->query("SELECT eleve.*, paiement.*, paiement_frais.*, annee.*, classe.*, taux_change.*, type_frais.*, frais.*, inscription.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement INNER JOIN frais ON paiement_frais.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE section.ID_Etablissement=".$id_ecole." AND inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." AND frais.ID_Frais=".$frais['ID_Frais']." AND paiement.Confirm_Paiement=1 AND inscription.Confirm_Inscription=1 GROUP BY inscription.ID_Inscription, frais.ID_Frais ORDER BY eleve.Nom_Eleve");
 	$NbrF++;
 	$pdf->Ln(5);
 	$pdf->SetFillColor(200,220,255);
@@ -137,7 +137,7 @@ while($frais=$req_frais->fetch()){
 	$pdf->Ln();
 	$pdf->SetFont('Arial','','10');
 	while($eleves=$req_eleve->fetch()){
-        $rs_paiement=$pdo->query("SELECT * FROM paiement WHERE ID_Inscription='".$eleves['ID_Inscription']."' AND Confirm_Paiement=1 AND ID_Frais=".$eleves['ID_Frais']);
+        $rs_paiement=$pdo->query("SELECT * FROM paiement INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement WHERE paiement.ID_Inscription='".$eleves['ID_Inscription']."' AND paiement.Confirm_Paiement=1 AND paiement_frais.ID_Frais=".$eleves['ID_Frais']);
         $Montant_Paie=0;
         while ($rs_paiements=$rs_paiement->fetch()) {
             if($frais['ID_Taux']==$rs_paiements['ID_Taux']){

@@ -256,7 +256,7 @@
                               </div>
                               <div style="display: none" id="details_paiement">
                                 <div class="row" style="marging-bottom: 20px;">
-                                  <iframe src="" style="width: 100%; height: 200px;border: 1px solid #E6E7E9; margin-top: 20px; padding: 7px; background: #F5F7FB" id="iframe_paiement"></iframe>
+                                  <iframe src="" style="width: 100%; height: 150px;border: 1px solid #E6E7E9; margin-top: 20px; padding: 7px; background: #F5F7FB" id="iframe_paiement"></iframe>
                                 </div>
                             </div>
                               <div class="row" style="marging-bottom: 20px; border-bottom: 1px solid #EEEEEE; padding-top: 5px">
@@ -645,33 +645,30 @@
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez saisir un montant différent de zéro svp!', function(){$('#montant_paiement').focus().select();});
             }else{
                 $.ajax({
-                    url:'enreg_paiement_frais.php',
+                    url:'enreg_paiement.php',
                     type:'post',
                     beforeSend:function(){
                       waitingDialog.show('Veuillez patienter...');
                     },
                     dataType:'text',
-                    data: formData,
-                    processData: false,
-                    cache: false,
-                    contentType: false,
+                    data: {ID_Paiement:$('#ID_Paiement').val(), ID_Etablissement:$('#ID_Etablissement').val(), ID_Eleve:$('#ID_Eleve').val(), frais:$('#frais').val(), annee:$('#annee').val(), devise:$('#devise').val(), montant_paiement:$('#montant_paiement').val(), mode_paiement:$('#mode_paiement').val(), compte_caisse:$('#compte_caisse').val(), compte_banque:$('#compte_banque').val(), datepaie:$('#datepaie').val(), token:$('#token').val()},
                     success:function(ret){
                          waitingDialog.hide();
                          const str_ret = ret;
                          const retour = str_ret.split(',');
                          if(ret==2){
                              alertify.alert('<?php echo $app_infos['Design_App']; ?>',"La somme des montants payés est supérieur au montant du frais!");
-                             $('#btn_annuler_tout').click();
-                         }else if(ret==3){
-                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Image upload failed!");
+                             $('#montant_paiement').focus();
                          }else if(retour[0]==1){
-                             Toast.fire({
-                                icon: 'success',
-                                title: 'Enregistré'
-                             })
-                             $('#iframe_impression').attr('src', 'imprimer.php?Page=recu.php&Paiement='+retour[1]+'&Ecole='+$('#ID_Etab').val());
-                             $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val()+'&Recu='+$('#txt_Recu').val());
-                             $('#btn_annuler_tout').click();
+                              $('#ID_Paiement').val(retour[1]);
+                              $('#frais').val('').focus();
+                              $('#paiements_effectues').val('0,00');
+                              $('#montant_reste').val('0,00');
+                              $('#montant_paiement').val('0.00');
+                              $('#iframe_paiement').attr('src','table_paiement_frais.php?Ecole='+$('#ID_Etab').val()+'&Paiement='+$('#ID_Paiement').val());
+                              if(!$('#btn_check_details').is(':checked')){
+                                  $('#btn_check_details').click();
+                              }
                          }else{
                             alertify.alert(ret);
                          }
@@ -784,54 +781,17 @@
       timer: 5000
     });
 
-        $('#PaiementForm').submit(function(e){
-            e.preventDefault();
-            let datepaiement = $('#datepaiement').val();
-            datepaie = datepaiement.replace(/\//g, "-");
-            $('#datepaie').val(datepaie);
-            var formData = new FormData(this);
-            if($('#frais').val()=='' || $('#annee').val()=='' || $('#datepaiement').val()=='' || $('#devise').val()=='' || $('#montant_paiement').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#frais').focus();});
-            }else if($('#ID_Eleve').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez séléctionner un élève dans la liste svp!', function(){$('#ancien_eleve').focus();});
-            }else if($('#paiements_effectues').val()=='0,00' && $('#montant_reste').val()=='0,00'){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Le montant du frais séléctionné n\'est pas encore configuré!', function(){$('#ancien_eleve').focus();});
-            }else if($('#montant_paiement').val()=='0.00'){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez saisir un montant différent de zéro svp!', function(){$('#montant_paiement').focus().select();});
+        $('#btn_enregistrer').click(function(){
+            if($('#ID_Paiement').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez enregistrer au moins un paiement svp!', function(){$('#ancien_eleve').focus();});
             }else{
-                $.ajax({
-                    url:'enreg_paiement.php',
-                    type:'post',
-                    beforeSend:function(){
-                      waitingDialog.show('Veuillez patienter...');
-                    },
-                    dataType:'text',
-                    data: formData,
-                    processData: false,
-                    cache: false,
-                    contentType: false,
-                    success:function(ret){
-                         waitingDialog.hide();
-                         const str_ret = ret;
-                         const retour = str_ret.split(',');
-                         if(ret==2){
-                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"La somme des montants payés est supérieur au montant du frais!");
-                             $('#btn_annuler_tout').click();
-                         }else if(ret==3){
-                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Image upload failed!");
-                         }else if(retour[0]==1){
-                             Toast.fire({
-                                icon: 'success',
-                                title: 'Enregistré'
-                             })
-                             $('#iframe_impression').attr('src', 'imprimer.php?Page=recu.php&Paiement='+retour[1]+'&Ecole='+$('#ID_Etab').val());
-                             $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val()+'&Recu='+$('#txt_Recu').val());
-                             $('#btn_annuler_tout').click();
-                         }else{
-                            alertify.alert(ret);
-                         }
-                    }
-                });
+                Toast.fire({
+                      icon: 'success',
+                      title: 'Enregistré'
+                })
+                $('#iframe_impression').attr('src', 'imprimer.php?Page=recu.php&Paiement='+$('#ID_Paiement').val()+'&Ecole='+$('#ID_Etab').val());
+                $('#iframe').attr('src','table_paiement_today.php?Ecole='+$('#ID_Etab').val()+'&Annee='+$('#Liste_Annee').val()+'&Classe='+$('#Liste_Classe').val()+'&Eleve='+$('#txt_Eleve').val()+'&Recu='+$('#txt_Recu').val());
+                $('#btn_annuler_tout').click();
             }
           })
   })
@@ -842,12 +802,18 @@
     })
     $('#btn_annuler_tout').click(function(){
         $('#ancien_eleve').val('');
+        $('#ID_Paiement').val('');
         $('#ID_Eleve').val('');
+        $('#frais').val('');
         $('#paiements_effectues').val('0,00');
         $('#montant_reste').val('0,00');
         $('#montant_paiement').val('0.00');
+        $('#iframe_paiement').attr('src','');
         if($('#btn_check_informations').is(':checked')){
             $('#btn_check_informations').click();
+        }
+        if($('#btn_check_details').is(':checked')){
+            $('#btn_check_details').click();
         }
         $.ajax({
                 url:'recherche_devises.php',

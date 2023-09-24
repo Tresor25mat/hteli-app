@@ -79,7 +79,7 @@
                     <!-- <div class="panel panel-default"> -->
                         <!-- <div class="panel-body"> -->
                             <table width="100%" class="table-bordered" id="dataTables-example" style="border: 1px solid #E6E7E9">
-                                <thead>
+                                <thead style="display: none">
                                     <tr style="height: 35px;">
                                         <!-- <th colspan="4" style="text-align: center">Répartition</th> -->
                                         <th>Désignation</th>
@@ -92,7 +92,7 @@
         if($selections['ID_Taux']==$default_devises['ID_Taux']){
             $MontantTotal+=$selections['Montant_Paie'];
         }else{
-            if($paiement_frais['ID_Taux']==1){
+            if($selections['ID_Taux']==1){
                 $MontantTotal+=($selections['Montant_Paie']/$selections['Taux']);
             }else{
                 $MontantTotal+=($selections['Montant_Paie']*$selections['Taux']);
@@ -114,7 +114,7 @@
 <tfoot>
                                     <tr style="height: 35px;">
                                         <th scope="row" colspan="2" style="padding-left: 10px">Total</th>
-                                        <td style="font-weight: bold; padding-left: 10px"><?php if(isset($_GET['Paiement']) && $_GET['Paiement']!=''){ echo number_format($MontantTotal, 2, ',', ' ').stripslashes($frais['Symbole']);} ?></td>
+                                        <td style="font-weight: bold; padding-left: 10px"><?php if(isset($_GET['Paiement']) && $_GET['Paiement']!=''){ echo number_format($MontantTotal, 2, ',', ' ').stripslashes($default_devises['Symbole']);} ?></td>
                                         <td></td>
                                     </tr>
                                 </tfoot>

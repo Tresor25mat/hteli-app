@@ -11,7 +11,7 @@ $sel_annee=$pdo->query("SELECT * FROM annee WHERE ID_Annee=".$annee);
 $annees=$sel_annee->fetch();
 $sel_eleve=$pdo->query("SELECT * FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve WHERE inscription.ID_Inscription='".$eleve."'");
 $rs_eleve=$sel_eleve->fetch();
-$req_frais=$pdo->query("SELECT frais.*, type_frais.*, taux_change.* FROM frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN paiement ON frais.ID_Frais=paiement.ID_Frais INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux WHERE paiement.ID_Inscription='".$eleve."' GROUP BY frais.ID_Frais ORDER BY type_frais.Libelle_Type_Frais");
+$req_frais=$pdo->query("SELECT frais.*, type_frais.*, taux_change.* FROM frais INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN paiement_frais ON frais.ID_Frais=paiement_frais.ID_Frais INNER JOIN paiement ON paiement_frais.ID_Paiement=paiement.ID_Paiement INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux WHERE paiement.ID_Inscription='".$eleve."' GROUP BY frais.ID_Frais ORDER BY type_frais.Libelle_Type_Frais");
 $app_info=$pdo->query("SELECT * FROM app_infos");
 $app_infos=$app_info->fetch();
 //include the file that loads the PhpSpreadsheet classes
@@ -157,7 +157,7 @@ $sheet->getStyle('C8')->applyFromArray($styleA4);
 $t=10;
 $NbrF=0;
 while($frais=$req_frais->fetch()){
-	$req_eleve=$pdo->query("SELECT paiement.*, taux_change.*, type_frais.*, recu.* FROM paiement INNER JOIN inscription ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN frais ON paiement.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement WHERE section.ID_Etablissement=".$id_ecole." AND inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." AND inscription.ID_Inscription='".$eleve."' AND frais.ID_Frais=".$frais['ID_Frais']." AND paiement.Confirm_Paiement=1 GROUP BY paiement.ID_Paiement ORDER BY paiement.Date_Paiement");
+	$req_eleve=$pdo->query("SELECT paiement.*, paiement_frais.*, taux_change.*, type_frais.*, recu.* FROM paiement INNER JOIN inscription ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement INNER JOIN frais ON paiement_frais.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN taux_change ON frais.ID_Taux=taux_change.ID_Taux INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais INNER JOIN recu ON paiement.ID_Paiement=recu.ID_Paiement WHERE section.ID_Etablissement=".$id_ecole." AND inscription.ID_Classe=".$classe." AND inscription.ID_Annee=".$annee." AND inscription.ID_Inscription='".$eleve."' AND frais.ID_Frais=".$frais['ID_Frais']." AND paiement.Confirm_Paiement=1 GROUP BY paiement.ID_Paiement ORDER BY paiement.Date_Paiement");
     $NbrF++;
     $sheet->setCellValue('A'.$t, $NbrF.". ".stripslashes($frais['Libelle_Type_Frais']));
     $sheet->mergeCells('A'.$t.':E'.$t);
@@ -171,7 +171,7 @@ while($frais=$req_frais->fetch()){
     $Nbr=0;
     $mont=0;
     while($eleves=$req_eleve->fetch()){ 
-        $rs_paiement=$pdo->query("SELECT * FROM paiement WHERE ID_Paiement='".$eleves['ID_Paiement']."' AND ID_Frais=".$frais['ID_Frais']);
+        $rs_paiement=$pdo->query("SELECT * FROM paiement INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement WHERE paiement.ID_Paiement='".$eleves['ID_Paiement']."' AND paiement_frais.ID_Frais=".$frais['ID_Frais']);
         $Montant_Paie=0;
         while ($rs_paiements=$rs_paiement->fetch()) {
             if($frais['ID_Taux']==$rs_paiements['ID_Taux']){

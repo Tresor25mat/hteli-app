@@ -1,29 +1,29 @@
 <?php
 session_start();
 require_once('connexion.php');
-$rs_paiement_cdf="SELECT eleve.*, paiement.*, annee.*, classe.*, type_frais.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN frais ON paiement.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE section.ID_Etablissement=".$_GET['Ecole']." AND paiement.ID_Taux=1 AND paiement.Confirm_Paiement=1";
+$rs_paiement_cdf="SELECT eleve.*, paiement.*, paiement_frais.*, annee.*, classe.*, type_frais.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement INNER JOIN frais ON paiement_frais.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE section.ID_Etablissement=".$_GET['Ecole']." AND paiement_frais.ID_Taux=1 AND paiement.Confirm_Paiement=1";
 if(isset($_GET['frais']) && !empty($_GET['frais'])){
-    $rs_paiement_cdf .=" AND type_frais.ID_Type_Frais=".$_GET['frais'];
+	$rs_paiement_cdf .=" AND type_frais.ID_Type_Frais=".$_GET['frais'];
 }
 if(isset($_GET['datedeb']) && !empty($_GET['datedeb']) && isset($_GET['datefin']) && !empty($_GET['datefin'])){
-    $rs_paiement_cdf .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."' AND paiement.Date_Paiement <='".date('Y-m-d', strtotime($_GET['datefin']))."'";
+	$rs_paiement_cdf .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."' AND paiement.Date_Paiement <='".date('Y-m-d', strtotime($_GET['datefin']))."'";
 }else{
     if(isset($_GET['datedeb']) && !empty($_GET['datedeb'])){
-        $rs_paiement_cdf .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."'";
+    	$rs_paiement_cdf .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."'";
     }
 }
 $rs_paiement_cdf .=" ORDER BY paiement.Date_Paiement, eleve.Nom_Eleve";
 $req_eleve_cdf=$pdo->query($rs_paiement_cdf);
 
-$rs_paiement_usd="SELECT eleve.*, paiement.*, annee.*, classe.*, type_frais.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN frais ON paiement.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE section.ID_Etablissement=".$_GET['Ecole']." AND paiement.ID_Taux=2 AND paiement.Confirm_Paiement=1";
+$rs_paiement_usd="SELECT eleve.*, paiement.*, paiement_frais.*, annee.*, classe.*, type_frais.* FROM eleve INNER JOIN inscription ON eleve.ID_Eleve=inscription.ID_Eleve INNER JOIN paiement ON inscription.ID_Inscription=paiement.ID_Inscription INNER JOIN paiement_frais ON paiement.ID_Paiement=paiement_frais.ID_Paiement INNER JOIN frais ON paiement_frais.ID_Frais=frais.ID_Frais INNER JOIN classe ON inscription.ID_Classe=classe.ID_Classe INNER JOIN annee ON inscription.ID_Annee=annee.ID_Annee INNER JOIN table_option ON classe.ID_Option=table_option.ID_Option INNER JOIN section ON table_option.ID_Section=section.ID_Section INNER JOIN type_frais ON frais.ID_Type_Frais=type_frais.ID_Type_Frais WHERE section.ID_Etablissement=".$_GET['Ecole']." AND paiement_frais.ID_Taux=2 AND paiement.Confirm_Paiement=1";
 if(isset($_GET['frais']) && !empty($_GET['frais'])){
-    $rs_paiement_usd .=" AND type_frais.ID_Type_Frais=".$_GET['frais'];
+	$rs_paiement_usd .=" AND type_frais.ID_Type_Frais=".$_GET['frais'];
 }
 if(isset($_GET['datedeb']) && !empty($_GET['datedeb']) && isset($_GET['datefin']) && !empty($_GET['datefin'])){
-    $rs_paiement_usd .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."' AND paiement.Date_Paiement <='".date('Y-m-d', strtotime($_GET['datefin']))."'";
+	$rs_paiement_usd .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."' AND paiement.Date_Paiement <='".date('Y-m-d', strtotime($_GET['datefin']))."'";
 }else{
     if(isset($_GET['datedeb']) && !empty($_GET['datedeb'])){
-        $rs_paiement_usd .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."'";
+    	$rs_paiement_usd .=" AND paiement.Date_Paiement >='".date('Y-m-d', strtotime($_GET['datedeb']))."'";
     }
 }
 $rs_paiement_usd .=" ORDER BY paiement.Date_Paiement, eleve.Nom_Eleve";

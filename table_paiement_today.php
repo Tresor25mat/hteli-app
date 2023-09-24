@@ -124,7 +124,7 @@
         $Titre="";
         while($paiement_frais=$paiement_frai->fetch()){
             $Titre.=' - '.strtoupper(stripslashes($paiement_frais['Libelle_Type_Frais'])).'</br>';
-            $frai=$pdo->query("SELECT * FROM frais WHERE ID_Frais=".$paiement_frais['ID_Fra']);
+            $frai=$pdo->query("SELECT * FROM frais WHERE ID_Frais=".$paiement_frais['ID_Frais']);
             $frais=$frai->fetch();
             if($paiement_frais['ID_Taux']==$default_devises['ID_Taux']){
                 $Montant_Paie+=$paiement_frais['Montant_Paie'];

@@ -128,7 +128,7 @@
         $Titre="";
         while($paiement_frais=$paiement_frai->fetch()){
             $Titre.=' - '.strtoupper(stripslashes($paiement_frais['Libelle_Type_Frais'])).'</br>';
-            $frai=$pdo->query("SELECT * FROM frais WHERE ID_Frais=".$paiement_frais['ID_Fra']);
+            $frai=$pdo->query("SELECT * FROM frais WHERE ID_Frais=".$paiement_frais['ID_Frais']);
             $frais=$frai->fetch();
             if($paiement_frais['ID_Taux']==$default_devises['ID_Taux']){
                 $Montant_Paie+=$paiement_frais['Montant_Paie'];
@@ -149,7 +149,7 @@
             <td><!-- <center> --><?php echo $Titre; ?></td>
             <td><!-- <center> --><?php echo number_format($Montant_Paie, 2, ',', ' ').$default_devises['Devise']; ?></td>
             <td><!-- <center> --><?php echo date('d/m/Y H:i:s', strtotime($selections['Mydate'])); ?></td>
-            <td><center>
+            <td style="width: 150px"><center>
             <a href="recu.php?Paiement=<?php echo($selections['ID_Paiement']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>" title="Afficher les détails" style="margin-right: 5px; border-radius: 0; width: 30px" class="btn btn-success"><i class="fa fa-print fa-fw"></i></a>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2 || $_SESSION['user_eteelo_app']['ID_Statut']==3 || $_SESSION['user_eteelo_app']['ID_Statut']==4){ ?>
                 <a href="modifier_paiement.php?ID=<?php echo($selections['ID_Paiement']) ?>&Ecole=<?php if(isset($_GET['Ecole']) && $_GET['Ecole']!=''){echo $_GET['Ecole']; } ?>&Annee=<?php if(isset($_GET['Annee']) && $_GET['Annee']!=''){echo $_GET['Annee']; } ?>&Classe=<?php if(isset($_GET['Classe']) && $_GET['Classe']!=''){echo $_GET['Classe']; } ?>&Eleve=<?php if(isset($_GET['Eleve']) && $_GET['Eleve']!=''){echo $_GET['Eleve']; } ?>&Recu=<?php if(isset($_GET['Recu']) && $_GET['Recu']!=''){echo $_GET['Recu']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>

@@ -671,7 +671,16 @@
                 }
             });
         $('#ID_Frais').val('');
-        $('#devise').val('');
+        $.ajax({
+                url:'recherche_devises.php',
+                type:'post',
+                dataType:'html', 
+                data:{Ecole:$('#ecole').val()},
+                success:function(ret){
+                    $('#add_devise').nextAll().remove();
+                    $('#add_devise').after(ret);
+                }
+            });
         $('#montant').val('');
         $('#type_frais').focus();
     })
