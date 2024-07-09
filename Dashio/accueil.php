@@ -56,7 +56,7 @@
             <!--CUSTOM CHART START -->
             <h3 style="margin-top: -40px"><strong><?php echo $app_infos['Design_App']; ?></strong></h3>
             <div class="border-head">
-              <h3>Logiciel de gestion scolaire</h3>
+              <h3>Logiciel de gestion des rapports</h3>
             </div>
             <div class="custom-bar-chart">
               <ul class="y-axis">

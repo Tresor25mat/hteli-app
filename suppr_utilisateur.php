@@ -10,6 +10,7 @@
         $rs=$pdo->prepare("DELETE FROM utilisateur WHERE `ID_Utilisateur`=?");
         $params=array($ID);
         $rs->execute($params);
+        $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);
         @unlink($IMG);
         header("location:table_utilisateur.php"); 
 

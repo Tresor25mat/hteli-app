@@ -2,6 +2,7 @@
     require_once('connexion.php');
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
+    $Logo="images/network.png";
  ?>
 
 <!DOCTYPE html>
@@ -11,8 +12,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Connexion | <?php echo $app_infos['Design_App']; ?></title>
   <!-- Favicons -->
-  <link href="images/eleve.png" rel="icon">
-  <link href="images/eleve.png" rel="apple-touch-icon">
+  <link href="<?php echo $Logo; ?>" rel="icon">
+  <link href="<?php echo $Logo; ?>" rel="apple-touch-icon">
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -30,7 +31,7 @@
 <style>
     #monid {
         /*background: white;*/
-        background-image: url("images/eleve.png");
+        background-image: url("<?php echo $Logo; ?>");
         background-size: 250px;
         background-repeat: no-repeat;
         background-position: center;
@@ -46,7 +47,7 @@
     <a href="#"><b><?php echo $app_infos['Design_App']; ?></b></a>
   </div>
 <!--   <center>
-  <img src="images/eleve.png" style="position: float">
+  <img src="<?php echo $Logo; ?>" style="position: float">
   </center> -->
   <!-- /.login-logo -->
   <div class="card" id="monid">

@@ -33,44 +33,20 @@
 		    	$params=array($cmpt, sha1($mdp));
 		    	$rs->execute($params);
 		    	if ($user=$rs->fetch()){
-					$ecole=$pdo->query("SELECT * FROM etablissement WHERE ID_Etablissement=".$user['ID_Etablissement']);
-					$ecoles=$ecole->fetch();
-					if($user['Statut']=='Admin'){
-						if($user['Active']==1){
-							if($user['Statut']!='Admin'){
-								$rec=$pdo->query("UPDATE utilisateur SET Etat=1, Loged=1, Logged=1 WHERE ID_Utilisateur=".$user['ID_Utilisateur']);
-							}else{
-								$rec=$pdo->query("UPDATE utilisateur SET Etat=1 WHERE ID_Utilisateur=".$user['ID_Utilisateur']);
-							}
-							$_SESSION['user_eteelo_app']=$user;
-							$_SESSION['user_eteelo_app']['token'] = sha1($token);
-							$_SESSION['logged_eteelo_app'] = true;
-							$_SESSION['last_activity'] = time();
-							$_SESSION['expire_time'] = 5*60;
-							echo '1';
+					if($user['Active']==1){
+						if($user['Statut']!='Admin'){
+							$rec=$pdo->query("UPDATE utilisateur SET Etat=1, Loged=1, Logged=1 WHERE ID_Utilisateur=".$user['ID_Utilisateur']);
 						}else{
-							echo '3';
+							$rec=$pdo->query("UPDATE utilisateur SET Etat=1 WHERE ID_Utilisateur=".$user['ID_Utilisateur']);
 						}
+						$_SESSION['user_eteelo_app']=$user;
+						$_SESSION['user_eteelo_app']['token'] = sha1($token);
+						$_SESSION['logged_eteelo_app'] = true;
+						$_SESSION['last_activity'] = time();
+						$_SESSION['expire_time'] = 10*60;
+						echo '1';
 					}else{
-						if($ecoles['Active']==1){
-							if($user['Active']==1){
-									if($user['Statut']!='Admin'){
-										$rec=$pdo->query("UPDATE utilisateur SET Etat=1, Loged=1, Logged=1 WHERE ID_Utilisateur=".$user['ID_Utilisateur']);
-									}else{
-										$rec=$pdo->query("UPDATE utilisateur SET Etat=1 WHERE ID_Utilisateur=".$user['ID_Utilisateur']);
-									}
-									$_SESSION['user_eteelo_app']=$user;
-									$_SESSION['user_eteelo_app']['token'] = sha1($token);
-									$_SESSION['logged_eteelo_app'] = true;
-									$_SESSION['last_activity'] = time();
-									$_SESSION['expire_time'] = 5*60;
-									echo '1';
-							}else{
-								echo '3';
-							}
-						}else{
-							echo '4';
-						}
+						echo '3';
 					}
 		    	}else{
 					if(empty($_SESSION['log_fail']))
@@ -84,7 +60,6 @@
 					}
 					echo '2';
 		    	}
-
 			}
     }catch (exception $e){
 	    die('Erreur: '.$e->getMessage());

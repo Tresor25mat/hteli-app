@@ -14,32 +14,7 @@
     $Profil=htmlentities($_POST['profil']);
     $Type_Photo=htmlentities($_POST['type_photo']);
     $Photo_Data=htmlentities($_POST['photo_data']);
-    $Inscription=0;
-    $Discipline=0;
-    $Cotes=0;
-    $Compta=0;
-    $Paiement=0;
-    if(isset($_POST['ID_Etablissement'])){
-        $Ecole=htmlentities($_POST['ID_Etablissement']);
-    }else{
-        $Ecole="";
-    }
-    if(isset($_POST['modules']) && !empty($_POST['modules'])){
-        $Modules = explode(",", $_POST['modules']);
-        foreach($Modules as $module) {
-            if($module==1){
-                $Inscription=1;
-            }else if($module==2){
-                $Discipline=1;
-            }else if($module==3){
-                $Cotes=1;
-            }else if($module==4){
-                $Compta=1;
-            }else if($module==5){
-                $Paiement=1;
-            }
-        }
-    }
+    $Etablissement=1;
     $Password=sha1($_POST['password']);
     $Image=basename($_FILES['mimg']['name']);
     $dossier_image = 'images/profil/';
@@ -60,9 +35,17 @@
             if(move_uploaded_file($_FILES['mimg']['tmp_name'], $dossier_image . $Image)) //Si la fonction renvoie TRUE, c'est
             {
                 if($Token==$_SESSION['user_eteelo_app']['token']){
-                    $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Photo_Type, Statut, Active, Inscription, Discipline, Cotes, Compta, Paiement) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                    $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], 1, $Inscription, $Discipline, $Cotes, $Compta, $Paiement);
+                    $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Photo_Type, Statut, Active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                    $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], 1);
                     $rs->execute($params);
+                    $select=$pdo->query("SELECT MAX(ID_Utilisateur) AS ID_Utilisateur FROM utilisateur");
+                    $selects=$select->fetch();
+                    if(isset($_POST['liste_sites']) && !empty($_POST['liste_sites'])){
+                        $Sites = explode(",", $_POST['liste_sites']);
+                        foreach($Sites as $site) {
+                            $insert=$pdo->query("INSERT INTO utilisateur_site SET ID_Utilisateur=".$selects['ID_Utilisateur'].", ID_Site=".$site);
+                        }
+                    }
                     echo "1";
                 }
             }else{
@@ -71,16 +54,32 @@
         }
     }else if($Photo_Data!=''){
         if($Token==$_SESSION['user_eteelo_app']['token']){
-            $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Photo_Type, Statut, Active, Inscription, Discipline, Cotes, Compta, Paiement) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], 1, $Inscription, $Discipline, $Cotes, $Compta, $Paiement);
+            $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Photo, Photo_Type, Statut, Active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], 1);
             $rs->execute($params);
+            $select=$pdo->query("SELECT MAX(ID_Utilisateur) AS ID_Utilisateur FROM utilisateur");
+            $selects=$select->fetch();
+            if(isset($_POST['liste_sites']) && !empty($_POST['liste_sites'])){
+                $Sites = explode(",", $_POST['liste_sites']);
+                foreach($Sites as $site) {
+                    $insert=$pdo->query("INSERT INTO utilisateur_site SET ID_Utilisateur=".$selects['ID_Utilisateur'].", ID_Site=".$site);
+                }
+            }
             echo "1";
         }
     }else{
         if($Token==$_SESSION['user_eteelo_app']['token']){
-            $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Statut, Active, Inscription, Discipline, Cotes, Compta, Paiement) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $statuts['Design_Statut'], 1, $Inscription, $Discipline, $Cotes, $Compta, $Paiement);
+            $rs=$pdo->prepare("INSERT INTO utilisateur(Prenom, Nom, ID_Profil, ID_Etablissement, ID_Statut, Tel, Email, Login, Password, Statut, Active) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+            $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $statuts['Design_Statut'], 1);
             $rs->execute($params);
+            $select=$pdo->query("SELECT MAX(ID_Utilisateur) AS ID_Utilisateur FROM utilisateur");
+            $selects=$select->fetch();
+            if(isset($_POST['liste_sites']) && !empty($_POST['liste_sites'])){
+                $Sites = explode(",", $_POST['liste_sites']);
+                foreach($Sites as $site) {
+                    $insert=$pdo->query("INSERT INTO utilisateur_site SET ID_Utilisateur=".$selects['ID_Utilisateur'].", ID_Site=".$site);
+                }
+            }
             echo "1";
         }
     }

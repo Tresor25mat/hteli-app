@@ -18,15 +18,15 @@
             $Photo="images/photo.jpg";
         }
     }
-    $Logo="images/eleve.png";
+    $Logo="images/network.png";
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $theme="light";
     if(isset($_GET['theme']) && $_GET['theme']!=''){
         $theme=$_GET['theme'];
     }
-    $ecole=$pdo->query("SELECT * FROM etablissement WHERE ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
-    $ecoles=$ecole->fetch();
+    $etablissement=$pdo->query("SELECT * FROM etablissement WHERE ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+    $etablissements=$etablissement->fetch();
 ?>
 <!doctype html>
 <!--
@@ -50,8 +50,8 @@
     <link href="./dist/css/tabler-vendors.min.css" rel="stylesheet"/>
     <link href="./dist/css/demo.min.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="lib/gritter/css/jquery.gritter.css" />
-    <link href="images/eleve.png" rel="icon">
-    <link href="images/eleve.png" rel="apple-touch-icon">
+    <link href="<?php echo $Logo; ?>" rel="icon">
+    <link href="<?php echo $Logo; ?>" rel="apple-touch-icon">
   </head>
   <style type="text/css">
             .top-link,
@@ -119,7 +119,7 @@
           </button>
           <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
             <a href="." style="font-size: 20px; font-weight: bold; font-style: italic;">
-              <img src="images/eleve.png" width="110" height="32" alt="Tabler" class="navbar-brand-image"><?php echo $app_infos['Design_App']; ?>
+              <img src="<?php echo $Logo; ?>" width="110" height="32" alt="Tabler" class="navbar-brand-image"><?php echo $app_infos['Design_App']; ?>
             </a>
           </h1>
           <div class="navbar-nav flex-row order-md-last">
@@ -176,7 +176,6 @@
                     </span>
                   </a>
                 </li>
-                <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1 || $_SESSION['user_eteelo_app']['Discipline']==1 || $_SESSION['user_eteelo_app']['Cotes']==1){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
@@ -185,58 +184,34 @@
                     </svg>
                     </span>
                     <span class="nav-link-title">
-                      Elèves
+                      Rapports
                     </span>
                   </a>
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_inscription.php">
-                          Inscription
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_rapport.php">
+                          	Daily PM - Progress
                         </a>
-                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Discipline']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="select_vols_importation.php">
-                          Discipline
+						<!-- <a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_new.php">
+                          	Daily PM - Progress (New)
+                        </a> -->
+						<a class="dropdown-item gonow" href="#" ver="afficher_janitorials_facilities_checklist.php">
+							Janitorials, Facilities & Alarms
                         </a>
-                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Cotes']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="select_vols_importation.php">
-                          Gestion des côtes
+						<a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_mensuel_site.php">
+							Monthly Site Inspection
                         </a>
-                        <?php } ?>
+						<a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_mensuel_tour.php">
+                          	Monthly Tower Inspection
+                        </a>
+						<a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_rectifier.php">
+							Rectifier & Storage Battery Maintenance
+                        </a>
                       </div>
                     </div>
                   </div>
                 </li>
-                <?php }  if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Compta']==1 || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
-                    <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-currency-exchange" viewBox="0 0 16 16">
-                        <path d="M0 5a5.002 5.002 0 0 0 4.027 4.905 6.46 6.46 0 0 1 .544-2.073C3.695 7.536 3.132 6.864 3 5.91h-.5v-.426h.466V5.05c0-.046 0-.093.004-.135H2.5v-.427h.511C3.236 3.24 4.213 2.5 5.681 2.5c.316 0 .59.031.819.085v.733a3.46 3.46 0 0 0-.815-.082c-.919 0-1.538.466-1.734 1.252h1.917v.427h-1.98c-.003.046-.003.097-.003.147v.422h1.983v.427H3.93c.118.602.468 1.03 1.005 1.229a6.5 6.5 0 0 1 4.97-3.113A5.002 5.002 0 0 0 0 5zm16 5.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0zm-7.75 1.322c.069.835.746 1.485 1.964 1.562V14h.54v-.62c1.259-.086 1.996-.74 1.996-1.69 0-.865-.563-1.31-1.57-1.54l-.426-.1V8.374c.54.06.884.347.966.745h.948c-.07-.804-.779-1.433-1.914-1.502V7h-.54v.629c-1.076.103-1.808.732-1.808 1.622 0 .787.544 1.288 1.45 1.493l.358.085v1.78c-.554-.08-.92-.376-1.003-.787H8.25zm1.96-1.895c-.532-.12-.82-.364-.82-.732 0-.41.311-.719.824-.809v1.54h-.005zm.622 1.044c.645.145.943.38.943.796 0 .474-.37.8-1.02.86v-1.674l.077.018z"/>
-                      </svg>
-                    </span>
-                    <span class="nav-link-title">
-                      Finances
-                    </span>
-                  </a>
-                  <div class="dropdown-menu">
-                    <div class="dropdown-menu-columns">
-                      <div class="dropdown-menu-column">
-                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Compta']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="select_vols_vente_simple.php">
-                          Comptabilité
-                        </a>
-                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_paiement.php">
-                          Paiements
-                        </a>
-                        <?php } ?>
-                      </div>
-                    </div>
-                  </div>
-                </li>
-                <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1 || $_SESSION['user_eteelo_app']['Discipline']==1 || $_SESSION['user_eteelo_app']['Cotes']==1 || $_SESSION['user_eteelo_app']['Compta']==1 || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/star -->
@@ -252,28 +227,29 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Compta']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
-                          Comptabilité
+                        <a class="dropdown-item gonow" href="#" ver="rapport_journalier.php">
+                          Daily PM - Progress
                         </a>
-                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Cotes']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="rapport_billet.php">
-                          Cotes
+						<!-- <a class="dropdown-item gonow" href="#" ver="rapport_journalier_new.php">
+                          Daily PM - Progress (New)
+                        </a> -->
+						<a class="dropdown-item gonow" href="#" ver="rapport_janitorial.php">
+							Janitorials, Facilities & Alarms
                         </a>
-                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Inscription']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="liste_eleve.php">
-                          Elèves
+						<a class="dropdown-item gonow" href="#" ver="rapport_mensuel_site.php">
+                          Monthly Site Inspection
                         </a>
-                        <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT' || $_SESSION['user_eteelo_app']['Paiement']==1){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="rapport_paiement.php">
-                          Paiements
+						<a class="dropdown-item gonow" href="#" ver="rapport_mensuel_tour.php">
+                          Monthly Tower Inspection
                         </a>
-                        <?php } ?>
+						<a class="dropdown-item gonow" href="#" ver="rapport_rectifier.php">
+							Rectifier & Storage Battery Maintenance
+                        </a>
                       </div>
                     </div>
                   </div>
                 </li>
-                <?php } if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='Admin_Ecole' || $_SESSION['user_eteelo_app']['Statut']=='User_IT'){ ?>
+                <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin' || $_SESSION['user_eteelo_app']['Statut']=='User_IT'){ ?>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#navbar-layout" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false" >
                     <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/layout-2 -->
@@ -289,49 +265,27 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="table_annee.php">
-                          Année scolaire
+                        <a class="dropdown-item gonow" href="#" ver="table_make_batterie.php">
+							Make of Batteries
                         </a>
-                        <?php } ?>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_cat_frais.php">
-                          Catégories frais
+						<a class="dropdown-item gonow" href="#" ver="afficher_table_province.php">
+							Provinces
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_cat_eleve.php">
-                          Catégories élèves
+						<a class="dropdown-item gonow" href="#" ver="table_rectifier_make.php">
+							Rectifier make
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_classe.php">
-                          Classes
+						<a class="dropdown-item gonow" href="#" ver="table_rectifier_model.php">
+							Rectifier model
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_compte.php">
-                          Comptes
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_site.php">
+                          Sites
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_devise.php">
-                          Devises
+                        <a class="dropdown-item gonow" href="#" ver="afficher_table_matiere.php">
+                          Table des matières
                         </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_discipline.php">
-                          Disciplines
-                        </a>
-                        <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
-                        <a class="dropdown-item gonow" href="#" ver="table_ecole.php">
-                          Ecoles
-                        </a>
-                        <?php } ?>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_enseignant.php">
-                          Enseignants
-                        </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_frais.php">
-                          Frais
-                        </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_journal.php">
-                          Journaux
-                        </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_option.php">
-                          Options
-                        </a>
-                        <a class="dropdown-item gonow" href="#" ver="afficher_table_section.php">
-                          Sections
-                        </a>
+						<!-- <a class="dropdown-item gonow" href="#" ver="afficher_table_matiere_new.php">
+                          Table des matières (New)
+                        </a> -->
                        <a class="dropdown-item gonow" href="#" ver="table_utilisateur.php">
                           Utilisateurs
                         </a>
@@ -354,7 +308,7 @@
               <!-- <div class="col"> -->
                 <!-- Page pre-title -->
                 <!-- <div class="page-pretitle"> -->
-                  <iframe src='Dashio/accueil.php' style="width: 100%; height: 2000px; border: 1px solid #E6E7E9;" id="iframe"></iframe>
+                  <iframe src='Dashio/accueil.php' style="width: 100%; height: 2500px; border: 1px solid #E6E7E9;" id="iframe"></iframe>
                 <!-- </div> -->
 
               <!-- </div> -->
@@ -374,7 +328,7 @@
               <div class="col-12 col-lg-auto mt-3 mt-lg-0">
                 <ul class="list-inline list-inline-dots mb-0">
                   <li class="list-inline-item">
-                    Copyright &copy; <script>document.write(new Date().getFullYear());</script> <?php echo $ecoles['Design_Etablissement']; ?>. Tous droits reservés | Design By
+                    Copyright &copy; <script>document.write(new Date().getFullYear());</script> <?php echo $etablissements['Design_Etablissement']; ?>. Tous droits reservés | Design By
                     <a href="https://www.facebook.com/tresor.mvuete" title="Tresor Mat Mvuete" target="_blank" id="mat">M@T</a>
                   </li>
 <!--                   <li class="list-inline-item">
@@ -408,7 +362,7 @@
         // (string | mandatory) the heading of the notification
         title: 'Bienvenu(e) '+ '<?php echo ($_SESSION['user_eteelo_app']['Prenom'].' '.$_SESSION['user_eteelo_app']['Nom']).' '; ?>'+'!',
         // (string | mandatory) the text inside the notification
-        text: "Ce logiciel permet la gestion scolaire",
+        text: "Ce logiciel permet de générer des rapports",
         // (string | optional) the image to display on the left
         image: '<?php echo ($Photo); ?>',
         // (bool | optional) if you want it to fade out on its own or just sit there
@@ -1108,7 +1062,7 @@
         function rappel(){
             changer_profil();
             verifier_session();
-            utilisateur_connecte();
+            // utilisateur_connecte();
         }
         setInterval(rappel,2000);
     </script>

@@ -17,7 +17,6 @@
     }else{
       $statut=$pdo->query("SELECT * FROM statut_user WHERE ID_Statut!=1 ORDER BY ID_Statut");
     }
-    $module=$pdo->query("SELECT * FROM module ORDER BY Design_Module");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -70,6 +69,16 @@
       .camera {
           width: 340px;
           display: inline-block;
+      }
+      .ui-autocomplete{
+        background-color:#CCC ! important;
+        z-index: 10000;
+        width: 200px
+      }
+      .alertify .ajs-dialog {
+            top: 15%;
+            transform: translateY(-50%);
+            margin: auto;
       }
   </style>
 </head>
@@ -262,43 +271,26 @@
                                     </div>
                                     </div>
 
-                                    <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE; <?php if($Utilisateurs['ID_Statut']==1){ echo 'display: none';} ?>" id="privileges">
+
+                                    <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE; <?php if($Utilisateurs['ID_Statut']!=3){echo "display: none"; }?>" id="privileges">
                                     <div class="col-md-10" style="margin-bottom: 10px">
                                     <div class="row">
-                                      <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none';} ?>">
-                                        <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Ecole *</label>
-                                          <div class="col-lg-12">
-                                            <select name="ecole" id="ecole" class="form-control " <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo 'disabled';} ?>>
-                                              <option value="">--</option>
-                                              <?php while($ecoles=$ecole->fetch()){ ?>
-                                              <option value="<?php echo($ecoles['ID_Etablissement'])?>" <?php if($ecoles['ID_Etablissement']==$Utilisateurs['ID_Etablissement']){echo "selected"; }?>><?php echo strtoupper($ecoles['Design_Etablissement']); ?></option>
-                                              <?php } ?>
-                                            </select>
-                                            <input id="ID_Etablissement" type="hidden" name="ID_Etablissement" value="<?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){ echo $_SESSION['user_eteelo_app']['ID_Etablissement'];} ?>">
-                                          </div>
-                                        </div>
-                                      </div>
                                       <div class="col-md-4" style="margin-bottom: 10px">
                                         <div class="form-group ">
-                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Module *</label>
+                                          <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Sites *</label>
                                           <div class="col-lg-12">
                                                         <div class="input-group">
-                                                        <select name="module" id="module" class="form-control ">
-                                                        <option value="">--</option>
-                                                        <?php while($modules=$module->fetch()){ ?>
-                                                        <option value="<?php echo($modules['Id_Module'])?>"><?php echo strtoupper($modules['Design_Module']); ?></option>
-                                                        <?php } ?>
-                                                        </select>
+                                                        <input type="text" name="sites" id="sites" class="form-control">
+                                                        <input type="hidden" name="ID_Site" id="ID_Site">
                                                             <div class="input-group-btn">
-                                                              <button type="button" class="btn btn-primary" id="ajouter_module" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-arrow-right"></i></button>
+                                                              <button type="button" class="btn btn-primary" id="ajouter_site" style="height: 38px; border-top-left-radius: 0; border-bottom-left-radius: 0"><i class="fa fa-arrow-right"></i></button>
                                                             </div>
                                                         </div>
-                                                        <input type="hidden" name="modules" id="modules">
+                                                        <input type="hidden" name="liste_sites" id="liste_sites">
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px;">
+                                      <div class="col-md-8" style="margin-bottom: 10px;">
                                         <div class="form-group ">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;"> </label>
                                           <div class="col-lg-12" style="border: 1px solid #D9DBDE; border-radius: 4px; height: 38px; font-size: 11px; padding-left: 5px; padding-right: 5px" id="mydiv">
@@ -432,46 +424,63 @@
     };
 
     })(jQuery);
-    let modules = [];
-    $(document).ready(function(){
+    let sites = [];
+    listeSites = [];
+    function actualiser_site(){
         $.ajax({
-            url:'charger_module.php',
+              url:"recherche_site.php",
+              type:'post',
+              dataType:"json",
+              success:function(donnee){
+                  listeSites.length=0;
+                  $.map(donnee,function(objet){
+                    listeSites.push({
+                          value:objet.Design,
+                          desc:objet.ID_Site
+                      });
+                  });
+              }
+        });
+    }
+    $(document).ready(function(){
+        actualiser_site();
+        $.ajax({
+            url:'charger_site.php',
             type:'post',
-            dataType:'text',
+            dataType:'json',
             data:{ID:$('#id_user').val()},
             success:function(retour){
               // modules = JSON.parse(retour);
               for(var i in retour) {
                   if(!isNaN(parseFloat(retour[i]))){
                       console.log('Valeur: ' + i);
-                      modules.push(retour[i]);
+                      sites.push(retour[i]);
                   }
               }
-              // $.map(retour,function(i){
-              //   modules.push(i);
-              // });
-              // alertify.alert('<?php echo $app_infos['Design_App']; ?>','Tableau: ' + modules);
-              //   modules = [retour.replace(/[[\]]/g,'')];
-                $.ajax({
-                      url:'ajout_module.php',
+              $.ajax({
+                      url:'ajout_site.php',
                       type:'post',
                       dataType:'text',
-                      data:{Modules:modules},
+                      data:{Sites:sites},
                       success:function(ret){
                           $('#mydiv').html(ret);
-                          $('#modules').val(modules);
-                          $('#module').val('');
+                          $('#liste_sites').val(sites);
+                          $('#sites').val('');
                       }
               });
             }
         });
     })
 
-    $('#module').change(function(){
-        if($('#module').val()!=''){
-            $('#ajouter_module').focus();
+    $('#sites').autocomplete({source:function(request,response){
+        var resultat=$.ui.autocomplete.filter(listeSites,request.term);
+        response(resultat.slice(0,15));
+        },
+        select:function(event,ui){
+            $('#ID_Site').val(ui.item.desc);
+            $('#ajouter_site').focus();
         }
-    })
+  });
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -617,48 +626,46 @@
         });
       }
     }
-    $('#ajouter_module').click(function(){
-        if($('#module').val()==''){
-            alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner un module svp!', function(){$('#module').focus();});
+    $('#ajouter_site').click(function(){
+        if($('#sites').val()==''){
+            alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez selectionner un site svp!', function(){$('#module').focus();});
         }else{
-          if (!modules.includes($('#module').val())) {
-              modules.push($('#module').val());
+          if (!sites.includes($('#ID_Site').val())) {
+              sites.push($('#ID_Site').val());
               $.ajax({
-                      url:'ajout_module.php',
+                      url:'ajout_site.php',
                       type:'post',
                       dataType:'text',
-                      data:{Modules:modules},
+                      data:{Sites:sites},
                       success:function(ret){
                           $('#mydiv').html(ret);
-                          $('#modules').val(modules);
-                          $('#module').val('').focus();
+                          $('#liste_sites').val(sites);
+                          $('#sites').val('').focus();
                       }
               });
           }else{
-            alertify.alert('<?php echo $app_infos['Design_App']; ?>','Ce module existe déjà !', function(){$('#module').val('').focus();});
+            alertify.alert('<?php echo $app_infos['Design_App']; ?>','Ce site existe déjà !', function(){$('#module').val('').focus();});
           }
         }
     });
 
-    function delete_module(mod){
-            let newModules = []
-            modules.forEach(m => {
+    function delete_site(mod){
+            let newSites = []
+            sites.forEach(m => {
                 if(m != mod){
-                    newModules.push(m)
+                    newSites.push(m)
                     return
                 }
             })
-            modules = newModules
-            // alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Modules :' + modules.length);
+            sites = newSites
             $.ajax({
-                      url:'ajout_module.php',
+                      url:'ajout_site.php',
                       type:'post',
                       dataType:'text',
-                      data:{Modules:modules},
+                      data:{Sites:sites},
                       success:function(ret){
                           $('#mydiv').html(ret);
-                          $('#modules').val(modules);
-                          $('#module').val('');
+                          $('#liste_sites').val(sites);
                       }
               });
     }
@@ -729,8 +736,8 @@
 
             if($('#prenom').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()=='' || $('#statut').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#prenom').focus();});
-            }else if($('#statut').val()!=1 && (modules.length==0 || $('#ecole').val()=='')){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir l\'école et les modules svp!', function(){$('#ecole').focus();});
+              }else if($('#statut').val()==3 && (sites.length==0)){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir les sites svp!', function(){$('#sites').focus();});
             }else{
                 $.ajax({
                     url:'edit_utilisateur.php',

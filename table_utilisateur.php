@@ -13,7 +13,7 @@
       $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
     }
     $userTotal=$req_user->rowCount();
-    $userparpage=10;
+    $userparpage=8;
     $pagesTotales=ceil($userTotal/$userparpage);
     if (isset($_GET['page']) AND !empty($_GET['page']) AND $_GET['page'] > 0 AND $_GET['page']<=$pagesTotales) {
         $_GET['page'] = intval($_GET['page']);
@@ -139,7 +139,7 @@
               <div class="col-md-6 col-lg-3">
                 <div class="card">
                   <div class="card-body p-4 text-center">
-                    <a href="#" onclick="Function_Afficher(<?php echo($utilisateurs['ID_Utilisateur']) ?>, '<?php if($utilisateurs['Photo']==''){if($utilisateurs['ID_Profil']==1){echo('images/photo_femme.jpg');}else{echo('images/photo.jpg');}}else{if($utilisateurs['Photo_Type']==1){ echo('images/profil/'.$utilisateurs['Photo']);}else{ echo($utilisateurs['Photo']);}} ?>', '<?php echo $utilisateurs['Prenom'].' '.$utilisateurs['Nom']; ?>', '<?php echo stripslashes($pays['Design_Pays']); ?>', '<?php echo stripslashes($villes['Design_Ville']); ?>', '<?php echo $list; ?>', '<?php echo stripslashes($methods['Design_Mode_Contact']); ?>', '<?php echo date('H:i', strtotime($utilisateurs['Heure_Contact'])); ?>', '<?php echo stripslashes($utilisateurs['Email']); ?>', '<?php echo stripslashes($pays['Code_Pays'].$utilisateurs['Tel']); ?>', <?php echo($utilisateurs['Active']) ?>)" title="Show detail" style="width: 30px; border-radius: 0;">
+                    <a href="#" onclick="Function_Afficher(<?php echo($utilisateurs['ID_Utilisateur']) ?>, '<?php if($utilisateurs['Photo']==''){if($utilisateurs['ID_Profil']==1){echo('images/photo_femme.jpg');}else{echo('images/photo.jpg');}}else{if($utilisateurs['Photo_Type']==1){ echo('images/profil/'.$utilisateurs['Photo']);}else{ echo($utilisateurs['Photo']);}} ?>', '<?php echo $utilisateurs['Prenom'].' '.$utilisateurs['Nom']; ?>', '<?php echo stripslashes($pays['Design_Pays']); ?>', '<?php echo stripslashes($villes['Design_Ville']); ?>', '<?php echo $list; ?>', '<?php echo stripslashes($methods['Design_Mode_Contact']); ?>', '<?php echo date('H:i', strtotime($utilisateurs['Heure_Contact'])); ?>', '<?php echo stripslashes($utilisateurs['Email']); ?>', '<?php echo stripslashes($pays['Code_Pays'].$utilisateurs['Tel']); ?>', <?php echo($utilisateurs['Active']) ?>)" title="Afficher les détails" style="width: 30px; border-radius: 0;">
                     <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(<?php if($utilisateurs['Photo']!='' && $utilisateurs['Photo_Type']==1){echo('images/profil/'.$utilisateurs['Photo']);}else if($utilisateurs['Photo']!='' && $utilisateurs['Photo_Type']==2){echo $utilisateurs['Photo'];}else{if($utilisateurs['ID_Profil']==1){ echo ('images/photo_femme.jpg');}else{echo('images/photo.jpg');}} ?>); border: 1px solid #DEE2E6;"><?php if($utilisateurs['Etat']==1){echo("<img src='images/connecte.gif' style='width: 12px; height: 12px; margin-top: 85px; margin-left: 78px'>");} ?></span>
                     </a>
                     <h3 class="m-0 mb-1"><?php echo $utilisateurs['Prenom'].' '.$utilisateurs['Nom']; ?><!-- <a href="#">Paweł Kuna</a> --></h3>
@@ -149,11 +149,9 @@
                     <h5 class="m-0 mb-1"><?php echo '243'.$utilisateurs['Tel']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
                     <?php } ?>
                     <div class="text-muted"><?php echo $utilisateurs['Statut']; ?></div>
-                    <?php if($utilisateurs['Statut']!='Admin'){ ?>
                     <div class="mt-3">
-                      <span class="badge bg-purple-lt">Ecole: <?php echo ($ecoles['Design_Etablissement']); ?></span>
+                      <span class="badge bg-purple-lt"><?php echo ($ecoles['Design_Etablissement']); ?></span>
                     </div>
-                    <?php } ?>
                   </div>
                   <div class="d-flex">
 <?php if($utilisateurs['ID_Utilisateur']!=1 && $utilisateurs['ID_Utilisateur']!=$_SESSION['user_eteelo_app']['ID_Utilisateur'] && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a href="modifier_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>" title="Modifier" style="width: 30px; border-radius: 0;" class="btn btn-primary card-btn"><i class="fa fa-edit fa-fw" style="color: white"></i></a><?php if ($utilisateurs['Active']==1){ echo '<a class="btn btn-secondary card-btn" href="desactiver_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Désactiver" style="width:30px; border-radius: 0;"><i class="fa fa-ban fa-fw" style="margin-left: -7px; color: white"></i></a>';}else{ echo '<a class="btn btn-info card-btn" style="width:30px; border-radius: 0;" href="activer_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Activer"><i class="fa fa-check fa-fw" style="color: white"></i></a>';} ?><?php if($utilisateurs['Etat']!=1 && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a style="width: 30px; border-radius: 0;" class="btn btn-danger card-btn" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet utilisateur?\n Toutes les informations concernant cet utilisateur seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&IMG=<?php echo($utilisateurs['Photo']) ?>');alertify.success('Spprimé');}).set('oncancel',function(closeEvent){alertify.error('Annulé');}).set({title:'<?php echo $app_infos['Design_App']; ?>'},{labels:{ok:'Oui', cancel:'Non'}});" title="Supprimer"><i class="fa fa-trash" style="color: white"></i></a><?php }} ?>
@@ -227,7 +225,7 @@
       <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">User detail</h5>
+            <h5 class="modal-title">Détails de l'utilisateur</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -236,19 +234,19 @@
                 <span class="avatar avatar-xl mb-3 avatar-rounded" style="background-image: url(''); border: 1px solid #DEE2E6;" id="myphoto"></span>
 
               </center>
-              <label class="form-label">Name</label>
+              <label class="form-label">Nom</label>
               <input type="text" class="form-control" name="example-text-input" placeholder="Name" id="myname" disabled="disabled" style="margin-bottom: 10px">
-              <label class="form-label">Country</label>
+              <!-- <label class="form-label">Country</label>
               <input type="text" class="form-control" name="example-text-input" placeholder="Country" id="mycountry" disabled="disabled" style="margin-bottom: 10px">
               <label class="form-label">City</label>
-              <input type="text" class="form-control" name="example-text-input" placeholder="City" id="mycity" disabled="disabled" style="margin-bottom: 10px">
-              <label class="form-label">Language</label>
-              <input type="text" class="form-control" name="example-text-input" placeholder="Language" id="mylanguage" disabled="disabled" style="margin-bottom: 10px">
+              <input type="text" class="form-control" name="example-text-input" placeholder="City" id="mycity" disabled="disabled" style="margin-bottom: 10px"> -->
+              <!-- <label class="form-label">Language</label>
+              <input type="text" class="form-control" name="example-text-input" placeholder="Language" id="mylanguage" disabled="disabled" style="margin-bottom: 10px"> -->
 <!--               <label class="form-label">Contact method</label>
               <input type="text" class="form-control" name="example-text-input" placeholder="Contact method" id="mymethode" disabled="disabled" style="margin-bottom: 10px">
               <label class="form-label">Time</label>
               <input type="text" class="form-control" name="example-text-input" placeholder="Time" id="mytime" disabled="disabled" style="margin-bottom: 10px"> -->
-              <label class="form-label">Phone</label>
+              <label class="form-label">Téléphone</label>
               <input type="text" class="form-control" name="example-text-input" placeholder="Phone" id="myphone" disabled="disabled" style="margin-bottom: 10px">
               <label class="form-label">Email</label>
               <input type="text" class="form-control" name="example-text-input" placeholder="Email" id="myemail" disabled="disabled" style="margin-bottom: 10px">
@@ -256,12 +254,7 @@
           </div>
           <div class="modal-footer" style="border-top: 1px solid #E6E7E9; padding-top: 10px">
             <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
-              Cancel
-            </a>
-            <a href="#" class="btn btn-primary ms-auto" id="monlien">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-              <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-              Create new ticket
+              Annuler
             </a>
           </div>
         </div>
@@ -298,7 +291,7 @@
             // $("#mymethode").val(g);
             // $("#mytime").val(h);
             $("#myemail").val(i);
-            $("#myphone").val(j);
+            $("#myphone").val('243'+j);
             if(k==1){
                 $("#monlien").attr('href', 'ajouter_ticket_admin.php?ID_Peace_Maker='+a);
                 $("#monlien").attr('disabled', false);

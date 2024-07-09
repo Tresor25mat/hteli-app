@@ -20,11 +20,7 @@
     $Cotes=0;
     $Compta=0;
     $Paiement=0;
-    if(isset($_POST['ID_Etablissement'])){
-        $Ecole=htmlentities($_POST['ID_Etablissement']);
-    }else{
-        $Ecole="";
-    }
+    $Etablissement=1;
     if(isset($_POST['modules']) && !empty($_POST['modules'])){
         $Modules = explode(",", $_POST['modules']);
         foreach($Modules as $module) {
@@ -63,13 +59,20 @@
                 if($Token==$_SESSION['user_eteelo_app']['token']){
                     if($Password!=''){
                         $Password=sha1($Password);
-                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                        $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                        $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], $ID);
                         $rs->execute($params);
                     }else{
-                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                        $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Image, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                        $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Image, $Type_Photo, $statuts['Design_Statut'], $ID);
                         $rs->execute($params);
+                    }
+                    $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);
+                    if(isset($_POST['liste_sites']) && !empty($_POST['liste_sites'])){
+                        $Sites = explode(",", $_POST['liste_sites']);
+                        foreach($Sites as $site) {
+                            $insert=$pdo->query("INSERT INTO utilisateur_site SET ID_Utilisateur=".$ID.", ID_Site=".$site);
+                        }
                     }
                     echo "1";
                 }
@@ -81,13 +84,20 @@
         if($Token==$_SESSION['user_eteelo_app']['token']){
             if($Password!=''){
                 $Password=sha1($Password);
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
             }else{
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
+            }
+            $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);
+            if(isset($_POST['liste_sites']) && !empty($_POST['liste_sites'])){
+                $Sites = explode(",", $_POST['liste_sites']);
+                foreach($Sites as $site) {
+                    $insert=$pdo->query("INSERT INTO utilisateur_site SET ID_Utilisateur=".$ID.", ID_Site=".$site);
+                }
             }
             echo "1";
         }
@@ -95,13 +105,20 @@
         if($Token==$_SESSION['user_eteelo_app']['token']){
             if($Password!=''){
                 $Password=sha1($Password);
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $Password, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
             }else{
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Statut=?, Inscription=?, Discipline=?, Cotes=?, Compta=?, Paiement=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Ecole, $Statut, $Tel, $Mail, $Login, $statuts['Design_Statut'], $Inscription, $Discipline, $Cotes, $Compta, $Paiement, $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
+            }
+            $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);
+            if(isset($_POST['liste_sites']) && !empty($_POST['liste_sites'])){
+                $Sites = explode(",", $_POST['liste_sites']);
+                foreach($Sites as $site) {
+                    $insert=$pdo->query("INSERT INTO utilisateur_site SET ID_Utilisateur=".$ID.", ID_Site=".$site);
+                }
             }
             echo "1";
         }
