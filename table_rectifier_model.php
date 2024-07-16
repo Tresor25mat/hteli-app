@@ -134,7 +134,9 @@
             <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Design_Rectifier_Model'])); ?></td>
             <td style="padding-left: 250px"><!-- <center> -->
                 <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Rectifier_Model']); ?>, '<?php echo (stripslashes($selections['Design_Rectifier_Model'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <?php if ($_SESSION['user_eteelo_app']['ID_Statut'] == 1) { ?>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cette désignation ?\n Toutes les informations concernant cette désignation seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_rectifier_model.php?ID=<?php echo($selections['ID_Rectifier_Model']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a><!-- </center>-->
+                <?php } ?>
             </td>
         </tr>
     <?php } ?>

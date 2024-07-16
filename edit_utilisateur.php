@@ -6,6 +6,7 @@
     $ID=htmlentities($_POST['id_user']);
     $Prenom=Securite::bdd($_POST['prenom']);
     $Nom=Securite::bdd($_POST['nom']);
+    $ID_Pays=htmlentities($_POST['ID_Pays']);
     $Tel=htmlentities($_POST['tel']);
     $Mail=Securite::bdd($_POST['mail']);
     $Statut=Securite::bdd($_POST['statut']);
@@ -59,12 +60,12 @@
                 if($Token==$_SESSION['user_eteelo_app']['token']){
                     if($Password!=''){
                         $Password=sha1($Password);
-                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
-                        $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], $ID);
+                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Pays=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                        $params=array($Prenom, $Nom, $ID_Pays, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Image, $Type_Photo, $statuts['Design_Statut'], $ID);
                         $rs->execute($params);
                     }else{
-                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
-                        $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Image, $Type_Photo, $statuts['Design_Statut'], $ID);
+                        $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Pays=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                        $params=array($Prenom, $Nom, $ID_Pays, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Image, $Type_Photo, $statuts['Design_Statut'], $ID);
                         $rs->execute($params);
                     }
                     $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);
@@ -84,12 +85,12 @@
         if($Token==$_SESSION['user_eteelo_app']['token']){
             if($Password!=''){
                 $Password=sha1($Password);
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Pays=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $ID_Pays, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
             }else{
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Pays=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Photo=?, Photo_Type=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $ID_Pays, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Photo_Data, $Type_Photo, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
             }
             $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);
@@ -105,12 +106,12 @@
         if($Token==$_SESSION['user_eteelo_app']['token']){
             if($Password!=''){
                 $Password=sha1($Password);
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Statut=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $statuts['Design_Statut'], $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Pays=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Password=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $ID_Pays, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $Password, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
             }else{
-                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Statut=? WHERE ID_Utilisateur=?");
-                $params=array($Prenom, $Nom, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $statuts['Design_Statut'], $ID);
+                $rs=$pdo->prepare("UPDATE utilisateur SET Prenom=?, Nom=?, ID_Pays=?, ID_Profil=?, ID_Etablissement=?, ID_Statut=?, Tel=?, Email=?, Login=?, Statut=? WHERE ID_Utilisateur=?");
+                $params=array($Prenom, $Nom, $ID_Pays, $Profil, $Etablissement, $Statut, $Tel, $Mail, $Login, $statuts['Design_Statut'], $ID);
                 $rs->execute($params);
             }
             $delete=$pdo->query("DELETE FROM utilisateur_site WHERE `ID_Utilisateur`=".$ID);

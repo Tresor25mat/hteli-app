@@ -8,6 +8,7 @@
     $ID = $_GET['ID'];
     $Utilisateur = $pdo->query('SELECT * FROM utilisateur WHERE ID_Utilisateur='.$ID);
     $Utilisateurs = $Utilisateur->fetch();
+    $pay = $pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
     $profil=$pdo->query("SELECT * FROM profil ORDER BY ID_Profil");
     $ecole=$pdo->query("SELECT * FROM etablissement ORDER BY Design_Etablissement");
     if($_SESSION['user_eteelo_app']['ID_Statut']==1){
@@ -17,6 +18,8 @@
     }else{
       $statut=$pdo->query("SELECT * FROM statut_user WHERE ID_Statut!=1 ORDER BY ID_Statut");
     }
+    $country_user = $pdo->query("SELECT * FROM pays WHERE ID_Pays=".$Utilisateurs['ID_Pays']);
+    $country_users = $country_user->fetch();
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -107,13 +110,13 @@
                       New view
                     </a>
                   </span> -->
-                  <a href="#" id="retour_table" class="btn btn-primary d-sm-inline-block" title="Retour">
+                  <!-- <a href="#" id="retour_table" class="btn btn-primary d-sm-inline-block" title="Retour"> -->
                     <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply" viewBox="0 0 16 16">
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-reply" viewBox="0 0 16 16">
                       <path d="M6.598 5.013a.144.144 0 0 1 .202.134V6.3a.5.5 0 0 0 .5.5c.667 0 2.013.005 3.3.822.984.624 1.99 1.76 2.595 3.876-1.02-.983-2.185-1.516-3.205-1.799a8.74 8.74 0 0 0-1.921-.306 7.404 7.404 0 0 0-.798.008h-.013l-.005.001h-.001L7.3 9.9l-.05-.498a.5.5 0 0 0-.45.498v1.153c0 .108-.11.176-.202.134L2.614 8.254a.503.503 0 0 0-.042-.028.147.147 0 0 1 0-.252.499.499 0 0 0 .042-.028l3.984-2.933zM7.8 10.386c.068 0 .143.003.223.006.434.02 1.034.086 1.7.271 1.326.368 2.896 1.202 3.94 3.08a.5.5 0 0 0 .933-.305c-.464-3.71-1.886-5.662-3.46-6.66-1.245-.79-2.527-.942-3.336-.971v-.66a1.144 1.144 0 0 0-1.767-.96l-3.994 2.94a1.147 1.147 0 0 0 0 1.946l3.994 2.94a1.144 1.144 0 0 0 1.767-.96v-.667z"/>
                     </svg>
                     Retour
-                  </a>
+                  </a> -->
 <!--                   <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
                     Download SVG icon from http://tabler-icons.io/i/plus
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -148,6 +151,21 @@
                                     <div class="row" style="margin-bottom: 10px; border-bottom: 1px solid #EEEEEE">
                                     <div class="col-md-10" style="margin-bottom: 10px">
                                     <div class="row">
+                                    <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'display: none'; } ?>">
+                                        <div class="form-group ">
+                                          <label for="pays" class="control-label col-lg-12" style="text-align: left;">Pays *</label>
+                                          <div class="col-lg-12">
+                                            <input id="ID_Pays" type="hidden" name="ID_Pays" value="<?php echo($_SESSION['user_eteelo_app']['ID_Pays']); ?>">
+                                            <input id="ID_Pay" type="hidden" name="ID_Pay" value="<?php echo($_GET['Pays']); ?>">
+                                            <select name="pays" id="pays" class="form-control " <?php if($_SESSION['user_eteelo_app']['ID_Statut']!=1){echo 'disabled'; } ?>>
+                                              <option value="">--</option>
+                                              <?php while($pays=$pay->fetch()){ ?>
+                                              <option value="<?php echo($pays['ID_Pays'])?>" <?php if($pays['ID_Pays']==$Utilisateurs['ID_Pays']){echo 'selected'; } ?>><?php echo ($pays['Design_Pays']); ?></option>
+                                              <?php } ?>
+                                            </select>
+                                          </div>
+                                        </div>
+                                      </div>
                                       <div class="col-md-4" style="margin-bottom: 10px">
                                         <div class="form-group ">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;">Prenom *</label>
@@ -185,7 +203,7 @@
                                           <div class="col-lg-12">
                                               <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                  <span class="input-group-text" id="afficher_code" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; height: 38px">243</span>
+                                                  <span class="input-group-text" id="afficher_code" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; height: 38px"><?= $country_users['Code_Pays'] ?></span>
                                                 </div>
                                                 <input class="form-control " id="tel" type="text" name="tel" value="<?php echo($Utilisateurs['Tel']); ?>">
                                               </div> 
@@ -237,7 +255,7 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 10px;">
+                                      <div class="col-md-4" style="margin-bottom: 10px; <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1){echo 'display: none'; } ?>">
                                         <div class="form-group ">
                                           <label for="prenom" class="control-label col-lg-12" style="text-align: left;"> </label>
                                           <div class="col-lg-12" style="border: 1px solid #D9DBDE; border-radius: 4px; height: 38px">
@@ -431,6 +449,9 @@
               url:"recherche_site.php",
               type:'post',
               dataType:"json",
+              data:{
+                  Pays:$('#pays').val()
+              },
               success:function(donnee){
                   listeSites.length=0;
                   $.map(donnee,function(objet){
@@ -470,6 +491,24 @@
               });
             }
         });
+    })
+    $('#pays').change(function(){
+        if($(this).val()!=''){
+            $('#prenom').focus();
+            $('#ID_Pays').val($(this).val());
+            actualiser_site();
+            $.ajax({
+                  url:"recherche_code_pays.php",
+                  type:'post',
+                  dataType:"text",
+                  data:{
+                      Pays: $('#pays').val()
+                  },
+                  success:function(ret){
+                      $('#afficher_code').text(ret);
+                  }
+            }); 
+        }
     })
 
     $('#sites').autocomplete({source:function(request,response){
@@ -734,7 +773,7 @@
             e.preventDefault();
             var formData = new FormData(this);
 
-            if($('#prenom').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()=='' || $('#statut').val()==''){
+            if($('#ID_Pays').val()=='' || $('#prenom').val()=='' || $('#profil').val()=='' || $('#login').val()=='' || $('#nom').val()=='' || $('#statut').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#prenom').focus();});
               }else if($('#statut').val()==3 && (sites.length==0)){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez choisir les sites svp!', function(){$('#sites').focus();});
@@ -761,7 +800,7 @@
                                 icon: 'success',
                                 title: 'Enregistré'
                              })
-                             window.location.replace('table_utilisateur.php');
+                             window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
                          }else{
                             alertify.alert(ret);
                          }
@@ -793,14 +832,14 @@
                 }
           })             
     $('#btn_annuler').click(function(){
-        window.location.replace('table_utilisateur.php');
+        window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
     })
     $('#retour_table').click(function(e){
         e.preventDefault();
-        window.location.replace('table_utilisateur.php');
+        window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
     })
     $('#btn_annuler_tout').click(function(){
-      window.location.replace('table_utilisateur.php');
+      window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
     })
     </script>
 </body>

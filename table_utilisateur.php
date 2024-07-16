@@ -5,30 +5,57 @@
         header("location: connection");
     }
     require_once('connexion.php');
-    if($_SESSION['user_eteelo_app']['ID_Statut']==1){
-      $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1");
-    }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
-      $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Statut!=1 AND ID_Statut!=2 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
-    }else{
-      $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+    $query = "SELECT * FROM utilisateur INNER JOIN pays ON utilisateur.ID_Pays=pays.ID_Pays WHERE utilisateur.ID_Utilisateur!=0";
+    if (isset($_GET['Pays']) && $_GET['Pays'] != '') {
+        $query .= " AND utilisateur.ID_Pays=" . $_GET['Pays'];
     }
-    $userTotal=$req_user->rowCount();
-    $userparpage=8;
-    $pagesTotales=ceil($userTotal/$userparpage);
-    if (isset($_GET['page']) AND !empty($_GET['page']) AND $_GET['page'] > 0 AND $_GET['page']<=$pagesTotales) {
+    if($_SESSION['user_eteelo_app']['ID_Statut']==1){
+      $query .= " AND utilisateur.ID_Utilisateur!=1";
+    }else{
+      $query .= " AND utilisateur.ID_Utilisateur!=1 AND utilisateur.ID_Statut!=1 AND utilisateur.ID_Statut!=2 AND utilisateur.ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays'];
+    }
+    $query .= " ORDER BY utilisateur.ID_Statut";
+    $req = $pdo->query($query);
+    $userTotal = $req->rowCount();
+    $userparpage = 10;
+    $pagesTotales = ceil($userTotal / $userparpage);
+    if (isset($_GET['page']) and !empty($_GET['page']) and $_GET['page'] > 0 and $_GET['page'] <= $pagesTotales) {
         $_GET['page'] = intval($_GET['page']);
-        $pageCourante=$_GET['page'];
-    } else{
-        $pageCourante=1;
+        $pageCourante = $_GET['page'];
+    } else {
+        $pageCourante = 1;
     }
-    $depart=($pageCourante-1)*$userparpage;
-    if($_SESSION['user_eteelo_app']['ID_Statut']==1){
-      $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 LIMIT ".$depart.",".$userparpage);
-    }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
-      $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Statut!=1 AND ID_Statut!=2 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." LIMIT ".$depart.",".$userparpage);
-    }else{
-      $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." LIMIT ".$depart.",".$userparpage);
-    }
+    $depart = ($pageCourante - 1) * $userparpage;
+    $query .= " LIMIT " . $depart . "," . $userparpage;
+    $utilisateur = $pdo->query($query);
+
+
+    // if($_SESSION['user_eteelo_app']['ID_Statut']==1){
+    //   $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1");
+    // }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
+    //   $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Statut!=1 AND ID_Statut!=2 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+    // }else{
+    //   $req_user=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']);
+    // }
+    // $userTotal=$req_user->rowCount();
+    // $userparpage=8;
+    // $pagesTotales=ceil($userTotal/$userparpage);
+    // if (isset($_GET['page']) AND !empty($_GET['page']) AND $_GET['page'] > 0 AND $_GET['page']<=$pagesTotales) {
+    //     $_GET['page'] = intval($_GET['page']);
+    //     $pageCourante=$_GET['page'];
+    // } else{
+    //     $pageCourante=1;
+    // }
+    // $depart=($pageCourante-1)*$userparpage;
+    // if($_SESSION['user_eteelo_app']['ID_Statut']==1){
+    //   $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 LIMIT ".$depart.",".$userparpage);
+    // }else if($_SESSION['user_eteelo_app']['ID_Statut']==3){
+    //   $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Statut!=1 AND ID_Statut!=2 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." LIMIT ".$depart.",".$userparpage);
+    // }else{
+    //   $utilisateur=$pdo->query("SELECT * FROM utilisateur WHERE ID_Utilisateur!=1 AND ID_Etablissement=".$_SESSION['user_eteelo_app']['ID_Etablissement']." LIMIT ".$depart.",".$userparpage);
+    // }
+
+
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -91,9 +118,9 @@
           <div class="page-header d-print-none">
             <div class="row g-2 align-items-center">
               <div class="col">
-                <h2 class="page-title">
+                <!-- <h2 class="page-title">
                   Utilisateurs
-                </h2>
+                </h2> -->
                 <div class="text-muted mt-1">
 
                                     <?php if($userTotal!=0){ 
@@ -116,11 +143,11 @@
               <div class="col-12 col-md-auto ms-auto d-print-none">
                 <div class="d-flex">
 <!--                   <input type="search" class="form-control d-inline-block w-9 me-3" placeholder="Search user…"/> -->
-                  <a href="ajouter_utilisateur.php" class="btn btn-primary d-sm-inline-block" title="Ajouter">
+                  <!-- <a href="ajouter_utilisateur.php" class="btn btn-primary d-sm-inline-block" title="Ajouter"> -->
                     <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                    Ajouter
-                  </a>
+                    <!-- <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" style="font-weight: bold;"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg> -->
+                    <!-- Ajouter -->
+                  <!-- </a> -->
                 </div>
               </div>
             </div>
@@ -146,7 +173,7 @@
                     <!-- <h5 class="m-0 mb-1"><?php echo $utilisateurs['Email']; ?><a href="#">Paweł Kuna</a></h5> -->
                     <h5 class="m-0 mb-1"><?php echo $utilisateurs['Login']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
                     <?php if($utilisateurs['Tel']!=''){ ?>
-                    <h5 class="m-0 mb-1"><?php echo '243'.$utilisateurs['Tel']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
+                    <h5 class="m-0 mb-1"><?php echo $utilisateurs['Code_Pays'].$utilisateurs['Tel']; ?><!-- <a href="#">Paweł Kuna</a> --></h5>
                     <?php } ?>
                     <div class="text-muted"><?php echo $utilisateurs['Statut']; ?></div>
                     <div class="mt-3">
@@ -154,7 +181,7 @@
                     </div>
                   </div>
                   <div class="d-flex">
-<?php if($utilisateurs['ID_Utilisateur']!=1 && $utilisateurs['ID_Utilisateur']!=$_SESSION['user_eteelo_app']['ID_Utilisateur'] && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a href="modifier_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>" title="Modifier" style="width: 30px; border-radius: 0;" class="btn btn-primary card-btn"><i class="fa fa-edit fa-fw" style="color: white"></i></a><?php if ($utilisateurs['Active']==1){ echo '<a class="btn btn-secondary card-btn" href="desactiver_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Désactiver" style="width:30px; border-radius: 0;"><i class="fa fa-ban fa-fw" style="margin-left: -7px; color: white"></i></a>';}else{ echo '<a class="btn btn-info card-btn" style="width:30px; border-radius: 0;" href="activer_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'" title="Activer"><i class="fa fa-check fa-fw" style="color: white"></i></a>';} ?><?php if($utilisateurs['Etat']!=1 && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a style="width: 30px; border-radius: 0;" class="btn btn-danger card-btn" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet utilisateur?\n Toutes les informations concernant cet utilisateur seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&IMG=<?php echo($utilisateurs['Photo']) ?>');alertify.success('Spprimé');}).set('oncancel',function(closeEvent){alertify.error('Annulé');}).set({title:'<?php echo $app_infos['Design_App']; ?>'},{labels:{ok:'Oui', cancel:'Non'}});" title="Supprimer"><i class="fa fa-trash" style="color: white"></i></a><?php }} ?>
+<?php if($utilisateurs['ID_Utilisateur']!=1 && $utilisateurs['ID_Utilisateur']!=$_SESSION['user_eteelo_app']['ID_Utilisateur'] && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a href="modifier_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Pays=<?php if (isset($_GET['Pays']) && $_GET['Pays'] != '') {echo $_GET['Pays'];} ?>" title="Modifier" style="width: 30px; border-radius: 0;" class="btn btn-primary card-btn"><i class="fa fa-edit fa-fw" style="color: white"></i></a><?php if ($utilisateurs['Active']==1){ echo '<a class="btn btn-secondary card-btn" href="desactiver_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'&Pays='.$_GET['Pays'].'" title="Désactiver" style="width:30px; border-radius: 0;"><i class="fa fa-ban fa-fw" style="margin-left: -7px; color: white"></i></a>';}else{ echo '<a class="btn btn-info card-btn" style="width:30px; border-radius: 0;" href="activer_utilisateur.php?ID='.$utilisateurs['ID_Utilisateur'].'&token='.$_SESSION['user_eteelo_app']['token'].'&Pays='.$_GET['Pays'].'" title="Activer"><i class="fa fa-check fa-fw" style="color: white"></i></a>';} ?><?php if($utilisateurs['Etat']!=1 && ($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2)){ ?><a style="width: 30px; border-radius: 0;" class="btn btn-danger card-btn" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet utilisateur?\n Toutes les informations concernant cet utilisateur seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_utilisateur.php?ID=<?php echo($utilisateurs['ID_Utilisateur']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&IMG=<?php echo($utilisateurs['Photo']) ?>&Pays=<?php if (isset($_GET['Pays']) && $_GET['Pays'] != '') {echo $_GET['Pays'];} ?>');alertify.success('Spprimé');}).set('oncancel',function(closeEvent){alertify.error('Annulé');}).set({title:'<?php echo $app_infos['Design_App']; ?>'},{labels:{ok:'Oui', cancel:'Non'}});" title="Supprimer"><i class="fa fa-trash" style="color: white"></i></a><?php }} ?>
 
 
 

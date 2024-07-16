@@ -265,6 +265,9 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
+					  <a class="dropdown-item gonow" href="#" ver="table_client.php">
+							Clients
+                        </a>
                         <a class="dropdown-item gonow" href="#" ver="table_make_batterie.php">
 							Make of Batteries
                         </a>
@@ -286,7 +289,7 @@
 						<!-- <a class="dropdown-item gonow" href="#" ver="afficher_table_matiere_new.php">
                           Table des matières (New)
                         </a> -->
-                       <a class="dropdown-item gonow" href="#" ver="table_utilisateur.php">
+                       <a class="dropdown-item gonow" href="#" ver="afficher_table_utilisateur.php">
                           Utilisateurs
                         </a>
                       </div>
