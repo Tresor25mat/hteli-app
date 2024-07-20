@@ -4,6 +4,7 @@
     $Token=$_POST['token'];
     $Province=htmlentities($_POST['Province']);
     $ID_Agent=htmlentities($_POST['ID_Agent']);
+    $Client=htmlentities($_POST['Client']);
     $Site_Name=Securite::bdd($_POST['Site_Name']);
     $Site_ID=htmlentities($_POST['Site_ID']);
     $Agent=Securite::bdd($_POST['Agent']);
@@ -19,8 +20,8 @@
                 $selects=$select->fetch();
                 $ID_Agent=$selects['ID_Agent'];
             }
-            $rs=$pdo->prepare("INSERT INTO site(ID_Prov, ID_Agent, Site_ID, Site_Name, Localisation, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
-            $params=array($Province, $ID_Agent, $Site_ID, $Site_Name, $Localisation, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
+            $rs=$pdo->prepare("INSERT INTO site(ID_Prov, ID_Agent, ID_Cient, Site_ID, Site_Name, Localisation, ID_Utilisateur) VALUES (?,?,?,?,?,?,?)");
+            $params=array($Province, $ID_Agent, $Client, $Site_ID, $Site_Name, $Localisation, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
             $rs->execute($params);
             echo "1";
         }

@@ -9,11 +9,17 @@
     if(isset($_GET['Province']) && $_GET['Province']!=''){
         $query.=" AND site.ID_Prov=".$_GET['Province'];
     }
+    if(isset($_GET['Client']) && $_GET['Client']!=''){
+        $query.=" AND site.ID_Cient=".$_GET['Client'];
+    }
     if(isset($_GET['siteName']) && $_GET['siteName']!=''){
         $query.=" AND UCASE(site.Site_Name) LIKE '%".strtoupper($_GET['siteName'])."%'";
     }
     if(isset($_GET['siteId']) && $_GET['siteId']!=''){
         $query.=" AND UCASE(site.Site_ID) LIKE '%".strtoupper($_GET['siteId'])."%'";
+    }
+    if($_SESSION['user_eteelo_app']['Statut']!='Admin'){
+        $query.=" AND province.ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays'];
     }
     $query.=" ORDER BY site.Site_ID, site.Site_Name";
     $req=$pdo->query($query);
@@ -30,6 +36,8 @@
     $query.=" LIMIT ".$depart.",".$totalparpage;
     $selection=$pdo->query($query);
     $liste_province=$pdo->query("SELECT * FROM province ORDER BY Design_Prov");
+    $list_country=$pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
+    $list_client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Nbr=0;
@@ -118,6 +126,7 @@
                                         <th>#</th>
                                         <th>Site ID & Name</th>
                                         <th>Province</th>
+                                        <th>Client</th>
                                         <th>FME Name</th>
                                         <th>Opérations</th>
                                     </tr>
@@ -126,16 +135,19 @@
     <?php while($selections=$selection->fetch()){
         $fme=$pdo->query("SELECT * FROM agent WHERE ID_Agent=".$selections['ID_Agent']);
         $fmes=$fme->fetch();
+        $client=$pdo->query("SELECT * FROM client WHERE ID_Cient=".$selections['ID_Cient']);
+        $clients=$client->fetch();
         $Nbr++; 
     ?>
         <tr class="odd gradeX" style="background: transparent;">
             <td style="width: 80px; "><center><?php echo sprintf('%02d', $Nbr); ?></center></td>
             <td><!-- <center> --><?php echo stripslashes($selections['Site_ID'].' - '.$selections['Site_Name']); ?></td>
             <td><!-- <center> --><?php echo stripslashes($selections['Design_Prov']); ?></td>
+            <td><!-- <center> --><?php echo stripslashes($clients['Design_Client']); ?></td>
             <td><!-- <center> --><?php echo stripslashes($fmes['Nom_Agent']); ?></td>
             <td><center>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
-                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Site']); ?>, <?php echo($selections['ID_Prov']); ?>, <?php echo($selections['ID_Agent']); ?>, '<?php echo (stripslashes($selections['Site_ID'])); ?>', '<?php echo ($selections['Site_Name']); ?>', '<?php echo (stripslashes($selections['Localisation'])); ?>', '<?php echo strtoupper(stripslashes($fmes['Nom_Agent'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Site']); ?>, <?php echo($selections['ID_Prov']); ?>, <?php echo($selections['ID_Agent']); ?>, '<?php echo (stripslashes($selections['Site_ID'])); ?>', '<?php echo ($selections['Site_Name']); ?>', '<?php echo (stripslashes($selections['Localisation'])); ?>', '<?php echo strtoupper(stripslashes($fmes['Nom_Agent'])); ?>', <?php echo($selections['ID_Cient']); ?>)" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php } if($_SESSION['user_eteelo_app']['ID_Statut']==1){ ?>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_site.php?ID=<?php echo($selections['ID_Site']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&Province=<?php if(isset($_GET['Province']) && $_GET['Province']!=''){echo $_GET['Province']; } ?>&siteName=<?php if(isset($_GET['siteName']) && $_GET['siteName']!=''){echo $_GET['siteName']; } ?>&siteId=<?php if(isset($_GET['siteId']) && $_GET['siteId']!=''){echo $_GET['siteId']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
@@ -215,8 +227,32 @@
                             <div class="col-lg-12">Province *</div>
                             <select name="liste_province" class="form-control" id="liste_province">
                                 <option value="">--</option>
+                                <?php if($_SESSION['user_eteelo_app']['Statut']!='Admin'){ ?>
                                 <?php while($liste_provinces=$liste_province->fetch()){ ?>
                                 <option value="<?php echo($liste_provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($liste_provinces['Design_Prov']))) ?></option>
+                                <?php }}else{ 
+                                  while($list_countries=$list_country->fetch()){
+                                    $liste_province=$pdo->query("SELECT * FROM province WHERE ID_Pays=".$list_countries['ID_Pays']." ORDER BY Design_Prov");
+                                    $Nombre=$liste_province->rowCount();
+                                    if($Nombre!=0){
+                                  ?>
+                                  <optgroup label="<?php echo(stripslashes($list_countries['Design_Pays'])); ?>">
+                                  <?php }
+                                   while($liste_provinces=$liste_province->fetch()){ ?>
+                                  <option value="<?php echo($liste_provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($liste_provinces['Design_Prov']))) ?></option>
+                                <?php }
+                                if($Nombre!=0){
+                                  ?>
+                                  </optgroup>
+                                  <?php }}} ?>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <div class="col-lg-12">Client *</div>
+                            <select name="list_client" class="form-control" id="list_client">
+                                <option value="">--</option>
+                                <?php while($list_clients=$list_client->fetch()){ ?>
+                                  <option value="<?php echo($list_clients['ID_Cient']) ?>"><?php echo(stripslashes($list_clients['Design_Client'])) ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -232,12 +268,12 @@
                             <div class="col-lg-12">FME Name </div>
                             <div class="col-lg-12"><input type="text" name="agent" id="agent" class="form-control" style="margin-top: 1%;" value=""></div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="col-lg-12">Localisation </div>
                             <div class="col-lg-12">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; margin-top: 5px; height: 37px"><i class="fa fa-map-marker"></i></span>
+                                        <span class="input-group-text" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; margin-top: 3px; height: 37px"><i class="fa fa-map-marker"></i></span>
                                     </div>
                                     <input type="text" name="localisation" id="localisation" class="form-control" style="margin-top: 1%;" value="">
                                 </div> 
@@ -293,7 +329,7 @@
   function fermerDialogue(){
         $("#ModalMod").modal('hide');
   }
-  function Function_Modifier(a, b, c, d, e, f, g){
+  function Function_Modifier(a, b, c, d, e, f, g, h){
       $("#ModalMod").modal('show');
       $('#ID_Site').val(a);
       $('#liste_province').val(b);
@@ -302,6 +338,7 @@
       $('#site_name').val(e);
       $('#agent').val(g);
       $('#localisation').val(f);
+      $('#list_client').val(h);
       $('#liste_province').focus();
   }
   $('#agent').autocomplete({source:function(request,response){
@@ -315,6 +352,11 @@
   });
   $('#liste_province').change(function(){
         if($('#liste_province').val()!=''){
+            $('#list_client').focus();
+        }
+  })
+  $('#list_client').change(function(){
+        if($('#list_client').val()!=''){
             $('#site_id').focus();
         }
   })
@@ -329,7 +371,7 @@
     });
 
     $('#enregistrer').click(function(){
-        if($('#liste_province').val()=='' || $('#site_id').val()=='' || $('#site_name').val()==''){
+        if($('#liste_province').val()=='' || $('#site_id').val()=='' || $('#site_name').val()=='' || $('#list_client').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
                 $('#liste_province').focus();
         }else{
@@ -339,7 +381,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Province:$('#liste_province').val(), Site_ID:$('#site_id').val(), Site_Name:$('#site_name').val(), ID_Agent:$('#ID_Agent').val(), Agent:$('#agent').val(), Localisation:$('#localisation').val(), token:$('#tok').val(), ID_Site:$('#ID_Site').val()},
+                        data: {Province:$('#liste_province').val(), Client:$('#list_client').val(), Site_ID:$('#site_id').val(), Site_Name:$('#site_name').val(), ID_Agent:$('#ID_Agent').val(), Agent:$('#agent').val(), Localisation:$('#localisation').val(), token:$('#tok').val(), ID_Site:$('#ID_Site').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");

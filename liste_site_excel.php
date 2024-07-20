@@ -9,6 +9,9 @@
     if(isset($_GET['Province']) && $_GET['Province']!=''){
         $query.=" AND site.ID_Prov=".$_GET['Province'];
     }
+    if(isset($_GET['Client']) && $_GET['Client']!=''){
+        $query.=" AND site.ID_Cient=".$_GET['Client'];
+    }
     if(isset($_GET['siteName']) && $_GET['siteName']!=''){
         $query.=" AND UCASE(site.Site_Name) LIKE '%".strtoupper($_GET['siteName'])."%'";
     }

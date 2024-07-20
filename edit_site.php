@@ -5,6 +5,7 @@
     $Province=htmlentities($_POST['Province']);
     $ID_Site=htmlentities($_POST['ID_Site']);
     $ID_Agent=htmlentities($_POST['ID_Agent']);
+    $Client=htmlentities($_POST['Client']);
     $Site_Name=Securite::bdd($_POST['Site_Name']);
     $Site_ID=htmlentities($_POST['Site_ID']);
     $Agent=Securite::bdd($_POST['Agent']);
@@ -16,8 +17,8 @@
             $selects=$select->fetch();
             $ID_Agent=$selects['ID_Agent'];
         }
-        $rs=$pdo->prepare("UPDATE site SET ID_Prov=?, ID_Agent=?, Site_ID=?, Site_Name=?, Localisation=? WHERE ID_Site=?");
-        $params=array($Province, $ID_Agent, $Site_ID, $Site_Name, $Localisation, $ID_Site);
+        $rs=$pdo->prepare("UPDATE site SET ID_Prov=?, ID_Agent=?, ID_Cient=?, Site_ID=?, Site_Name=?, Localisation=? WHERE ID_Site=?");
+        $params=array($Province, $ID_Agent, $Client, $Site_ID, $Site_Name, $Localisation, $ID_Site);
         $rs->execute($params);
         echo "1";
     }

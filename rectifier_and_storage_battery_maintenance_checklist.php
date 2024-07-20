@@ -6,6 +6,8 @@ $app_infos=$app_info->fetch();
 $ID_Rapport=$_GET['Rapport'];
 $req_rapport=$pdo->query("SELECT * FROM table_rapport_rectifier INNER JOIN table_rectifier_make ON table_rapport_rectifier.ID_Rectifier_Make=table_rectifier_make.ID_Rectifier_Make INNER JOIN table_rectifier_model ON table_rapport_rectifier.ID_Rectifier_Model=table_rectifier_model.ID_Rectifier_Model INNER JOIN table_make_batterie ON table_rapport_rectifier.ID_Make_Batterie=table_make_batterie.ID_Make_Batterie INNER JOIN site ON table_rapport_rectifier.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov INNER JOIN utilisateur ON table_rapport_rectifier.ID_Utilisateur=utilisateur.ID_Utilisateur WHERE table_rapport_rectifier.ID_Rapport=".$ID_Rapport);
 $rapports=$req_rapport->fetch();
+$client=$pdo->query("SELECT * FROM client WHERE ID_Cient=".$rapports['ID_Cient']);
+$clients=$client->fetch();
 $text=$pdo->query("SELECT * FROM questionnaire_rectifier WHERE ID_Rapport=".$rapports['ID_Rapport']);
 
 
@@ -80,7 +82,7 @@ $pdf->SetMargins(0, 0, 0, 0);
 $pdf->SetSubject(utf8_decode($app_infos['Design_App']." : RECTIFIER AND STORAGE BATTERY MAINTENANCE CHECKLIST"));
 $pdf->SetTitle(utf8_decode($app_infos['Design_App']." : RECTIFIER AND STORAGE BATTERY MAINTENANCE CHECKLIST"));
 $pdf->Image('images/PM04-1.jpg','0','0','210','295','');
-
+$pdf->Image('images/client/'.$clients['Logo'],'1','6','63','20','');
 
 $pdf->SetFont('Arial','B',10);
 $pdf->SetXY(24,50);
@@ -149,9 +151,12 @@ $pdf->MultiCell(170,5,utf8_decode(stripslashes($rapports['Description'])),0,'L')
 $pdf->SetFont('Arial','B',10);
 $pdf->AddPage('P','A4',0);
 $pdf->Image('images/PM04-2.jpg','0','0','210','295','');
+$pdf->Image('images/client/'.$clients['Logo'],'1','6','63','20','');
 $h=35;
 $pdf->SetXY(26,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': H - TELI')),0,'L');
+$pdf->SetXY(121,$h);
+$pdf->MultiCell(170,6,utf8_decode(stripslashes(': '.$clients['Design_Client'])),0,'L');
 $h=$h+9;
 $pdf->SetXY(21,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': '.$rapports['Prenom'].' '.$rapports['Nom'])),0,'L');

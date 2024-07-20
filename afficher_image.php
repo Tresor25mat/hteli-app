@@ -6,11 +6,13 @@
     }
     require_once('connexion.php');
     $ID=$_GET['ID'];
+    $req_rapport=$pdo->query("SELECT * FROM table_rapport_journalier INNER JOIN site ON table_rapport_journalier.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov WHERE table_rapport_journalier.ID_Rapport=".$ID);
+    $rapports=$req_rapport->fetch();
     if(isset($_GET['Titre']) && $_GET['Titre']!=''){
         $Titre=$_GET['Titre'];
         $table_stitre=$pdo->query("SELECT * FROM table_sous_titre INNER JOIN table_titre ON table_sous_titre.ID_Titre=table_titre.ID_Titre WHERE table_sous_titre.ID_Sous_Titre=".$Titre);
     }else{
-        $table_stitre=$pdo->query("SELECT * FROM table_sous_titre INNER JOIN table_titre ON table_sous_titre.ID_Titre=table_titre.ID_Titre");
+        $table_stitre=$pdo->query("SELECT * FROM table_sous_titre INNER JOIN table_titre ON table_sous_titre.ID_Titre=table_titre.ID_Titre WHERE table_titre.ID_Cient=".$rapports['ID_Cient']);
     }
     $table_stitres=$table_stitre->fetch();
     $photo=$pdo->query("SELECT * FROM table_photo_rapport INNER JOIN table_titre_rapport ON table_titre_rapport.ID_Titre_Rapport=table_photo_rapport.ID_Titre_Rapport WHERE table_titre_rapport.ID_Rapport=".$ID." AND table_titre_rapport.ID_Sous_Titre=".$table_stitres['ID_Sous_Titre']);

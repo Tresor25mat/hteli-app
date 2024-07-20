@@ -6,6 +6,8 @@ $app_infos=$app_info->fetch();
 $ID_Rapport=$_GET['Rapport'];
 $req_rapport=$pdo->query("SELECT * FROM table_rapport_mensuel_site INNER JOIN site ON table_rapport_mensuel_site.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov INNER JOIN utilisateur ON table_rapport_mensuel_site.ID_Utilisateur=utilisateur.ID_Utilisateur WHERE table_rapport_mensuel_site.ID_Rapport=".$ID_Rapport);
 $rapports=$req_rapport->fetch();
+$client=$pdo->query("SELECT * FROM client WHERE ID_Cient=".$rapports['ID_Cient']);
+$clients=$client->fetch();
 $text=$pdo->query("SELECT * FROM questionnaire_rapport_site WHERE ID_Rapport=".$rapports['ID_Rapport']);
 
 
@@ -80,6 +82,7 @@ $pdf->SetMargins(0, 0, 0, 0);
 $pdf->SetSubject(utf8_decode($app_infos['Design_App']." : MONTHLY  SITE INSPECTIONS CHECKLIST"));
 $pdf->SetTitle(utf8_decode($app_infos['Design_App']." : MONTHLY  SITE INSPECTIONS CHECKLIST"));
 $pdf->Image('images/PM03-1.jpg','0','0','210','295','');
+$pdf->Image('images/client/'.$clients['Logo'],'2','7','63','20','');
 
 
 $pdf->SetFont('Arial','B',10);
@@ -130,6 +133,7 @@ while ($texts=$text->fetch()){$nbr++;
         $h=42;
         $pdf->AddPage('P','A4',0);
         $pdf->Image('images/PM03-2.jpg','0','0','210','295','');
+        $pdf->Image('images/client/'.$clients['Logo'],'2','7','63','20','');
     }else{
         $h=$h+7;
     }
@@ -141,6 +145,8 @@ $pdf->SetFont('Arial','B',10);
 $h=$h+32;
 $pdf->SetXY(25,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': H - TELI')),0,'L');
+$pdf->SetXY(133,$h);
+$pdf->MultiCell(170,6,utf8_decode(stripslashes($clients['Design_Client'])),0,'L');
 $h=$h+9;
 $pdf->SetXY(20,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': '.$rapports['Prenom'].' '.$rapports['Nom'])),0,'L');

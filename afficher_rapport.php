@@ -8,7 +8,7 @@
     $ID=$_GET['ID'];
     $req_rapport=$pdo->query("SELECT * FROM table_rapport_journalier INNER JOIN site ON table_rapport_journalier.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov WHERE table_rapport_journalier.ID_Rapport=".$ID);
     $rapports=$req_rapport->fetch();
-    $titre=$pdo->query("SELECT * FROM table_titre ORDER BY Code_Titre");
+    $titre=$pdo->query("SELECT * FROM table_titre WHERE ID_Cient=".$rapports['ID_Cient']." ORDER BY Code_Titre");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>

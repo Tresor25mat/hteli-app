@@ -8,8 +8,9 @@
     $ID=$_GET['ID'];
     $req_rapport=$pdo->query("SELECT * FROM table_rapport_journalier INNER JOIN site ON table_rapport_journalier.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov WHERE table_rapport_journalier.ID_Rapport=".$ID);
     $rapports=$req_rapport->fetch();
-    $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov ORDER BY Design_Prov");
-    $titre=$pdo->query("SELECT * FROM table_titre ORDER BY ID_Titre");
+    $country=$pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
+    $client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
+    $titre=$pdo->query("SELECT * FROM table_titre WHERE ID_Cient=".$rapports['ID_Cient']." ORDER BY ID_Titre");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Numero_titre=0;
@@ -118,15 +119,57 @@
                                         <div class="form-group ">
                                           <label for="province" class="control-label col-lg-12" style="text-align: left;">Province *</label>
                                           <div class="col-lg-12">
-                                            <select name="province" id="province" class="form-control ">
-                                              <option value="">--</option>
-                                              <?php while($provinces=$province->fetch()){ 
-                                                if($prov!=$provinces['ID_Prov']){ 
-                                                  $prov=$provinces['ID_Prov'];
+                                          <?php if($_SESSION['user_eteelo_app']['Statut']!='Admin'){ 
+                                              $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays']." ORDER BY Design_Prov");
                                               ?>
-                                              <option value="<?php echo($provinces['ID_Prov']); ?>" <?php if($provinces['ID_Prov']==$rapports['ID_Prov']){echo 'selected';} ?>><?php echo strtoupper($provinces['Design_Prov']); ?></option>
-                                              <?php }} ?>
+                                            <select name="province" class="form-control" id="province">
+                                                <option value="">--</option>
+                                                <?php while($provinces=$province->fetch()){ 
+                                                    if($prov!=$provinces['ID_Prov']){ 
+                                                        $prov=$provinces['ID_Prov'];
+                                                  ?>
+                                                <option value="<?php echo($provinces['ID_Prov']) ?>" <?php if($provinces['ID_Prov']==$rapports['ID_Prov']){echo 'selected';} ?>><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                                <?php }} ?>
                                             </select>
+                                            <?php }else{ ?>
+                                            <select name="province" class="form-control" id="province">
+                                                <option value="">--</option>
+                                                <?php while($countries=$country->fetch()){ 
+                                                  $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$countries['ID_Pays']." ORDER BY Design_Prov");
+                                                  $Nombre=$province->rowCount();
+                                                  if($Nombre!=0){
+                                                ?>
+                                                <optgroup label="<?php echo(stripslashes($countries['Design_Pays'])); ?>">
+                                                <?php }
+                                                  while($provinces=$province->fetch()){ 
+                                                    if($prov!=$provinces['ID_Prov']){ 
+                                                        $prov=$provinces['ID_Prov'];
+                                                  ?>
+                                                <option value="<?php echo($provinces['ID_Prov']) ?>" <?php if($provinces['ID_Prov']==$rapports['ID_Prov']){echo 'selected';} ?>><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                                <?php }} 
+                                                if($Nombre!=0){
+                                                ?>
+                                                </optgroup>
+                                                <?php }} ?>
+                                            </select>
+                                            <?php } ?>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-3" style="margin-bottom: 5px;">
+                                        <div class="form-group ">
+                                          <label for="client" class="control-label col-lg-12" style="text-align: left;">Client *</label>
+                                          <div class="col-lg-12">
+                                            <div class="row">
+                                              <div class="col-sm-12">
+                                                  <select name="client" class="form-control" id="client">
+                                                      <option value="">--</option>
+                                                      <?php while($clients=$client->fetch()){ ?>
+                                                      <option value="<?php echo($clients['ID_Cient']) ?>" <?php if($clients['ID_Cient']==$rapports['ID_Cient']){echo 'selected';} ?>><?php echo(stripslashes(strtoupper($clients['Design_Client']))); ?></option>
+                                                      <?php } ?>
+                                                  </select>
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -192,7 +235,7 @@
                           </form>
                       </div>
                       <div class="tab-pane" id="tabs-home-13">
-                         <div class="row">
+                         <div class="row" id="contenu">
                             <?php while($titres=$titre->fetch()){ 
                                 $table_stitre=$pdo->query("SELECT * FROM table_sous_titre WHERE ID_Titre=".$titres['ID_Titre']);
                                 ?>
@@ -347,7 +390,7 @@
           url:"recherche_site.php",
           type:'post',
           dataType:"json",
-          data:{Province:$('#province').val()},
+          data:{Province:$('#province').val(), Client:$('#client').val()},
           success:function(donnee){
             listSites.length=0;
               $.map(donnee,function(objet){
@@ -400,7 +443,7 @@
         recheche_site();
     })
     $('#btn_next').click(function(){
-        if($('#province').val()=='' ||  $('#site').val()=='' || $('#noc_ticket').val()=='' || $('#date_rapport').val()=='' || $('#pm_type').val()=='' || $('#run_hour').val()=='' || $('#dc_load').val()==''){
+        if($('#province').val()=='' ||  $('#site').val()=='' || $('#noc_ticket').val()=='' || $('#date_rapport').val()=='' || $('#pm_type').val()=='' || $('#run_hour').val()=='' || $('#dc_load').val()=='' || $('#client').val()==''){
           alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
         }else{
                 // alertify.alert('Salut');
@@ -434,8 +477,22 @@
 
     $('#province').change(function(){
         if($('#province').val()!=''){
-            recheche_site();
-            $('#site').val('').focus();
+            $('#client').val('').focus();
+        }
+    })
+    $('#client').change(function(){
+        if($('#client').val()!=''){
+          $.ajax({
+            url:"page_contenu.php",
+            type:'post',
+            dataType:"text",
+            data:{Client:$('#client').val()},
+            success:function(retour){
+                $('#contenu').html(retour);
+                recheche_site();
+                $('#site').val('').focus();
+            }
+          });
         }
     })
 

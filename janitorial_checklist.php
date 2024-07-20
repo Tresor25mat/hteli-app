@@ -6,6 +6,8 @@ $app_infos=$app_info->fetch();
 $ID_Rapport=$_GET['Rapport'];
 $req_rapport=$pdo->query("SELECT * FROM table_rapport_janitorial INNER JOIN site ON table_rapport_janitorial.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov INNER JOIN type_site ON table_rapport_janitorial.ID_Type=type_site.ID_Type INNER JOIN utilisateur ON table_rapport_janitorial.ID_Utilisateur=utilisateur.ID_Utilisateur WHERE table_rapport_janitorial.ID_Rapport=".$ID_Rapport);
 $rapports=$req_rapport->fetch();
+$client=$pdo->query("SELECT * FROM client WHERE ID_Cient=".$rapports['ID_Cient']);
+$clients=$client->fetch();
 $text=$pdo->query("SELECT * FROM questionnaire_janitorial WHERE ID_Rapport=".$rapports['ID_Rapport']);
 
 
@@ -80,7 +82,7 @@ $pdf->SetMargins(0, 0, 0, 0);
 $pdf->SetSubject(utf8_decode($app_infos['Design_App']." : JANITORIALS, FACILITIES AND ALARMS CHECKLIST"));
 $pdf->SetTitle(utf8_decode($app_infos['Design_App']." : JANITORIALS, FACILITIES AND ALARMS CHECKLIST"));
 $pdf->Image('images/PM02-1.jpg','0','0','210','295','');
-
+$pdf->Image('images/client/'.$clients['Logo'],'10','3','55','17','');
 
 $pdf->SetFont('Arial','B',10);
 $pdf->SetXY(21,41);
@@ -128,6 +130,7 @@ while ($texts=$text->fetch()){$nbr++;
         $h=53;
         $pdf->AddPage('P','A4',0);
         $pdf->Image('images/PM02-2.jpg','0','0','210','295','');
+        $pdf->Image('images/client/'.$clients['Logo'],'10','3','55','17','');
         $pdf->SetFont('Arial','B',10);
         $pdf->SetXY(21,24);
         $pdf->MultiCell(70,5,utf8_decode($rapports['Site_ID']),0,'L');
@@ -159,6 +162,8 @@ $pdf->SetFont('Arial','B',10);
 $h=$h+24;
 $pdf->SetXY(23,$h);
 $pdf->MultiCell(170,6,utf8_decode(stripslashes(': H - TELI')),0,'L');
+$pdf->SetXY(126,$h);
+$pdf->MultiCell(170,6,utf8_decode(stripslashes($clients['Design_Client'])),0,'L');
 $h=$h+9;
 $pdf->SetXY(18,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': '.$rapports['Prenom'].' '.$rapports['Nom'])),0,'L');

@@ -5,7 +5,8 @@
         header("location: connection");
     }
     require_once('connexion.php');
-    $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov ORDER BY Design_Prov");
+    $country=$pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
+    $client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $prov="";
@@ -123,31 +124,74 @@
                           <div class="row" style="margin-bottom: 5px; border-bottom: 1px solid #EEEEEE;">
                                 <div class="col-md-12" style="margin-bottom: 5px">
                                     <div class="row">
-                                      <div class="col-md-4" style="margin-bottom: 5px;">
+                                    <div class="col-md-3" style="margin-bottom: 5px;">
                                         <div class="form-group ">
                                           <label for="province" class="control-label col-lg-12" style="text-align: left;">Province *</label>
                                           <div class="col-lg-12">
                                             <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                                            <select name="province" id="province" class="form-control ">
-                                              <option value="">--</option>
-                                              <?php while($provinces=$province->fetch()){ 
-                                                if($prov!=$provinces['ID_Prov']){ 
-                                                    $prov=$provinces['ID_Prov'];
+                                            <?php if($_SESSION['user_eteelo_app']['Statut']!='Admin'){ 
+                                              $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays']." ORDER BY Design_Prov");
                                               ?>
-                                              <option value="<?php echo($provinces['ID_Prov']); ?>"><?php echo strtoupper($provinces['Design_Prov']); ?></option>
-                                              <?php }} ?>
+                                            <select name="province" class="form-control" id="province">
+                                                <option value="">--</option>
+                                                <?php while($provinces=$province->fetch()){ 
+                                                    if($prov!=$provinces['ID_Prov']){ 
+                                                        $prov=$provinces['ID_Prov'];
+                                                  ?>
+                                                <option value="<?php echo($provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                                <?php }} ?>
                                             </select>
+                                            <?php }else{ ?>
+                                            <select name="province" class="form-control" id="province">
+                                                <option value="">--</option>
+                                                <?php while($countries=$country->fetch()){ 
+                                                  $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$countries['ID_Pays']." ORDER BY Design_Prov");
+                                                  $Nombre=$province->rowCount();
+                                                  if($Nombre!=0){
+                                                ?>
+                                                <optgroup label="<?php echo(stripslashes($countries['Design_Pays'])); ?>">
+                                                <?php }
+                                                  while($provinces=$province->fetch()){ 
+                                                    if($prov!=$provinces['ID_Prov']){ 
+                                                        $prov=$provinces['ID_Prov'];
+                                                  ?>
+                                                <option value="<?php echo($provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                                <?php }} 
+                                                if($Nombre!=0){
+                                                ?>
+                                                </optgroup>
+                                                <?php }} ?>
+                                            </select>
+                                            <?php } ?>
+
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 5px;">
+                                      <div class="col-md-3" style="margin-bottom: 5px;">
+                                        <div class="form-group ">
+                                          <label for="client" class="control-label col-lg-12" style="text-align: left;">Client *</label>
+                                          <div class="col-lg-12">
+                                            <div class="row">
+                                              <div class="col-sm-12">
+                                                  <select name="client" class="form-control" id="client">
+                                                      <option value="">--</option>
+                                                      <?php while($clients=$client->fetch()){ ?>
+                                                      <option value="<?php echo($clients['ID_Cient']) ?>"><?php echo(stripslashes(strtoupper($clients['Design_Client']))); ?></option>
+                                                      <?php } ?>
+                                                  </select>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-3" style="margin-bottom: 5px;">
                                         <div class="form-group ">
                                             <label for="site" class="control-label col-lg-12" style="text-align: left;">Site ID & Name *</label>
                                             <input type="text" name="site" id="site" class="form-control">
                                             <input type="hidden" name="ID_Site" id="ID_Site">
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                      <div class="col-md-3" style="margin-bottom: 5px">
                                         <div class="form-group ">
                                           <label for="num_ref" class="control-label col-lg-12" style="text-align: left;">Ref. No *</label>
                                           <div class="col-lg-12">
@@ -155,7 +199,7 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                      <div class="col-md-3" style="margin-bottom: 5px">
                                         <div class="form-group ">
                                           <label for="date_rapport" class="control-label col-lg-12" style="text-align: left;">Date *</label>
                                           <div class="col-lg-12">
@@ -164,7 +208,7 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                      <div class="col-md-3" style="margin-bottom: 5px">
                                         <div class="form-group ">
                                           <label for="time_in" class="control-label col-lg-12" style="text-align: left;">Time In *</label>
                                           <div class="col-lg-12">
@@ -172,7 +216,7 @@
                                           </div>
                                         </div>
                                       </div>
-                                      <div class="col-md-4" style="margin-bottom: 5px">
+                                      <div class="col-md-3" style="margin-bottom: 5px">
                                         <div class="form-group ">
                                           <label for="time_out" class="control-label col-lg-12" style="text-align: left;">Time Out *</label>
                                           <div class="col-lg-12">
@@ -858,7 +902,7 @@
           url:"recherche_site.php",
           type:'post',
           dataType:"json",
-          data:{Province:$('#province').val()},
+          data:{Province:$('#province').val(), Client:$('#client').val()},
           success:function(donnee){
             listSites.length=0;
               $.map(donnee,function(objet){
@@ -909,6 +953,11 @@
 
     $('#province').change(function(){
         if($('#province').val()!=''){
+            $('#client').val('').focus();
+        }
+    })
+    $('#client').change(function(){
+        if($('#client').val()!=''){
             recheche_site();
             $('#site').val('').focus();
         }
@@ -973,6 +1022,7 @@
     })
     $('#btn_annuler').click(function(){
         $('#province').val('').focus();
+        $('#client').val('');
         $('#site').val('');
         $('#ID_Site').val('');
         $('#num_ref').val('');
@@ -983,6 +1033,7 @@
         $('#description').val('');
         $('#a0').tab('show');
         $('#province').val('').focus();
+        $('#client').val('');
         $('#site').val('');
         $.ajax({
             url:'annuler_rapport_site.php',

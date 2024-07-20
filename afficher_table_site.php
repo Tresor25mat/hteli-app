@@ -5,8 +5,17 @@
         header("location: connexion");
     }
     require_once('connexion.php');
-    $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov ORDER BY Design_Prov");
-    $liste_province=$pdo->query("SELECT * FROM province ORDER BY Design_Prov");
+    $country=$pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
+    $list_country=$pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
+    $list_client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
+    if($_SESSION['user_eteelo_app']['Statut']=='Admin'){
+        // $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov ORDER BY Design_Prov");
+        $liste_province=$pdo->query("SELECT * FROM province ORDER BY Design_Prov");
+    }else{
+      $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays']." ORDER BY Design_Prov");
+      $liste_province=$pdo->query("SELECT * FROM province WHERE ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays']." ORDER BY Design_Prov");
+    }
+    $client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $prov="";
@@ -91,6 +100,7 @@
                         <div class="col-lg-12">
                           <div class="row">
                             <div class="col-sm-12">
+                                <?php if($_SESSION['user_eteelo_app']['Statut']!='Admin'){ ?>
                                 <select name="province" class="form-control" id="province">
                                     <option value="">--</option>
                                     <?php while($provinces=$province->fetch()){ 
@@ -100,12 +110,51 @@
                                     <option value="<?php echo($provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
                                     <?php }} ?>
                                 </select>
+                                <?php }else{ ?>
+                                <select name="province" class="form-control" id="province">
+                                    <option value="">--</option>
+                                    <?php while($countries=$country->fetch()){ 
+                                      $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$countries['ID_Pays']." ORDER BY Design_Prov");
+                                      $Nombre=$province->rowCount();
+                                      if($Nombre!=0){
+                                    ?>
+                                    <optgroup label="<?php echo(stripslashes($countries['Design_Pays'])); ?>">
+                                    <?php }
+                                      while($provinces=$province->fetch()){ 
+                                        if($prov!=$provinces['ID_Prov']){ 
+                                            $prov=$provinces['ID_Prov'];
+                                      ?>
+                                    <option value="<?php echo($provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                    <?php }} 
+                                    if($Nombre!=0){
+                                    ?>
+                                    </optgroup>
+                                    <?php }} ?>
+                                </select>
+                                <?php } ?>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div class="col-md-2">
+                      <div class="form-group ">
+                        <label for="client" class="control-label col-lg-12" style="text-align: left;">Client </label>
+                        <div class="col-lg-12">
+                          <div class="row">
+                            <div class="col-sm-12">
+                                <select name="client" class="form-control" id="client">
+                                    <option value="">--</option>
+                                    <?php while($clients=$client->fetch()){ ?>
+                                    <option value="<?php echo($clients['ID_Cient']) ?>"><?php echo(stripslashes(strtoupper($clients['Design_Client']))); ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-1">
                       <div class="form-group ">
                         <label for="siteName" class="control-label col-lg-12" style="text-align: left;">Site Name </label>
                         <div class="col-lg-12">
@@ -117,7 +166,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                       <div class="form-group ">
                         <label for="siteId" class="control-label col-lg-12" style="text-align: left;">Site ID </label>
                         <div class="col-lg-12">
@@ -170,8 +219,32 @@
                             <div class="col-lg-12">Province *</div>
                             <select name="liste_province" class="form-control" id="liste_province">
                                 <option value="">--</option>
+                                <?php if($_SESSION['user_eteelo_app']['Statut']!='Admin'){ ?>
                                 <?php while($liste_provinces=$liste_province->fetch()){ ?>
                                 <option value="<?php echo($liste_provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($liste_provinces['Design_Prov']))) ?></option>
+                                <?php }}else{ 
+                                  while($list_countries=$list_country->fetch()){
+                                    $liste_province=$pdo->query("SELECT * FROM province WHERE ID_Pays=".$list_countries['ID_Pays']." ORDER BY Design_Prov");
+                                    $Nombre=$liste_province->rowCount();
+                                    if($Nombre!=0){
+                                  ?>
+                                  <optgroup label="<?php echo(stripslashes($list_countries['Design_Pays'])); ?>">
+                                  <?php }
+                                   while($liste_provinces=$liste_province->fetch()){ ?>
+                                  <option value="<?php echo($liste_provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($liste_provinces['Design_Prov']))) ?></option>
+                                <?php }
+                                if($Nombre!=0){
+                                  ?>
+                                  </optgroup>
+                                  <?php }}} ?>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <div class="col-lg-12">Client *</div>
+                            <select name="list_client" class="form-control" id="list_client">
+                                <option value="">--</option>
+                                <?php while($list_clients=$list_client->fetch()){ ?>
+                                  <option value="<?php echo($list_clients['ID_Cient']) ?>"><?php echo(stripslashes($list_clients['Design_Client'])) ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -187,12 +260,12 @@
                             <div class="col-lg-12">FME Name </div>
                             <div class="col-lg-12"><input type="text" name="agent" id="agent" class="form-control" style="margin-top: 1%;" value=""></div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-6">
                             <div class="col-lg-12">Localisation </div>
                             <div class="col-lg-12">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; margin-top: 5px; height: 37px"><i class="fa fa-map-marker"></i></span>
+                                        <span class="input-group-text" style="border-top-right-radius: 0; border-bottom-right-radius: 0; border-right: none; margin-top: 3px; height: 37px"><i class="fa fa-map-marker"></i></span>
                                     </div>
                                     <input type="text" name="localisation" id="localisation" class="form-control" style="margin-top: 1%; height: 37px" value="">
                                 </div> 
@@ -244,7 +317,7 @@
     }
     $(document).ready(function() {
         actualiser_agent();
-        $('#iframe').attr('src', "table_site.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val());
+        $('#iframe').attr('src', "table_site.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val()+'&Client='+$('#client').val());
     });
     $('#agent').autocomplete({source:function(request,response){
         var resultat=$.ui.autocomplete.filter(listeAgent,request.term);
@@ -260,16 +333,26 @@
             $('#btn_afficher').focus();
         }
     })
+    $('#client').change(function(){
+        if($('#client').val()!=''){
+            $('#btn_afficher').focus();
+        }
+    })
     $('#liste_province').change(function(){
         if($('#liste_province').val()!=''){
+            $('#list_client').focus();
+        }
+    })
+    $('#list_client').change(function(){
+        if($('#list_client').val()!=''){
             $('#site_id').focus();
         }
     })
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_site.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val());
+        $('#iframe').attr('src', "table_site.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val()+'&Client='+$('#client').val());
     })
     $('#btn_exporter').click(function(){
-        $('#iframe').attr('src', "liste_site_excel.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val());
+        $('#iframe').attr('src', "liste_site_excel.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val()+'&Client='+$('#client').val());
 })
     function fermerDialogue(){
         $("#ModalAjout").modal('hide');
@@ -289,12 +372,13 @@
       $('#ID_Agent').val('');
       $('#site_id').val('');
       $('#site_name').val('');
+      $('#list_client').val('');
       $('#agent').val('');
       $('#localisation').val('');
       $('#liste_province').focus();
     })
     $('#enregistrer').click(function(){
-        if($('#liste_province').val()=='' || $('#site_id').val()=='' || $('#site_name').val()==''){
+        if($('#liste_province').val()=='' || $('#site_id').val()=='' || $('#site_name').val()=='' || $('#list_client').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
                 $('#liste_province').focus();
         }else{
@@ -304,7 +388,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Province:$('#liste_province').val(), Site_ID:$('#site_id').val(), Site_Name:$('#site_name').val(), ID_Agent:$('#ID_Agent').val(), Agent:$('#agent').val(), Localisation:$('#localisation').val(), token:$('#tok').val()},
+                        data: {Province:$('#liste_province').val(), Client:$('#list_client').val(), Site_ID:$('#site_id').val(), Site_Name:$('#site_name').val(), ID_Agent:$('#ID_Agent').val(), Agent:$('#agent').val(), Localisation:$('#localisation').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -312,7 +396,7 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                $('#iframe').attr('src', "table_site.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val());
+                                $('#iframe').attr('src', "table_site.php?Province="+$('#province').val()+'&siteName='+$('#siteName').val()+'&siteId='+$('#siteId').val()+'&Client='+$('#client').val());
                                 fermerDialogue();
                                 actualiser_agent();
                             }else if(ret==2){

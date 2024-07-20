@@ -9,6 +9,9 @@
     if(isset($_GET['titleName']) && $_GET['titleName']!=''){
         $query.=" AND UCASE(Design_Titre) LIKE '%".strtoupper($_GET['titleName'])."%'";
     }
+    if(isset($_GET['Client']) && $_GET['Client']!=''){
+        $query.=" AND ID_Cient=".$_GET['Client'];
+    }
     $query.=" ORDER BY Code_Titre";
     $req=$pdo->query($query);
     $Total=$req->rowCount();
@@ -23,6 +26,7 @@
     $depart=($pageCourante-1)*$totalparpage;
     $query.=" LIMIT ".$depart.",".$totalparpage;
     $selection=$pdo->query($query);
+    $list_client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -97,6 +101,7 @@
         <div class="page-body">
           <div class="container-xl" style="border: 1px solid #E6E7E9">
             <div class="row row-deck row-cards">
+            <input type="hidden" name="client" id="client" value="<?php if(isset($_GET['Client']) && $_GET['Client']!=''){echo $_GET['Client']; } ?>">
             <input type="hidden" name="ID_Titre" id="ID_Titre">
             <input type="hidden" name="ID_STitre" id="ID_STitre">
             <input type="hidden" name="titleName" id="titleName" value="<?php if(isset($_GET['titleName']) && $_GET['titleName']!=''){echo $_GET['titleName']; } ?>">
@@ -123,7 +128,7 @@
             <td style="padding-left: 120px; ">
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1 || $_SESSION['user_eteelo_app']['ID_Statut']==2){ ?>
                 <a href="#" onclick="Function_Ajouter(<?php echo($selections['ID_Titre']); ?>)" title="Ajouter un sous-titre" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-success"><i class="fa fa-plus fa-fw"></i></a>
-                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Titre']); ?>, '<?php echo (stripslashes($selections['Design_Titre'])); ?>')" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
+                <a href="#" onclick="Function_Modifier(<?php echo($selections['ID_Titre']); ?>, '<?php echo (stripslashes($selections['Design_Titre'])); ?>', <?php echo($selections['ID_Cient']); ?>)" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php } if($_SESSION['user_eteelo_app']['ID_Statut']==1){ ?>
                 <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_titre.php?ID=<?php echo($selections['ID_Titre']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&titleName=<?php if(isset($_GET['titleName']) && $_GET['titleName']!=''){echo $_GET['titleName']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a>
                 <?php } ?>
@@ -150,7 +155,7 @@
                                 <?php 
                                 if($pageCourante>1){
                                     $page=$pageCourante-1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$page.'&titleName='.$_GET['titleName'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$page.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>Previous</a></li>';
                                 }
@@ -161,28 +166,28 @@
                                     $pageAvantPrecedente=$pageCourante-2;
                                     $pagesAvantTotales=$pagesTotales-1;
                                     if($pageCourante==1){
-                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageTrois.'&titleName='.$_GET['titleName'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageTrois.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pageTrois.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==2){
-                                        echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>';
                                     }else if($pageCourante==$pagesAvantTotales){
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'">'.$pageNexte.'</a></li>';
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pageNexte.'</a></li>';
                                     }else if($pageCourante==$pagesTotales){
-                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageAvantPrecedente.'&titleName='.$_GET['titleName'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageAvantPrecedente.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pageAvantPrecedente.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li>';
                                     }else{
-                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
+                                        echo '<li class="page-item"><a class="page-link" href="#">...</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pagePrecedente.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pagePrecedente.'</a></li><li class="page-item active"><a class="page-link" href="#">'.$pageCourante.'</a></li><li class="page-item"><a class="page-link" href="table_matiere.php?page='.$pageNexte.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$pageNexte.'</a></li><li class="page-item"><a class="page-link" href="#">...</a></li>'; 
                                     }
                                 }else{
                                     for ($i=1; $i <= $pagesTotales ; $i++) { 
                                         if ($i==$pageCourante) {
                                             echo '<li class="page-item active"><a class="page-link" href="#">'.$i.'</a></li>';
                                         }else{
-                                            echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$i.'&titleName='.$_GET['titleName'].'">'.$i.'</a></li>';
+                                            echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$i.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">'.$i.'</a></li>';
                                         }
                                     } 
                                 }
                                 if($pagesTotales>$pageCourante){
                                     $page=$pageCourante+1;
-                                    echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$page.'&titleName='.$_GET['titleName'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
+                                    echo '<li class="page-item"><a class="page-link" href="table_matiere.php?page='.$page.'&titleName='.$_GET['titleName'].'&Client='.$_GET['Client'].'">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }else{
                                     echo '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg></a></li>';
                                 }
@@ -211,6 +216,17 @@
                    <form method="post" action="">
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                     <div class="row">
+                        <div class="col-12">
+                            <div class="col-lg-12">Client *</div>
+                            <div class="col-lg-12">
+                                <select name="list_client" class="form-control" id="list_client">
+                                    <option value="">--</option>
+                                    <?php while($list_clients=$list_client->fetch()){ ?>
+                                    <option value="<?php echo($list_clients['ID_Cient']) ?>"><?php echo(stripslashes(strtoupper($list_clients['Design_Client']))); ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="col-lg-12">Désignation *</div>
                             <div class="col-lg-12">
@@ -359,12 +375,17 @@
       $('#NombrePhotoMod').val(d)
       $('#designSTitreMod').val(c).focus();
   }
-  function Function_Modifier(a, b){
+  function Function_Modifier(a, b, c){
       $("#ModalModTitre").modal('show');
       $('#ID_Titre').val(a);
+      $('#list_client').val(c);
       $('#designTitre').val(b).focus();
   }
-
+  $('#list_client').change(function(){
+        if($('#list_client').val()!=''){
+            $('#designTitre').focus();
+        }
+    })
   $(function() {
     const Toast = Swal.mixin({
       toast: true,
@@ -374,7 +395,7 @@
     });
 
     $('#enregistrertitre').click(function(){
-        if($('#designTitre').val()==''){
+        if($('#designTitre').val()=='' || $('#list_client').val()==''){
                 alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez saisir le titre svp!');
                 $('#designTitre').focus();
         }else{
@@ -384,7 +405,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#designTitre').val(), token:$('#tok').val(), ID_Titre:$('#ID_Titre').val()},
+                        data: {Design:$('#designTitre').val(), Client:$('#list_client').val(), token:$('#tok').val(), ID_Titre:$('#ID_Titre').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -392,7 +413,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_matiere.php?titleName='+$('#titleName').val());
+                                window.location.replace('table_matiere.php?titleName='+$('#titleName').val()+'&Client='+$('#client').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{
@@ -421,7 +442,7 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                window.location.replace('table_matiere.php?titleName='+$('#titleName').val());
+                                window.location.replace('table_matiere.php?titleName='+$('#titleName').val()+'&Client='+$('#client').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{
@@ -450,7 +471,7 @@
                                     icon: 'success',
                                     title: 'Modification éffectuée'
                                 })
-                                window.location.replace('table_matiere.php?titleName='+$('#titleName').val());
+                                window.location.replace('table_matiere.php?titleName='+$('#titleName').val()+'&Client='+$('#client').val());
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Cette désignation existe déjà'); 
                             }else{

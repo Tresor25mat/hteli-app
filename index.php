@@ -265,9 +265,11 @@
                   <div class="dropdown-menu">
                     <div class="dropdown-menu-columns">
                       <div class="dropdown-menu-column">
-					  <a class="dropdown-item gonow" href="#" ver="table_client.php">
+					  <?php if($_SESSION['user_eteelo_app']['Statut']=='Admin'){ ?>
+					  	<a class="dropdown-item gonow" href="#" ver="table_client.php">
 							Clients
                         </a>
+						<?php } ?>
                         <a class="dropdown-item gonow" href="#" ver="table_make_batterie.php">
 							Make of Batteries
                         </a>

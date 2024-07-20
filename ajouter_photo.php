@@ -11,7 +11,7 @@
     $rapports=$req_rapport->fetch();
     $province=$pdo->query("SELECT * FROM province ORDER BY Design_Prov");
     $table_dc=$pdo->query("SELECT * FROM table_dc_load ORDER BY Design_Dc");
-    $titre=$pdo->query("SELECT * FROM table_titre ORDER BY ID_Titre");
+    $titre=$pdo->query("SELECT * FROM table_titre WHERE ID_Cient=".$rapports['ID_Cient']." ORDER BY ID_Titre");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
     $Numero_titre=0;

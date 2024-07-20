@@ -6,6 +6,8 @@ $app_infos=$app_info->fetch();
 $ID_Rapport=$_GET['Rapport'];
 $req_rapport=$pdo->query("SELECT * FROM table_rapport_mensuel_tour INNER JOIN site ON table_rapport_mensuel_tour.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov INNER JOIN table_tower_type ON table_rapport_mensuel_tour.ID_Tower_Type=table_tower_type.ID_Tower_Type INNER JOIN utilisateur ON table_rapport_mensuel_tour.ID_Utilisateur=utilisateur.ID_Utilisateur WHERE table_rapport_mensuel_tour.ID_Rapport=".$ID_Rapport);
 $rapports=$req_rapport->fetch();
+$client=$pdo->query("SELECT * FROM client WHERE ID_Cient=".$rapports['ID_Cient']);
+$clients=$client->fetch();
 $text=$pdo->query("SELECT * FROM questionnaire_rapport_tour WHERE ID_Rapport=".$rapports['ID_Rapport']);
 $texts=$text->fetch();
 
@@ -80,6 +82,7 @@ $pdf->AddPage('P','A4',0);
 $pdf->SetSubject(utf8_decode($app_infos['Design_App']." : MONTHLY TOWER INSPECTION CHECKLIST"));
 $pdf->SetTitle(utf8_decode($app_infos['Design_App']." : MONTHLY TOWER INSPECTION CHECKLIST"));
 $pdf->Image('images/background.jpg','0','0','210','295','');
+$pdf->Image('images/client/'.$clients['Logo'],'2','7','63','20','');
 
 $pdf->SetFont('Arial','B',10);
 $pdf->SetXY(23,49);
@@ -132,6 +135,8 @@ $pdf->SetFont('Arial','B',10);
 $h=$h+32;
 $pdf->SetXY(25,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': H - TELI')),0,'L');
+$pdf->SetXY(124,$h);
+$pdf->MultiCell(170,6,utf8_decode(stripslashes($clients['Design_Client'])),0,'L');
 $h=$h+9;
 $pdf->SetXY(20,$h);
 $pdf->MultiCell(170,5,utf8_decode(stripslashes(': '.$rapports['Prenom'].' '.$rapports['Nom'])),0,'L');

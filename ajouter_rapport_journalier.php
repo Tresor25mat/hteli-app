@@ -5,13 +5,10 @@
         header("location: connection");
     }
     require_once('connexion.php');
-    $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov ORDER BY Design_Prov");
-    $titre=$pdo->query("SELECT * FROM table_titre ORDER BY ID_Titre");
+    $country=$pdo->query("SELECT * FROM pays ORDER BY Design_Pays");
+    $client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
-    $Numero_titre=0;
-    $Numero_stitre=0;
-    $Nombre_Total=0;
     $prov="";
 ?>
 <!DOCTYPE html>
@@ -132,15 +129,58 @@
                                           <label for="province" class="control-label col-lg-12" style="text-align: left;">Province *</label>
                                           <div class="col-lg-12">
                                             <input id="token" type="hidden" name="token" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                                            <select name="province" id="province" class="form-control ">
-                                              <option value="">--</option>
-                                              <?php while($provinces=$province->fetch()){ 
-                                                if($prov!=$provinces['ID_Prov']){ 
-                                                    $prov=$provinces['ID_Prov'];
+                                            <?php if($_SESSION['user_eteelo_app']['Statut']!='Admin'){ 
+                                              $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$_SESSION['user_eteelo_app']['ID_Pays']." ORDER BY Design_Prov");
                                               ?>
-                                              <option value="<?php echo($provinces['ID_Prov']); ?>"><?php echo strtoupper($provinces['Design_Prov']); ?></option>
-                                              <?php }} ?>
+                                            <select name="province" class="form-control" id="province">
+                                                <option value="">--</option>
+                                                <?php while($provinces=$province->fetch()){ 
+                                                    if($prov!=$provinces['ID_Prov']){ 
+                                                        $prov=$provinces['ID_Prov'];
+                                                  ?>
+                                                <option value="<?php echo($provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                                <?php }} ?>
                                             </select>
+                                            <?php }else{ ?>
+                                            <select name="province" class="form-control" id="province">
+                                                <option value="">--</option>
+                                                <?php while($countries=$country->fetch()){ 
+                                                  $province=$pdo->query("SELECT * FROM province INNER JOIN site ON province.ID_Prov=site.ID_Prov WHERE province.ID_Pays=".$countries['ID_Pays']." ORDER BY Design_Prov");
+                                                  $Nombre=$province->rowCount();
+                                                  if($Nombre!=0){
+                                                ?>
+                                                <optgroup label="<?php echo(stripslashes($countries['Design_Pays'])); ?>">
+                                                <?php }
+                                                  while($provinces=$province->fetch()){ 
+                                                    if($prov!=$provinces['ID_Prov']){ 
+                                                        $prov=$provinces['ID_Prov'];
+                                                  ?>
+                                                <option value="<?php echo($provinces['ID_Prov']) ?>"><?php echo(stripslashes(strtoupper($provinces['Design_Prov']))); ?></option>
+                                                <?php }} 
+                                                if($Nombre!=0){
+                                                ?>
+                                                </optgroup>
+                                                <?php }} ?>
+                                            </select>
+                                            <?php } ?>
+
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="col-md-3" style="margin-bottom: 5px;">
+                                        <div class="form-group ">
+                                          <label for="client" class="control-label col-lg-12" style="text-align: left;">Client *</label>
+                                          <div class="col-lg-12">
+                                            <div class="row">
+                                              <div class="col-sm-12">
+                                                  <select name="client" class="form-control" id="client">
+                                                      <option value="">--</option>
+                                                      <?php while($clients=$client->fetch()){ ?>
+                                                      <option value="<?php echo($clients['ID_Cient']) ?>"><?php echo(stripslashes(strtoupper($clients['Design_Client']))); ?></option>
+                                                      <?php } ?>
+                                                  </select>
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -206,52 +246,8 @@
                           </form>
                       </div>
                       <div class="tab-pane" id="tabs-home-13">
-                         <div class="row">
-                            <?php while($titres=$titre->fetch()){ 
-                                $table_stitre=$pdo->query("SELECT * FROM table_sous_titre WHERE ID_Titre=".$titres['ID_Titre']);
-                                ?>
-                            <div class="col-12" style="text-align: center">
-                                    <span style="font-weight: bold;"><?php echo stripslashes(strtoupper($titres['Code_Titre'].'. '.$titres['Design_Titre'])); ?></span>
-                                    <div class="row">
-                                        <?php while($table_stitres=$table_stitre->fetch()){
-                                            $Nombre=1;
-                                            $Numero_titre=$titres['Code_Titre'];
-                                            $Numero_stitre=$table_stitres['Code_Sous_Titre'];
-                                            ?>
-                                        <div class="col-12" style="text-align: center; border-top: 1px solid #E6E7E9; padding-top: 10px; margin-top: 10px">
-                                            <span><?php echo stripslashes(strtoupper($titres['Code_Titre'].'.'.$table_stitres['Code_Sous_Titre'].'. '.$table_stitres['Design_Sous_Titre'])); ?></span>
-                                            <div class="row">
-                                            <?php while($Nombre<=$table_stitres['Nombre_Photo']){$Nombre++; $Nombre_Total++; ?>
-                                                <div class="col-sm-3" style="border-top: 1px solid #E6E7E9; padding-top: 10px; margin-top: 10px; margin-bottom: 5px">
-                                                  <form class="PicturesForm" id="PicturesForm_<?php echo $Nombre_Total; ?>" method="post" action="" enctype="multipart/form-data">
-                                                    <input type="hidden" name="ID_Rapport_<?php echo $Nombre_Total; ?>" class="ID_Rapport">
-                                                    <input id="token_<?php echo $Nombre_Total; ?>" type="hidden" name="token_<?php echo $Nombre_Total; ?>" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
-                                                    <input type="hidden" class="ID_Titre" name="ID_Titre_<?php echo $Nombre_Total; ?>" id="ID_Titre" value="<?php echo $table_stitres['ID_Sous_Titre']; ?>">
-                                                    <input class="form-control fichier_image" id="fichier_image_<?php echo $Nombre_Total; ?>" type="file" name="fichier_image_<?php echo $Nombre_Total; ?>" style="display: none;" accept=".jpg, .jpeg, .png">
-                                                    <div style="border: 2px solid RGB(234,234,234); height: 200px">
-                                                        <input type="hidden" name="Indice" value="<?php echo $Nombre_Total; ?>">
-                                                        <a href="#" class="btn_choisir_image" id="mapercu_<?php echo $Nombre_Total; ?>" indice="<?php echo $Nombre_Total; ?>" title="Choisir l'image">
-                                                        <img src="images/picture.png" style="height: 180px; margin-top: 10px" id="miamge_<?php echo $Nombre_Total; ?>" class="miamge">
-                                                        </a>
-                                                    </div>
-                                                  <input id="btn_submit_<?php echo $Nombre_Total; ?>" type="submit" name="btn_submit_<?php echo $Nombre_Total; ?>" value="btn_submit_<?php echo $Nombre_Total; ?>" style="display: none">
-                                                  </form>
-                                                </div>
-                                                <?php } ?>
-                                            </div>
-                                        </div>
-                                        <?php } ?>
-                                    </div>
-                            </div>
-                            <?php } ?>
-                            <div class="col-12" style="text-align: center; border-top: 1px solid #E6E7E9; padding-top: 10px; margin-top: 10px">
-                                <span><?php echo $Numero_titre.'.'.($Numero_stitre+1).'. '; ?>ISSUE</span>
-                            <div class="row">
-                                <div class="col-12" style="text-align: center; border-top: 1px solid #E6E7E9; padding-top: 10px; margin-top: 10px">
-                                    <textarea name="description" class="form-control" id="description" cols="30" rows="6"></textarea>
-                                </div>
-                            </div>
-                            </div>
+                         <div class="row" id="contenu">
+
                          </div>
                          <div class="row" style="margin-top: 10px; padding-bottom: 10px">
                                             <div class="col-lg-12">
@@ -359,7 +355,7 @@
           url:"recherche_site.php",
           type:'post',
           dataType:"json",
-          data:{Province:$('#province').val()},
+          data:{Province:$('#province').val(), Client:$('#client').val()},
           success:function(donnee){
             listSites.length=0;
               $.map(donnee,function(objet){
@@ -412,7 +408,7 @@
         
     })
     $('#btn_next').click(function(){
-        if($('#province').val()=='' ||  $('#site').val()=='' || $('#noc_ticket').val()=='' || $('#date_rapport').val()=='' || $('#pm_type').val()=='' || $('#run_hour').val()=='' || $('#dc_load').val()==''){
+        if($('#province').val()=='' ||  $('#site').val()=='' || $('#noc_ticket').val()=='' || $('#date_rapport').val()=='' || $('#pm_type').val()=='' || $('#run_hour').val()=='' || $('#dc_load').val()=='' || $('#client').val()==''){
           alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
         }else{
                 // alertify.alert('Salut');
@@ -447,8 +443,22 @@
 
     $('#province').change(function(){
         if($('#province').val()!=''){
-            recheche_site();
-            $('#site').val('').focus();
+            $('#client').val('').focus();
+        }
+    })
+    $('#client').change(function(){
+        if($('#client').val()!=''){
+          $.ajax({
+            url:"page_contenu.php",
+            type:'post',
+            dataType:"text",
+            data:{Client:$('#client').val()},
+            success:function(retour){
+                $('#contenu').html(retour);
+                recheche_site();
+                $('#site').val('').focus();
+            }
+          });
         }
     })
 
@@ -460,49 +470,6 @@
       showConfirmButton: false,
       timer: 5000
     });
-
-
-    $('.PicturesForm').submit(function(e){
-            e.preventDefault();
-            var formData = new FormData(this);
-            $.ajax({
-                    url:'enreg_picture.php',
-                    type:'post',
-                    beforeSend:function(){
-                        waitingDialog.show('Veuillez patienter svp!');
-                    },
-                    dataType:'text',
-                    data: formData,
-                    processData: false,
-                    cache: false,
-                    contentType: false,
-                    success:function(retour){
-                        const stret = retour;
-                        const valeuret = stret.split(',');
-                        waitingDialog.hide();
-                        if(valeuret[0]==2){
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>',"L'extension de l'image ne correspond pas!");
-                            $('#fichier_image_'+idimg).val('');
-                            $('#'+idimg).attr('src', 'images/picture.png');
-                        }else if(valeuret[0]==3){
-                            alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Le téléchargement de l'image a échoué!");
-                            $('#fichier_image_'+idimg).val('');
-                            $('#'+idimg).attr('src', 'images/picture.png');
-                        }else if(valeuret[0]==1){
-                            $('#'+idimg).attr('src', images);
-                            Toast.fire({
-                                icon: 'success',
-                                title: 'Upload éffectué'
-                            })
-                        }else{
-                            alertify.alert(retour);
-                            $('#fichier_image_'+idimg).val('');
-                            $('#'+idimg).attr('src', 'images/picture.png');
-                        }
-                    }
-                });
-          })
-
 
 
         $('#btn_enregistrer').click(function(){
@@ -546,6 +513,7 @@
     $('#btn_annuler').click(function(){
         $('#province').val('').focus();
         $('#site').val('');
+        $('#client').val('');
         $('#ID_Site').val('');
         $('#dc_load').val('');
         $('#noc_ticket').val('');
@@ -556,6 +524,7 @@
         $('.fichier_image').val('');
         $('.miamge').attr('src', 'images/picture.png');
         $('#description').val('');
+        $('#client').val('');
         $('#a0').tab('show');
         $('#province').val('').focus();
         $('#site').val('');

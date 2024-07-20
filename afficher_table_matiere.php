@@ -5,6 +5,8 @@
         header("location: connexion");
     }
     require_once('connexion.php');
+    $client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
+    $list_client=$pdo->query("SELECT * FROM client ORDER BY Design_Client");
     $app_info=$pdo->query("SELECT * FROM app_infos");
     $app_infos=$app_info->fetch();
 ?>
@@ -76,7 +78,24 @@
               <!-- Page title actions -->
               <div class="col-12">
                 <div class="row" style="border-bottom: 1px solid #EEEEEE; padding-bottom: 20px">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                      <div class="form-group ">
+                        <label for="client" class="control-label col-lg-12" style="text-align: left;">Client </label>
+                        <div class="col-lg-12">
+                          <div class="row">
+                            <div class="col-sm-12">
+                                <select name="client" class="form-control" id="client">
+                                    <option value="">--</option>
+                                    <?php while($clients=$client->fetch()){ ?>
+                                    <option value="<?php echo($clients['ID_Cient']) ?>"><?php echo(stripslashes(strtoupper($clients['Design_Client']))); ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-2">
                       <div class="form-group ">
                         <label for="classe" class="control-label col-lg-12" style="text-align: left;"> </label>
                         <div class="col-lg-12">
@@ -122,6 +141,17 @@
                     <input id="tok" type="hidden" name="tok" value="<?php echo($_SESSION['user_eteelo_app']['token']); ?>">
                     <div class="row">
                         <div class="col-12">
+                            <div class="col-lg-12">Client *</div>
+                            <div class="col-lg-12">
+                                <select name="list_client" class="form-control" id="list_client">
+                                    <option value="">--</option>
+                                    <?php while($list_clients=$list_client->fetch()){ ?>
+                                    <option value="<?php echo($list_clients['ID_Cient']) ?>"><?php echo(stripslashes(strtoupper($list_clients['Design_Client']))); ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
                             <div class="col-lg-12">Désignation *</div>
                             <div class="col-lg-12">
                                 <!-- <div class="input-group">
@@ -160,14 +190,24 @@
 
     <script>
     $(document).ready(function() {
-        $('#iframe').attr('src', "table_matiere.php?titleName="+$('#titleName').val());
+        $('#iframe').attr('src', "table_matiere.php?titleName="+$('#titleName').val()+'&Client='+$('#client').val());
     });
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_matiere.php?titleName="+$('#titleName').val());
+        $('#iframe').attr('src', "table_matiere.php?titleName="+$('#titleName').val()+'&Client='+$('#client').val());
     })
     function fermerDialogue(){
         $("#ModalAjout").modal('hide');
     }
+    $('#client').change(function(){
+        if($('#client').val()!=''){
+            $('#btn_afficher').focus();
+        }
+    })
+    $('#list_client').change(function(){
+        if($('#list_client').val()!=''){
+            $('#designTitre').focus();
+        }
+    })
   $(function() {
     const Toast = Swal.mixin({
       toast: true,
@@ -182,8 +222,8 @@
       $('#designTitre').val('').focus();
     })
     $('#enregistrer').click(function(){
-        if($('#designTitre').val()==''){
-                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez saisir le titre svp!');
+        if($('#designTitre').val()=='' || $('#list_client').val()==''){
+                alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!');
                 $('#designTitre').focus();
         }else{
                 $.ajax({
@@ -192,7 +232,7 @@
                         beforeSend:function(){
                         },
                         dataType:'text',
-                        data: {Design:$('#designTitre').val(), token:$('#tok').val()},
+                        data: {Design:$('#designTitre').val(), Client:$('#list_client').val(), token:$('#tok').val()},
                         success:function(ret){
                             if(ret==1){
                                 alertify.success("L'opération a réussi");
@@ -200,7 +240,7 @@
                                     icon: 'success',
                                     title: 'Enregistrement éffectué'
                                 })
-                                $('#iframe').attr('src', "table_matiere.php?titleName="+$('#titleName').val());
+                                $('#iframe').attr('src', "table_matiere.php?titleName="+$('#titleName').val()+'&Client='+$('#client').val());
                                 fermerDialogue();
                             }else if(ret==2){
                                 alertify.alert('<?php echo $app_infos['Design_App']; ?>', 'Ce titre existe déjà'); 
