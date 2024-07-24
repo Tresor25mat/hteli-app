@@ -53,6 +53,9 @@
         z-index: 10000;
         width: 200px
       }
+      #link_piece_jointe:hover {
+        opacity: 0.7;
+      }
   </style>
 </head>
 
@@ -259,13 +262,29 @@
                                           </div>
                                         </div>
                                       </div>
+                                      <div class="row" style="margin-bottom: 10px; border-top: 1px solid #EEEEEE; margin-top: 10px; padding-top: 10px;">
+                                        <div class="col-md-12" style="text-align: center">
+                                          <h4>Pièce jointe</h4>
+                                        </div>
+                                        <div class="col-md-12" style="justify-content: center; align-items: center; display: flex">
+                                        <input class="form-control " id="fichier" type="file" name="fichier" style="display: none;" accept=".jpg, .jpeg, .png, .pdf, .doc, .docx, .xls, .xlsx">
+                                        <div style="width: 90px; height: 90px; border: 2px solid RGB(234,234,234); border-radius: 5px; justify-content: center; align-items: center; display: flex">
+                                            <a href="#" class="link_piece_jointe" id="link_piece_jointe" title="Joindre un fichier">
+                                                <img src="images/piece_jointe.png" id="img_piece_jointe" class="img_piece_jointe" style="border-radius: 2px; height: 70px">
+                                            </a>
+                                        </div>
+                                        </div>
+                                        <div class="col-md-12" style="text-align: center; padding-top: 3px">
+                                          <h5 id="txt_piece_jointe">.</h5>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                           </div>
                                     <div class="row" style="margin-top: 10px; padding-bottom: 10px">
                                             <div class="col-lg-12">
                                               <div class="pull-right">
-                                                  <button class="btn btn-primary" type="button" id="btn_next">Suivant</button>
+                                                  <button class="btn btn-primary" type="submit" id="btn_next">Suivant</button>
                                                   <button class="btn btn-danger" type="button" id="btn_annuler">Annuler</button>
                                               </div>
                                             </div>
@@ -738,6 +757,58 @@
          $('#tower_ht').focus();
     })
 
+    function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function demo_piece_jointe() {
+            await sleep(2000);
+            $('#img_piece_jointe').attr('src', images);
+            $('#txt_piece_jointe').text($('#fichier').val());
+        }
+
+         function readURL_Piece_Jointe(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function (e) {
+                    const files = input.files;
+                    // Prendre le premier fichier
+                    const file = files[0];
+                    // Obtenir le nom du fichier
+                    const fileName = file.name;
+                    // Extraire l'extension du fichier
+                    const fileExtension = fileName.split('.').pop();
+                    const ExtensionUpper = fileExtension.toUpperCase();
+                    $('#img_piece_jointe').attr('src', 'images/loading.gif');
+                    if(ExtensionUpper=='PDF'){
+                        images = 'images/pdf.png';
+                    }else if(ExtensionUpper=='DOC' || ExtensionUpper=='DOCX'){
+                        images = 'images/word.png';
+                    }else if(ExtensionUpper=='XLS' || ExtensionUpper=='XLSX'){
+                        images = 'images/excel.png';
+                    }else if(ExtensionUpper=='PPT' || ExtensionUpper=='PPTX'){
+                        images = 'images/powerpoint.png';
+                    }else{
+                        images = e.target.result;
+                    }
+                    demo_piece_jointe()
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+
+    $('#link_piece_jointe').click(function(e){
+        e.preventDefault();
+        $('#fichier').click();
+    });
+
+    $('#fichier').change(function(){
+        readURL_Piece_Jointe(this);
+    })
+
+
     $(document).ready(function(){
         
     })
@@ -759,8 +830,6 @@
                         $('#a1').tab('show');
                     }
                 });
-                // $('.l1').removeClass('disabled').addClass('Active');
-                // $('#a1').tab('show');
         }
     })
     $('#site').autocomplete({source:function(request,response){
@@ -795,6 +864,47 @@
       timer: 5000
     });
 
+
+    $('#RapportForm').submit(function(e){
+            e.preventDefault();
+            let daterapport = $('#date_rapport').val();
+            daterap = daterapport.replace(/\//g, "-");
+            $('#daterap').val(daterap);
+            if($('#province').val()=='' ||  $('#site').val()=='' || $('#pm_ref').val()=='' || $('#date_rapport').val()=='' || $('#time_in').val()=='' || $('#time_out').val()=='' || $('#tower_type').val()=='' || $('#tower_ht').val()==''){
+              alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
+            }else{
+                var formData = new FormData(this);
+                $.ajax({
+                    url:'enreg_rapport_mensuel.php',
+                    type:'post',
+                    beforeSend:function(){
+                        waitingDialog.show('Veuillez patienter svp!');
+                    },
+                    dataType:'text',
+                    data: formData,
+                    processData: false,
+                    cache: false,
+                    contentType: false,
+                    success:function(ret){
+                      const stret = ret;
+                      const valeuret = stret.split(',');
+                         waitingDialog.hide();
+                          if(valeuret[0]==2){
+                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"L'extension du fichier ne correspond pas!");
+                          }else if(valeuret[0]==3){
+                             alertify.alert('<?php echo $app_infos['Design_App']; ?>',"Le téléchargement du fichier a échoué!");
+                           }else if(valeuret[0]==1){
+                                $('#ID_Rapport').val(valeuret[1]);
+                                $('.l1').removeClass('disabled').addClass('Active');
+                                $('#a1').tab('show');
+                         }else{
+                            alertify.alert(ret);
+                         }
+
+                    }
+                });
+            }
+          })
 
     $('#DetailsForm').submit(function(e){
             e.preventDefault();
@@ -847,6 +957,9 @@
         $('#province').val('').focus();
         $('#client').val('');
         $('#site').val('');
+        $('#img_piece_jointe').attr('src', 'images/piece_jointe.png');
+        $('#fichier').val('');
+        $('#txt_piece_jointe').text('.');
         $('#history_card_ref').val('');
         $('#ID_Site').val('');
         $('#pm_ref').val('');
@@ -860,6 +973,9 @@
         $('#a0').tab('show');
         $('#province').val('').focus();
         $('#client').val('');
+        $('#img_piece_jointe').attr('src', 'images/piece_jointe.png');
+        $('#fichier').val('');
+        $('#txt_piece_jointe').text('.');
         $('#site').val('');
         $.ajax({
             url:'annuler_rapport_mensuel.php',

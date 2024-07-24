@@ -6,6 +6,7 @@
     $siteId=$_GET['siteId'];
     $nocTicket=$_GET['nocTicket'];
     $dateRapport=$_GET['dateRapport'];
+    $Fichier='documents/'.$_GET['Fichier'];
     $Rapport = Securite::bdd($_GET['ID']);
     if($token==$_SESSION['user_eteelo_app']['token']){
         $selection=$pdo->query("SELECT * FROM table_titre_rapport WHERE ID_Rapport=".$Rapport);
@@ -20,6 +21,7 @@
         $rs=$pdo->prepare("DELETE FROM table_rapport_journalier WHERE `ID_Rapport`=?");
         $params=array($Rapport);
         $rs->execute($params);
+        @unlink($Fichier);
         $delete=$pdo->query("DELETE FROM table_titre_rapport WHERE `ID_Rapport`=".$Rapport);
         header("location:table_rapport.php?User=".$User."&siteId=".$siteId."&nocTicket=".$nocTicket."&dateRapport=".$dateRapport); 
     }

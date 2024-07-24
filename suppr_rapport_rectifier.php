@@ -6,12 +6,14 @@
     $siteId=$_GET['siteId'];
     $RectifierMake=$_GET['RectifierMake'];
     $dateRapport=$_GET['dateRapport'];
+    $Fichier='documents/'.$_GET['Fichier'];
     $Rapport = Securite::bdd($_GET['ID']);
     if($token==$_SESSION['user_eteelo_app']['token']){
         $rs=$pdo->prepare("DELETE FROM table_rapport_rectifier WHERE `ID_Rapport`=?");
         $params=array($Rapport);
         $delete=$pdo->query("DELETE FROM questionnaire_rectifier WHERE `ID_Rapport`=".$Rapport);
         $rs->execute($params);
+        @unlink($Fichier);
         header("location:table_rapport_rectifier.php?User=".$User."&siteId=".$siteId."&RectifierMake=".$RectifierMake."&dateRapport=".$dateRapport); 
     }
 ?>

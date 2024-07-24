@@ -6,12 +6,14 @@
     $siteId=$_GET['siteId'];
     $SiteType=$_GET['SiteType'];
     $dateRapport=$_GET['dateRapport'];
+    $Fichier='documents/'.$_GET['Fichier'];
     $Rapport = Securite::bdd($_GET['ID']);
     if($token==$_SESSION['user_eteelo_app']['token']){
         $rs=$pdo->prepare("DELETE FROM table_rapport_janitorial WHERE `ID_Rapport`=?");
         $params=array($Rapport);
         $delete=$pdo->query("DELETE FROM questionnaire_janitorial WHERE `ID_Rapport`=".$Rapport);
         $rs->execute($params);
+        @unlink($Fichier);
         header("location:table_janitorial.php?User=".$User."&siteId=".$siteId."&SiteType=".$SiteType."&dateRapport=".$dateRapport); 
     }
 ?>

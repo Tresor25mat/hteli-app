@@ -81,6 +81,10 @@
         transform: translateY(-50%);
         margin: auto;
       }
+      #btn_download:hover {
+            border: 2px solid #F5F7FB;
+            background-color: #F5F7FB;
+      }
   </style>
 </head>
 
@@ -138,10 +142,11 @@
             <td><!-- <center> --><?php echo date('H:i', strtotime($selections['Time_In'])); ?></td>
             <td><!-- <center> --><?php echo date('H:i', strtotime($selections['Time_Out'])); ?></td>
             <td><center>
+                <?php if($selections['Fichier']!=''){ ?><a href="documents/<?php echo($selections['Fichier']) ?>" id="btn_download" title="Télécharger la pièce jointe" style="margin-right: 5px; width: 30px; border-radius: 0; border: 2px solid #DEE0E6" class="btn btn-default" download><i class="fa fa-download fa-fw"></i></a><?php } ?>
                 <a href="monthly_tower_inspection_checklist.php?Rapport=<?php echo($selections['ID_Rapport']) ?>" title="Imprimer" style="margin-right: 5px; width: 30px; border-radius: 0" class="btn btn-success"><i class="fa fa-print fa-fw"></i></a>
                 <a href="modifier_rapport_mensuel_tour.php?ID=<?php echo($selections['ID_Rapport']) ?>&User=<?php if(isset($_GET['User']) && $_GET['User']!=''){echo $_GET['User']; } ?>&siteId=<?php if(isset($_GET['siteId']) && $_GET['siteId']!=''){echo $_GET['siteId']; } ?>&TowerType=<?php if(isset($_GET['TowerType']) && $_GET['TowerType']!=''){echo $_GET['TowerType']; } ?>&dateRapport=<?php if(isset($_GET['dateRapport']) && $_GET['dateRapport']!=''){echo $_GET['dateRapport']; } ?>" title="Modifier" style="margin-right: 5px; width: 25px; border-radius: 0;" class="btn btn-primary"><i class="fa fa-edit fa-fw"></i></a>
                 <?php if($_SESSION['user_eteelo_app']['ID_Statut']==1){ ?>
-                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_rapport_mensuel_tour.php?ID=<?php echo($selections['ID_Rapport']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&User=<?php if(isset($_GET['User']) && $_GET['User']!=''){echo $_GET['User']; } ?>&siteId=<?php if(isset($_GET['siteId']) && $_GET['siteId']!=''){echo $_GET['siteId']; } ?>&TowerType=<?php if(isset($_GET['TowerType']) && $_GET['TowerType']!=''){echo $_GET['TowerType']; } ?>&dateRapport=<?php if(isset($_GET['dateRapport']) && $_GET['dateRapport']!=''){echo $_GET['dateRapport']; } ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
+                <a style="width: 25px; border-radius: 0;" class="btn btn-danger" href="javascript: alertify.confirm('Voulez-vous vraiment supprimer cet enregistrement?\n Toutes les informations concernant cet enregistrement seront supprimées!').set('onok',function(closeEvent){window.location.replace('suppr_rapport_mensuel_tour.php?ID=<?php echo($selections['ID_Rapport']) ?>&token=<?php echo($_SESSION['user_eteelo_app']['token']) ?>&User=<?php if(isset($_GET['User']) && $_GET['User']!=''){echo $_GET['User']; } ?>&siteId=<?php if(isset($_GET['siteId']) && $_GET['siteId']!=''){echo $_GET['siteId']; } ?>&TowerType=<?php if(isset($_GET['TowerType']) && $_GET['TowerType']!=''){echo $_GET['TowerType']; } ?>&dateRapport=<?php if(isset($_GET['dateRapport']) && $_GET['dateRapport']!=''){echo $_GET['dateRapport']; } ?>&Fichier=<?php echo($selections['Fichier']) ?>');alertify.success('suppression éffectuée');}).set('oncancel',function(closeEvent){alertify.error('suppression annulée');}).set({title:''},{labels:{ok:'Oui', cancel:'Annuler'}});" title="Supprimer"><i class="fa fa-trash-o fa-fw"></i></a></center>
                 <?php } ?>
             </td>
         </tr>
