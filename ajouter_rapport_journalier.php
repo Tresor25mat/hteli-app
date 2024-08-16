@@ -441,29 +441,26 @@
     $(document).ready(function(){
         
     })
-    $('#btn_next').click(function(){
-        if($('#province').val()=='' ||  $('#site').val()=='' || $('#noc_ticket').val()=='' || $('#date_rapport').val()=='' || $('#pm_type').val()=='' || $('#run_hour').val()=='' || $('#dc_load').val()=='' || $('#client').val()==''){
-          alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
-        }else{
-                // alertify.alert('Salut');
-                let daterapport = $('#date_rapport').val();
-                daterap = daterapport.replace(/\//g, "-");
-                $('#daterap').val(daterap);
-                $.ajax({
-                    url:'enreg_rapport.php',
-                    type:'post',
-                    dataType:'text', 
-                    data:{Province:$('#province').val(), Site:$('#ID_Site').val(), Noc_ticket:$('#noc_ticket').val(), Daterap:$('#daterap').val(), PM_type:$('#pm_type').val(), Run_hour:$('#run_hour').val(), DC_load:$('#dc_load').val(), token:$('#token').val()},
-                    success:function(ret){
-                        $('.ID_Rapport').val(ret);
-                        $('.l1').removeClass('disabled').addClass('Active');
-                        $('#a1').tab('show');
-                    }
-                });
-                // $('.l1').removeClass('disabled').addClass('Active');
-                // $('#a1').tab('show');
-        }
-    })
+    // $('#btn_next').click(function(){
+    //     if($('#province').val()=='' ||  $('#site').val()=='' || $('#noc_ticket').val()=='' || $('#date_rapport').val()=='' || $('#pm_type').val()=='' || $('#run_hour').val()=='' || $('#dc_load').val()=='' || $('#client').val()==''){
+    //       alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
+    //     }else{
+    //             let daterapport = $('#date_rapport').val();
+    //             daterap = daterapport.replace(/\//g, "-");
+    //             $('#daterap').val(daterap);
+    //             $.ajax({
+    //                 url:'enreg_rapport.php',
+    //                 type:'post',
+    //                 dataType:'text', 
+    //                 data:{Province:$('#province').val(), Site:$('#ID_Site').val(), Noc_ticket:$('#noc_ticket').val(), Daterap:$('#daterap').val(), PM_type:$('#pm_type').val(), Run_hour:$('#run_hour').val(), DC_load:$('#dc_load').val(), token:$('#token').val()},
+    //                 success:function(ret){
+    //                     $('.ID_Rapport').val(ret);
+    //                     $('.l1').removeClass('disabled').addClass('Active');
+    //                     $('#a1').tab('show');
+    //                 }
+    //             });
+    //     }
+    // })
     $('#site').autocomplete({source:function(request,response){
         var resultat=$.ui.autocomplete.filter(listSites,request.term);
         response(resultat.slice(0,15));

@@ -812,26 +812,26 @@
     $(document).ready(function(){
         
     })
-    $('#btn_next').click(function(){
-        if($('#province').val()=='' ||  $('#site').val()=='' || $('#pm_ref').val()=='' || $('#date_rapport').val()=='' || $('#time_in').val()=='' || $('#time_out').val()=='' || $('#tower_type').val()=='' || $('#tower_ht').val()==''){
-          alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
-        }else{
-                let daterapport = $('#date_rapport').val();
-                daterap = daterapport.replace(/\//g, "-");
-                $('#daterap').val(daterap);
-                $.ajax({
-                    url:'enreg_rapport_mensuel.php',
-                    type:'post',
-                    dataType:'text', 
-                    data:{Province:$('#province').val(), Site:$('#ID_Site').val(), PM_Ref:$('#pm_ref').val(), Daterap:$('#daterap').val(), Time_in:$('#time_in').val(), Time_out:$('#time_out').val(), Tower_type:$('#tower_type').val(), Tower_ht:$('#tower_ht').val(), History_card_ref:$('#history_card_ref').val(), token:$('#token').val()},
-                    success:function(ret){
-                        $('#ID_Rapport').val(ret);
-                        $('.l1').removeClass('disabled').addClass('Active');
-                        $('#a1').tab('show');
-                    }
-                });
-        }
-    })
+    // $('#btn_next').click(function(){
+    //     if($('#province').val()=='' ||  $('#site').val()=='' || $('#pm_ref').val()=='' || $('#date_rapport').val()=='' || $('#time_in').val()=='' || $('#time_out').val()=='' || $('#tower_type').val()=='' || $('#tower_ht').val()==''){
+    //       alertify.alert('<?php echo $app_infos['Design_App']; ?>','Veuillez remplir tous les champs obligatoires svp!', function(){$('#libelle').focus();});
+    //     }else{
+    //             let daterapport = $('#date_rapport').val();
+    //             daterap = daterapport.replace(/\//g, "-");
+    //             $('#daterap').val(daterap);
+    //             $.ajax({
+    //                 url:'enreg_rapport_mensuel.php',
+    //                 type:'post',
+    //                 dataType:'text', 
+    //                 data:{Province:$('#province').val(), Site:$('#ID_Site').val(), PM_Ref:$('#pm_ref').val(), Daterap:$('#daterap').val(), Time_in:$('#time_in').val(), Time_out:$('#time_out').val(), Tower_type:$('#tower_type').val(), Tower_ht:$('#tower_ht').val(), History_card_ref:$('#history_card_ref').val(), token:$('#token').val()},
+    //                 success:function(ret){
+    //                     $('#ID_Rapport').val(ret);
+    //                     $('.l1').removeClass('disabled').addClass('Active');
+    //                     $('#a1').tab('show');
+    //                 }
+    //             });
+    //     }
+    // })
     $('#site').autocomplete({source:function(request,response){
         var resultat=$.ui.autocomplete.filter(listSites,request.term);
         response(resultat.slice(0,15));

@@ -98,6 +98,18 @@ $app_infos = $app_info->fetch();
                         </div>
                       </div>
                     </div>
+                    <div class="col-md-3">
+                      <div class="form-group ">
+                        <label for="username" class="control-label col-lg-12" style="text-align: left;">Nom </label>
+                        <div class="col-lg-12">
+                          <div class="row">
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" name="username" id="username" value="<?php if(isset($_GET['UserName']) && $_GET['UserName']!=''){echo $_GET['UserName'];} ?>">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="col-md-3" style='margin-top: 20px; margin-bottom: 20px;'>
                       <button class="btn btn-default" type="button" id="btn_afficher" style="height: 32px; border-radius: 0; margin-top: 2px"><i class="fa fa-search"></i></button>
                     </div>
@@ -138,10 +150,10 @@ $app_infos = $app_info->fetch();
 
     <script>
     $(document).ready(function() {
-        $('#iframe').attr('src', "table_utilisateur.php?Pays="+$('#pays').val());
+        $('#iframe').attr('src', "table_utilisateur.php?Pays="+$('#pays').val()+'&UserName='+$('#username').val());
     });
     $('#btn_afficher').click(function(){
-        $('#iframe').attr('src', "table_utilisateur.php?Pays="+$('#pays').val());
+        $('#iframe').attr('src', "table_utilisateur.php?Pays="+$('#pays').val()+'&UserName='+$('#username').val());
     })
 
 
@@ -155,7 +167,7 @@ $app_infos = $app_info->fetch();
 
     $('#btn_ajouter').click(function(e){
       e.preventDefault();
-      window.location.replace('ajouter_utilisateur.php?Pays='+$('#pays').val());
+      window.location.replace('ajouter_utilisateur.php?Pays='+$('#pays').val()+'&UserName='+$('#username').val());
     })
 
   });

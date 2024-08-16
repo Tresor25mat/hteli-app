@@ -205,6 +205,9 @@
 						<a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_mensuel_tour.php">
                           	Monthly Tower Inspection
                         </a>
+						<a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_quality.php">
+							Quality Reporting Standards
+                        </a>
 						<a class="dropdown-item gonow" href="#" ver="afficher_table_rapport_rectifier.php">
 							Rectifier & Storage Battery Maintenance
                         </a>
@@ -272,6 +275,9 @@
 						<?php } ?>
                         <a class="dropdown-item gonow" href="#" ver="table_make_batterie.php">
 							Make of Batteries
+                        </a>
+						<a class="dropdown-item gonow" href="#" ver="table_project.php">
+							Projects
                         </a>
 						<a class="dropdown-item gonow" href="#" ver="afficher_table_province.php">
 							Provinces

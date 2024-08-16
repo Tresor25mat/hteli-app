@@ -85,8 +85,11 @@
     <div class="page">
       <div class="page-wrapper">
         <div class="container-xl">
-        <input type="hidden" name="Pays" id="Pays" value="<?php if (isset($_GET['Pays']) && $_GET['Pays'] != '') {
+        <input type="hidden" name="Country" id="Country" value="<?php if (isset($_GET['Pays']) && $_GET['Pays'] != '') {
                 echo $_GET['Pays'];
+            } ?>">
+        <input type="hidden" name="UserName" id="UserName" value="<?php if (isset($_GET['UserName']) && $_GET['UserName'] != '') {
+                echo $_GET['UserName'];
             } ?>">
           <!-- Page title -->
           <div class="page-header d-print-none">
@@ -766,7 +769,7 @@
                                 icon: 'success',
                                 title: 'Enregistré'
                              })
-                             window.location.replace('afficher_table_utilisateur.php?Pays='+$('#Pays').val());
+                             window.location.replace('afficher_table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
                          }else{
                             alertify.alert(ret);
                          }
@@ -798,11 +801,11 @@
                 }
           })             
     $('#btn_annuler').click(function(){
-        window.location.replace('afficher_table_utilisateur.php?Pays='+$('#Pays').val());
+        window.location.replace('afficher_table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
     })
     $('#retour_table').click(function(e){
         e.preventDefault();
-        window.location.replace('afficher_table_utilisateur.php?Pays='+$('#Pays').val());
+        window.location.replace('afficher_table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
     })
     $('#btn_annuler_tout').click(function(){
         $('#prenom').val('');

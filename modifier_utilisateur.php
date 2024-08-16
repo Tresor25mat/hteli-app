@@ -105,6 +105,12 @@
               <!-- Page title actions -->
               <div class="col-12 col-md-auto ms-auto d-print-none">
                 <div class="btn-list">
+                <input type="hidden" name="Country" id="Country" value="<?php if (isset($_GET['Pays']) && $_GET['Pays'] != '') {
+                echo $_GET['Pays'];
+                    } ?>">
+                <input type="hidden" name="UserName" id="UserName" value="<?php if (isset($_GET['UserName']) && $_GET['UserName'] != '') {
+                        echo $_GET['UserName'];
+                    } ?>">
 <!--                   <span class="d-none d-sm-inline">
                     <a href="#" class="btn btn-white">
                       New view
@@ -800,7 +806,7 @@
                                 icon: 'success',
                                 title: 'Enregistré'
                              })
-                             window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
+                             window.location.replace('table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
                          }else{
                             alertify.alert(ret);
                          }
@@ -832,14 +838,14 @@
                 }
           })             
     $('#btn_annuler').click(function(){
-        window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
+        window.location.replace('table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
     })
     $('#retour_table').click(function(e){
         e.preventDefault();
-        window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
+        window.location.replace('table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
     })
     $('#btn_annuler_tout').click(function(){
-      window.location.replace('table_utilisateur.php?Pays='+$('#ID_Pay').val());
+      window.location.replace('table_utilisateur.php?Pays='+$('#Country').val()+'&UserName='+$('#UserName').val());
     })
     </script>
 </body>
