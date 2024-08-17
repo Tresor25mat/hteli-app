@@ -245,6 +245,9 @@
 						<a class="dropdown-item gonow" href="#" ver="rapport_mensuel_tour.php">
                           Monthly Tower Inspection
                         </a>
+						<a class="dropdown-item gonow" href="#" ver="rapport_quality.php">
+							Quality Reporting Standards
+                        </a>
 						<a class="dropdown-item gonow" href="#" ver="rapport_rectifier.php">
 							Rectifier & Storage Battery Maintenance
                         </a>

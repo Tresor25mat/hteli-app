@@ -320,7 +320,7 @@ $prov = "";
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="row" style="margin-top: 10px; padding-bottom: 10px">
+                                                <div class="row" style="margin-top: 10px; padding-bottom: 10px;">
                                                     <div class="col-lg-12">
                                                         <div class="pull-right">
                                                             <button class="btn btn-primary" type="submit"
@@ -334,9 +334,8 @@ $prov = "";
                                         </div>
                                         <div class="tab-pane" id="tabs-home-13">
                                             <div class="row" id="contenu">
-
                                             </div>
-                                            <div class="row" style="margin-top: 10px; padding-bottom: 10px">
+                                            <div class="row" style="margin-top: 10px; padding-bottom: 10px; border-top: 1px solid #EEEEEE; padding-top: 10px">
                                                 <div class="col-lg-12">
                                                     <div class="pull-right">
                                                         <button class="btn btn-primary" type="button"

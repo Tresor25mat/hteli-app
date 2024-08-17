@@ -5,7 +5,7 @@ if (empty($_SESSION['logged_eteelo_app']) || $_SESSION['logged_eteelo_app'] == f
     header("location: connexion");
 }
 require_once ('connexion.php');
-$query = "SELECT * FROM table_rapport_quality INNER JOIN site ON table_rapport_quality.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov WHERE table_rapport_quality.ID_Rapport!=0";
+$query = "SELECT * FROM table_rapport_quality INNER JOIN site ON table_rapport_quality.ID_Site=site.ID_Site INNER JOIN province ON site.ID_Prov=province.ID_Prov INNER JOIN agent ON table_rapport_quality.ID_Agent=agent.ID_Agent WHERE table_rapport_quality.ID_Rapport!=0";
 if (isset($_GET['User']) && $_GET['User'] != '') {
     $query .= " AND table_rapport_quality.ID_Utilisateur=" . $_GET['User'];
 }
@@ -147,8 +147,6 @@ $Nbr = 0;
                             </thead>
                             <tbody id="MaTable">
                                 <?php while ($selections = $selection->fetch()) {
-                                    $fme = $pdo->query("SELECT * FROM agent WHERE ID_Agent=" . $selections['ID_Agent']);
-                                    $fmes = $fme->fetch();
                                     $projet = $pdo->query("SELECT * FROM table_project WHERE ID_Project=" . $selections['ID_Project']);
                                     $projets = $projet->fetch();
                                     $Nbr++;
@@ -165,7 +163,7 @@ $Nbr = 0;
                                         </td>
                                         <td><!-- <center> --><?php echo date('d/m/Y', strtotime($selections['Date_Rapport'])); ?>
                                         </td>
-                                        <td><!-- <center> --><?php echo strtoupper(stripslashes($fmes['Nom_Agent'])); ?>
+                                        <td><!-- <center> --><?php echo strtoupper(stripslashes($selections['Nom_Agent'])); ?>
                                         </td>
                                         <td>
                                             <center>

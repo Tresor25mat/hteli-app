@@ -108,6 +108,7 @@ $styleA1=array(
 //     );
  if(isset($_GET['dateRapport']) && !empty($_GET['dateRapport'])){
       $sheet->setCellValue('A5', "EN DATE DU ".date('d/m/Y', strtotime($_GET['dateRapport'])));
+      $sheet->mergeCells('A5:H5');
       $sheet->getStyle('A5')->applyFromArray($styleA5);
 }
 $sheet->getStyle('A3')->applyFromArray($styleA1);

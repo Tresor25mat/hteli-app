@@ -32,8 +32,11 @@ if ($Fichier != '') {
                     $selects=$select->fetch();
                     $ID_Agent=$selects['ID_Agent'];
                 }
-                $rs = $pdo->prepare("INSERT INTO table_rapport_quality (ID_Site, ID_Project, ID_Agent, Date_Rapport, Fichier, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
-                $params = array($Site, $Project, $ID_Agent, $Daterap, $Fichier, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
+                $count = $pdo->query("SELECT COUNT(*) AS Nbr FROM table_rapport_quality");
+                $counts = $count->fetch();
+                $Numero = sprintf('%04d', ($counts['Nbr'] + 1)).'/'.date('m');
+                $rs = $pdo->prepare("INSERT INTO table_rapport_quality (ID_Site, ID_Project, ID_Agent, Date_Rapport, Numero, Fichier, ID_Utilisateur) VALUES (?,?,?,?,?,?,?)");
+                $params = array($Site, $Project, $ID_Agent, $Daterap, $Numero, $Fichier, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
                 $rs->execute($params);
                 $select = $pdo->query("SELECT MAX(ID_Rapport) AS ID_Rapport FROM table_rapport_quality");
                 $selects = $select->fetch();
@@ -51,8 +54,11 @@ if ($Fichier != '') {
             $selects=$select->fetch();
             $ID_Agent=$selects['ID_Agent'];
         }
-        $rs = $pdo->prepare("INSERT INTO table_rapport_quality (ID_Site, ID_Project, ID_Agent, Date_Rapport, ID_Utilisateur) VALUES (?,?,?,?,?)");
-        $params = array($Site, $Project, $ID_Agent, $Daterap, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
+        $count = $pdo->query("SELECT COUNT(*) AS Nbr FROM table_rapport_quality");
+        $counts = $count->fetch();
+        $Numero = sprintf('%04d', ($counts['Nbr'] + 1)).'/'.date('m');
+        $rs = $pdo->prepare("INSERT INTO table_rapport_quality (ID_Site, ID_Project, ID_Agent, Date_Rapport, Numero, ID_Utilisateur) VALUES (?,?,?,?,?,?)");
+        $params = array($Site, $Project, $ID_Agent, $Daterap, $Numero, $_SESSION['user_eteelo_app']['ID_Utilisateur']);
         $rs->execute($params);
         $select = $pdo->query("SELECT MAX(ID_Rapport) AS ID_Rapport FROM table_rapport_quality");
         $selects = $select->fetch();
